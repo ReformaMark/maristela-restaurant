@@ -12,6 +12,8 @@ const config: Config = {
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
+			text: '#8a8a8a',
+			yellow: '#feb524',
   			card: {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'
@@ -21,7 +23,7 @@ const config: Config = {
   				foreground: 'hsl(var(--popover-foreground))'
   			},
   			primary: {
-  				DEFAULT: 'hsl(var(--primary))',
+  				DEFAULT: '#93cb2a',
   				foreground: 'hsl(var(--primary-foreground))'
   			},
   			secondary: {
@@ -55,9 +57,49 @@ const config: Config = {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
-  		}
+  		},
+		animation: {
+		'slide-down': 'slideDown 0.5s ease-in-out forwards',
+		'slide-up': 'slideUp 0.5s ease-in-out forwards',
+		},
+		keyframes: {
+			slideDown: {
+				'0%': { 
+					transform: 'translateY(-20%)',
+					
+					opacity: '0.1'
+				 },
+				 '50%': {
+					transform: 'translateY(-10%)',
+	
+					opacity: '0.5'
+				 },
+				'100%': { 
+					transform: 'translateY(0)',
+					opacity: '1'
+				 },
+			},
+			slideUp: {
+				'100%': { 
+					transform: 'translateY(-20%)',
+					
+					opacity: '0'
+				 },
+				 '50%': {
+					transform: 'translateY(-10%)',
+	
+					opacity: '0.5'
+				 },
+				'0%': { 
+					transform: 'translateY(0)',
+					opacity: '1'
+				 },
+			},
+		}
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+
+  ],
 };
 export default config;
