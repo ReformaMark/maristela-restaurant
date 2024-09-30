@@ -8,6 +8,8 @@ const CustomPassword = Password<DataModel>({
       email: params.email as string,
       name: params.name as string,
       role: params.role as "user" | "admin",
+      lastName: params.lname as string,
+      address: params.address as string,
     }
   }
 })

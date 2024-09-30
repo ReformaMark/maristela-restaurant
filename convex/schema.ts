@@ -12,7 +12,9 @@ const schema = defineSchema({
         phoneVerificationTime: v.optional(v.number()),
         isAnonymous: v.optional(v.boolean()),
         name: v.string(),
+        lastName: v.optional(v.string()),
         role: v.union(v.literal("user"), v.literal("admin")),
+        address: v.optional(v.string()),
     })
 })
 

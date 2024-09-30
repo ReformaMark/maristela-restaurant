@@ -8,4 +8,7 @@ export const authSteps = [
     {
         text: "First name and Last name is required when signing up"
     },
+    {
+        text: "Kindly verify your address before signing up"
+    },
 ]

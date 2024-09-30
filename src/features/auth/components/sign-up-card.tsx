@@ -3,6 +3,7 @@ import {
     Card,
     CardContent,
     CardDescription,
+    CardFooter,
     CardHeader,
     CardTitle
 } from "@/components/ui/card"
@@ -10,9 +11,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import { Separator } from "@/components/ui/separator"
-import { TriangleAlertIcon } from "lucide-react"
+import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, TriangleAlertIcon } from "lucide-react"
 import { useAuthActions } from "@convex-dev/auth/react"
 import { useRouter } from "next/navigation"
+import { cn } from "@/lib/utils"
 
 interface SignUpCardProps {
     setState: (state: AuthFlow) => void
@@ -24,13 +26,16 @@ export const SignUpCard = ({
 
     const { signIn } = useAuthActions();
 
-    const [name, setName] = useState("");
+    const [name, setFName] = useState("");
+    const [lname, setLName] = useState("");
+    const [address, setAddress] = useState("");
     const [role, _setRole] = useState("user");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [pending, setPending] = useState<boolean>(false);
     const [error, setError] = useState("");
+    const [step, setStep] = useState(1);
 
     const router = useRouter()
 
@@ -46,17 +51,109 @@ export const SignUpCard = ({
 
         signIn("password", {
             email,
+            lname,
             name,
+            address,
             role,
             password,
-            flow: "signUp"
+            flow: "signUp",
         })
+            // .then(() => {
+
+            // })
             .catch(() => {
                 setError("Something went wrong!")
             })
             .finally(() => {
                 setPending(false)
             })
+    }
+
+    const handleFirstStep = () => {
+        if (step === 1 && name && lname && email) setStep((prevStep) => prevStep + 1)
+    }
+
+    const handleSecondStep = () => {
+        if (step === 2 && password && confirmPassword && password === confirmPassword) {
+            setStep((prevStep) => prevStep + 1)
+            setError("")
+        } else {
+            setError("Passwords do not match")
+        }
+    }
+
+    const handlePrevious = () => {
+        if (step > 1) setStep((prevStep) => prevStep - 1)
+    }
+
+    const renderStep = () => {
+        switch (step) {
+            case 1:
+                return (
+                    <>
+                        <Input
+                            disabled={pending}
+                            value={name}
+                            onChange={(e) => setFName(e.target.value)}
+                            placeholder="First name"
+                            required
+                        />
+
+                        <Input
+                            disabled={pending}
+                            value={lname}
+                            onChange={(e) => setLName(e.target.value)}
+                            placeholder="Last name"
+                            required
+                        />
+
+                        <Input
+                            disabled={pending}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Email"
+                            type="email"
+                            required
+                        />
+                    </>
+                )
+            case 2:
+                return (
+                    <>
+                        <Input
+                            disabled={pending}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Password"
+                            type="password"
+                            required
+                        />
+                        <Input
+                            disabled={pending}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Confirm Password"
+                            type="password"
+                            required
+                        />
+                    </>
+                )
+            case 3:
+                return (
+                    <>
+                        <Input
+                            disabled={pending}
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            placeholder="Address"
+                            type="text"
+                            required
+                        />
+                    </>
+                )
+            default:
+                return null
+        }
     }
 
     return (
@@ -79,49 +176,42 @@ export const SignUpCard = ({
 
             <CardContent className="space-y-5 px-0 pb-0">
                 <form
+                    id="sign-up-form"
                     onSubmit={onSignUp}
                     className="space-y-2.5"
                 >
-                    <Input
-                        disabled={pending}
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Full name"
-                        required
-                    />
-                    <Input
-                        disabled={pending}
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Email"
-                        type="email"
-                        required
-                    />
-                    <Input
-                        disabled={pending}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Password"
-                        type="password"
-                        required
-                    />
-                    <Input
-                        disabled={pending}
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm Password"
-                        type="password"
-                        required
-                    />
-                    <Button
-                        type="submit"
-                        className="w-full"
-                        size="lg"
-                        disabled={pending}
-                    >
-                        Continue
-                    </Button>
+                    <div className="mb-6 flex justify-between">
+                        {[1, 2, 3].map((stepNumber) => (
+                            <div
+                                key={stepNumber}
+                                className={`flex h-8 w-8 items-center justify-center rounded-full ${step >= stepNumber ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'
+                                    }`}
+                            >
+                                {step > stepNumber ? <CheckIcon className="h-5 w-5" /> : stepNumber}
+                            </div>
+                        ))}
+                    </div>
+                    {renderStep()}
                 </form>
+                <CardFooter className="flex justify-between">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handlePrevious}
+                        disabled={step === 1}
+                    >
+                        <ArrowLeftIcon className="mr-2 h-4 w-4" /> Previous
+                    </Button>
+                    {step < 3 ? (
+                        <Button type="button" onClick={step === 1 ? handleFirstStep : handleSecondStep}>
+                            Next <ArrowRightIcon className="ml-2 h-4 w-4" />
+                        </Button>
+                    ) : (
+                        <Button type="submit" form="sign-up-form">
+                            Submit <CheckIcon className="ml-2 h-4 w-4" />
+                        </Button>
+                    )}
+                </CardFooter>
                 <Separator />
                 <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
@@ -141,6 +231,6 @@ export const SignUpCard = ({
                     </p>
                 </div>
             </CardContent>
-        </Card>
+        </Card >
     )
 }

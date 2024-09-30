@@ -19,8 +19,6 @@ import { OrderStatusDistributionCard } from "./_components/order-status-distribu
 import { LocationProductPreferencesCard } from "./_components/location-product-preferences-card"
 import { LocationSalesPerformanceCard } from "./_components/location-sales-performance-card"
 
-
-
 const DashboardPage = () => {
     return (
         <div className="flex h-screen bg-yellow-50">
@@ -34,7 +32,7 @@ const DashboardPage = () => {
                     <MobileSheet />
 
                     <div className="flex items-center space-x-2">
-                        <Button variant="ghost" size="icon" className="text-white hover:text-black">
+                        <Button variant="ghost" size="icon" className="hover:bg-gray-200">
                             <BellIcon className="h-5 w-5" />
                         </Button>
 

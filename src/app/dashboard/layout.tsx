@@ -1,4 +1,8 @@
+import { ConvexClientProvider } from "@/components/convex-client-provider";
+import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import localFont from "next/font/local";
+
+import "@/lib/globals.css";
 
 const geistSans = localFont({
     src: "../fonts/GeistVF.woff",
@@ -13,9 +17,17 @@ const geistMono = localFont({
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     return (
-        <div className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-            {children}
-        </div>
+        <ConvexAuthNextjsServerProvider>
+            <html lang="en">
+                <body
+                    className={''}
+                >
+                    <ConvexClientProvider>
+                        {children}
+                    </ConvexClientProvider>
+                </body>
+            </html>
+        </ConvexAuthNextjsServerProvider>
     )
 }
 

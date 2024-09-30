@@ -2,6 +2,7 @@
 import MenuPopover from '@/app/(landing-page)/_components/MenuPopover';
 import { UserAvatar } from '@/app/dashboard/_components/user-avatar';
 import { useCurrentUser } from '@/features/auth/api/use-current-user';
+import { Loader2Icon } from 'lucide-react';
 import Link from 'next/link'
 import { usePathname } from 'next/navigation';
 import { FaSearch, FaShoppingBag, FaUser } from 'react-icons/fa'
@@ -33,13 +34,14 @@ function Header() {
         {/* <Link href={''} className='text-primary'><FaUser /></Link> */}
         {isLoggedIn ? (
           <UserAvatar />
-        ) : (
-          <Link href={'/auth'} className='text-primary'>
-            <FaUser />
-          </Link>
-        )}
+        )
+          : isLoading ? (<Loader2Icon className='w-6 h-6 animate-spin' />)
+            : (
+              <Link href={'/auth'} className='text-primary'>
+                <FaUser />
+              </Link>
+            )}
       </div>
-
     </nav>
   )
 }

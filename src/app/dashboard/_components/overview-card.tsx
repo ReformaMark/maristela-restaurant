@@ -23,7 +23,7 @@ export const OverviewCard = ({
 }: OverviewCardProps) => {
     return (
         <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-3 bg-red-400 rounded-t-md text-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-3 bg-primary rounded-t-md text-white">
                 <CardTitle className="text-sm font-medium">
                     {title}
                 </CardTitle>

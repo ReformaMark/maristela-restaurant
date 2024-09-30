@@ -33,7 +33,7 @@ export const UserAvatar = () => {
             <DropdownMenuTrigger className="outline-none relative">
                 <Avatar className="size-8 hover:opacity-75 transition rounded-md">
                     <AvatarImage alt={name} src={image} className="rounded-md" />
-                    <AvatarFallback className="bg-yellow-500 text-white rounded-md">
+                    <AvatarFallback className="bg-yellow text-white rounded-md text-sm">
                         {avatarFallback}
                     </AvatarFallback>
                 </Avatar>
