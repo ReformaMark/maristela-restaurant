@@ -7,6 +7,7 @@ import {
     CardHeader,
     CardTitle
 } from "@/components/ui/card"
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ChartConfig, ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"

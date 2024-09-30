@@ -24,7 +24,8 @@ export const UserAvatar = () => {
         return null
     }
 
-    const { name, email, role, image } = data
+    // const { name, email, role, image } = data
+    const { name, image } = data
 
     const avatarFallback = name.charAt(0).toUpperCase()
 

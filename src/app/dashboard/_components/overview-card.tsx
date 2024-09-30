@@ -19,7 +19,7 @@ export const OverviewCard = ({
     description,
     title,
     icon: Icon,
-    className
+    // className
 }: OverviewCardProps) => {
     return (
         <Card>

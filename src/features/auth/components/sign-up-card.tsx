@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator"
 import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, TriangleAlertIcon } from "lucide-react"
 import { useAuthActions } from "@convex-dev/auth/react"
 import { useRouter } from "next/navigation"
-import { cn } from "@/lib/utils"
+
 
 interface SignUpCardProps {
     setState: (state: AuthFlow) => void
@@ -29,7 +29,7 @@ export const SignUpCard = ({
     const [name, setFName] = useState("");
     const [lname, setLName] = useState("");
     const [address, setAddress] = useState("");
-    const [role, _setRole] = useState("user");
+    const [role] = useState("user");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
