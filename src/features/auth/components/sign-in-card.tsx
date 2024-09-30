@@ -12,6 +12,7 @@ import { useState } from "react"
 import { Separator } from "@/components/ui/separator"
 import { TriangleAlertIcon } from "lucide-react"
 import { useAuthActions } from "@convex-dev/auth/react";
+import { useRouter } from "next/navigation"
 interface SignInCardProps {
     setState: (state: AuthFlow) => void
 }
@@ -26,6 +27,8 @@ export const SignInCard = ({
     const [password, setPassword] = useState("");
     const [pending, setPending] = useState<boolean>(false);
     const [error, setError] = useState("");
+
+    const router = useRouter()
 
     const onSignIn = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -48,7 +51,7 @@ export const SignInCard = ({
     return (
         <Card className="w-full h-full p-8">
             <CardHeader className="px-0 pt-0">
-                <CardTitle>
+                <CardTitle className="text-primary">
                     Login to continue
                 </CardTitle>
                 <CardDescription>
@@ -89,13 +92,23 @@ export const SignInCard = ({
                     </Button>
                 </form>
                 <Separator />
-                <p className="text-sm text-muted-foreground">
-                    Don&apos;t have an account? <span
-                        className="text-sky-700 hover:underline cursor-pointer"
-                        onClick={() => setState("signUp")}>
-                        Sign up
-                    </span>
-                </p>
+                <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">
+                        Don&apos;t have an account? <span
+                            className="text-primary hover:underline cursor-pointer"
+                            onClick={() => setState("signUp")}>
+                            Sign up
+                        </span>
+                    </p>
+
+                    <p className="block lg:hidden text-sm text-muted-foreground">
+                        Changed your mind? <span
+                            className="text-primary hover:underline cursor-pointer"
+                            onClick={() => router.push("/")}>
+                            Go back to homepage.
+                        </span>
+                    </p>
+                </div>
             </CardContent>
         </Card>
     )
