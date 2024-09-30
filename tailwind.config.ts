@@ -9,6 +9,12 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+		fontFamily:{
+			"parisienne": ["Parisienne", 'cursive']
+		},
+		backgroundImage: {
+			'hero-img': "url('/public/img/hero-img.jpg')",
+		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
@@ -23,7 +29,7 @@ const config: Config = {
   				foreground: 'hsl(var(--popover-foreground))'
   			},
   			primary: {
-  				DEFAULT: '#93cb2a',
+  				DEFAULT: '#c01b17',
   				foreground: 'hsl(var(--primary-foreground))'
   			},
   			secondary: {
