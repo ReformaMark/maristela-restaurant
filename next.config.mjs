@@ -7,6 +7,11 @@ const nextConfig = {
               hostname: 'precise-peccary-273.convex.cloud',
             
             },
+            {
+              protocol: 'https',
+              hostname: 'lovable-seal-462.convex.cloud',
+            
+            },
           ],
     }
 };
