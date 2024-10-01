@@ -30,7 +30,7 @@ function Hero() {
         className="w-1/2">
           <h4 className='text-yellow font-bold mb-2 text-xl '>Legacy that will satisfy!</h4>
           <h1 className='text-6xl text-primary font-bold'>Home for the best crispy pata in town</h1>
-          <Link href={'/'} className=''>
+          <Link href={'/menu'} className=''>
             <Button variant={'destructive'} className='mt-10 rouded-2xl py-2 px-5 bg-yellow text-xl tracking-wider font-semibold uppercase'>Order now!</Button>
           </Link>
         </motion.div>
