@@ -6,16 +6,30 @@ import { Loader2Icon } from 'lucide-react';
 import Link from 'next/link'
 import { usePathname } from 'next/navigation';
 import { FaSearch, FaShoppingBag, FaUser } from 'react-icons/fa'
-
+import { motion } from "framer-motion"
+import { useEffect, useState } from 'react';
+import { useScroll } from '@/lib/hooks/useScrollToSection';
 
 function Header() {
   const pathname = usePathname();
   const { data, isLoading } = useCurrentUser()
-
+  const [showNav, setShowNav] = useState(true);
+  const {scrollY ,prevScrollY } = useScroll()
   const isLoggedIn = data?._id ? true : false
+  useEffect(() => {
+    if (scrollY > prevScrollY && Number(scrollY) > 100) {
+        setShowNav(false);
+    } else {
+        setShowNav(true);
+    }
+}, [scrollY]);
 
   return (
-    <nav className='flex absolute z-50 inset-0 justify-between items-center text-text px-24  h-24 w-full bg-white shadow-lg '>
+    <motion.nav 
+      initial={{ y: 0 }}
+      animate={{ y: showNav ? 0 : -100 }}
+      transition={{ duration: 0.3 }}
+      className='flex fixed z-50 inset-0 justify-between items-center text-text px-24  h-24 w-full bg-white shadow-lg '>
       <h1 className='text-primary font-parisienne font-bold text-sm sm:text-lg md:text-xl lg:text-2xl'>Maristela&apos;s Restaurant</h1>
       <div className='flex items-center justify-between gap-x-6 '>
         <Link href={'/'} className={`${pathname === "/" ? "text-primary" : "text-text"} hover:text-primary text-xs font-thin md:text-lg lg:text-lg transition-colors duration-300 ease-linear'}{'${pathname === "/home" ? "text-primary" : "text-text"} hover:text-primary text-xs font-thin md:text-lg lg:text-lg transition-colors duration-300 ease-linear`}>Home</Link>
@@ -42,7 +56,7 @@ function Header() {
               </Link>
             )}
       </div>
-    </nav>
+    </motion.nav>
   )
 }
 
