@@ -20,7 +20,6 @@ const schema = defineSchema({
         orders: v.optional(v.array(v.id("orders"))),
         transactions: v.optional(v.array(v.id("transactions"))),
     }),
-
     menus: defineTable({
         imageId: v.optional(v.id('_storage')),
         category: v.union(
@@ -41,7 +40,7 @@ const schema = defineSchema({
         recommended: v.optional(v.boolean()),
         prepTime: v.optional(v.string()),
     }),
-    famimlyMeals: defineTable({
+    familyMeals: defineTable({
         menus: v.array(v.id('menus')),
         price: v.number(),
         goodFor: v.string(),
