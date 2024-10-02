@@ -8,7 +8,6 @@ import { toast, Toaster } from 'sonner'
 import QtyBtn from './QtyBtn'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { Item } from '@radix-ui/react-dropdown-menu'
 
 function CartItems() {
     const cartartItems = useQuery(api.cartItems.getCartItems)
