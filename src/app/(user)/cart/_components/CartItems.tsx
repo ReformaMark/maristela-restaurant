@@ -8,11 +8,13 @@ import { toast, Toaster } from 'sonner'
 import QtyBtn from './QtyBtn'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
+import { Item } from '@radix-ui/react-dropdown-menu'
 
 function CartItems() {
     const cartartItems = useQuery(api.cartItems.getCartItems)
     const router = useRouter()
 
+ 
     //calculate the total price of an item
     function calcTotal(quantity?:number,price?:number){
         return quantity && price ? quantity * price : 0
@@ -20,7 +22,7 @@ function CartItems() {
 
     //calculate the total price of all the items in the cart
     const subTotal = cartartItems && cartartItems.reduce((accumulator, item) => {
-        return accumulator + (item?.price || 0) ;
+        return accumulator + (item?.menu?.price || 0) ;
     }, 0);
   return (
     <div className='px-48 text-text'>
@@ -37,16 +39,16 @@ function CartItems() {
         {cartartItems ? cartartItems.map((item)=>(
             <div key={item?._id} className="grid shadow-sm grid-cols-12 items-center w-full h-fit pl-5 border-b-2 border-b-gray-200  py-2">
                 <div className="flex items-center gap-x-2 col-span-5">
-                    <Image src={item?.url ? item.url : ""} width={100} height={100} alt={item?.name || ''} className='s size-20 p-2 shadow-md'/>
+                    <Image src={item?.url ? item.url : ""} width={100} height={100} alt={item?.menu?.name || ''} className='s size-20 p-2 shadow-md'/>
                     <div className="">
-                        <h1>{item?.name}</h1>
+                        <h1>{item?.menu?.name}</h1>
                     </div>
                 </div>
                
-                <h1  className='c col-span-2 pl-5'>₱ {item?.price?.toFixed(2)}</h1>
-                <QtyBtn quantity={item?.quantity}/>
-                <h1  className='c col-span-2 pl-5'>₱ {calcTotal(item?.quantity,item?.price).toFixed(2)}</h1>
-                <IoClose  className='c col-span-1 hover:text-primary transition-colors duration-300 ease-in-out cursor-pointer ml-5' onClick={() => toast.error(`${item?.name} was removed from your cart!`)}/>
+                <h1  className='c col-span-2 pl-5'>₱ {item?.menu?.price?.toFixed(2)}</h1>
+                <QtyBtn cartItemId={item?._id} quantity={item?.quantity}/>
+                <h1  className='c col-span-2 pl-5'>₱ {calcTotal(item?.quantity,item?.menu?.price).toFixed(2)}</h1>
+                <IoClose  className='c col-span-1 hover:text-primary transition-colors duration-300 ease-in-out cursor-pointer ml-5' onClick={() => toast.error(`${item?.menu?.name} was removed from your cart!`)}/>
                 <Toaster richColors/>
             </div>
         )):(

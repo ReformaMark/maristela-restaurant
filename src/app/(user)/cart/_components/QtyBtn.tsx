@@ -1,13 +1,34 @@
+import { useMutation } from 'convex/react';
 import React from 'react'
 import { FaMinus } from 'react-icons/fa'
 import { FaPlus } from "react-icons/fa6";
+import { api } from '../../../../../convex/_generated/api';
+import { Id } from '../../../../../convex/_generated/dataModel';
 
-function QtyBtn({quantity}:{quantity?:number}) {
+function QtyBtn({
+    quantity,
+    cartItemId
+}:{
+    quantity?:number,
+    cartItemId?: Id<'cartItems'>
+
+}) {
+    const addSubtract = useMutation(api.cartItems.addSubtract)
+    
+    if(!cartItemId){
+        return
+    }
   return (
     <div className='c col-span-2 pl-5 flex items-center gap-x-2'>
-        <FaMinus className='px-2 border border-gray-200 text-sm size-7 cursor-pointer'/>
+        <FaMinus 
+            onClick={()=>addSubtract({operation:"subtract", cartItemId})}
+            className='px-2 border border-gray-200 text-sm size-7 cursor-pointer'
+        />
         {quantity}
-        <FaPlus className='px-2 border border-gray-200 text-sm size-7 cursor-pointer'/>
+        <FaPlus
+            onClick={()=>addSubtract({operation:"add", cartItemId})} 
+            className='px-2 border border-gray-200 text-sm size-7 cursor-pointer'
+        />
     </div>
   )
 }

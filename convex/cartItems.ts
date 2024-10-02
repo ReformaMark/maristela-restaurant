@@ -48,7 +48,7 @@ export const getCartItems = query({
                 
                     return { 
                         ...cartItem,
-                        ...menu, 
+                        menu, 
                         ...(menu?.imageId) ?
                         {url: await ctx.storage.getUrl(menu?.imageId)} : ""
                     }
@@ -58,6 +58,30 @@ export const getCartItems = query({
             return cartItems
         } else {
             return null
+        }
+    }
+})
+
+export const addSubtract = mutation({
+    args:{
+        operation: v.string(),
+        cartItemId: v.id('cartItems')
+    },
+    handler: async (ctx, args)=>{
+        if(args.operation.toLowerCase() === "subtract"){
+            const cartItem = await ctx.db.get(args.cartItemId)
+            if(cartItem)
+             cartItem && cartItem.quantity > 1 ?
+               await ctx.db.patch(args.cartItemId, {quantity: cartItem?.quantity - 1}) :
+               await ctx.db.delete(args.cartItemId)
+
+        }
+        if(args.operation.toLowerCase() === "add"){
+            const cartItem = await ctx.db.get(args.cartItemId)
+            if(cartItem)
+            
+            return await ctx.db.patch(args.cartItemId, {quantity: cartItem?.quantity + 1}) 
+            
         }
     }
 })
