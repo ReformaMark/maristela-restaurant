@@ -12,6 +12,10 @@ const nextConfig = {
               hostname: 'lovable-seal-462.convex.cloud',
             
             },
+            {
+              protocol: 'https',
+              hostname: 'successful-robin-887.convex.cloud',
+            },
           ],
     }
 };

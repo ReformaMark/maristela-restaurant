@@ -1,4 +1,4 @@
-import { AuthFlow } from "../types"
+import { Button } from "@/components/ui/button"
 import {
     Card,
     CardContent,
@@ -7,13 +7,13 @@ import {
     CardHeader,
     CardTitle
 } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
 import { Separator } from "@/components/ui/separator"
-import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, TriangleAlertIcon } from "lucide-react"
 import { useAuthActions } from "@convex-dev/auth/react"
+import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, TriangleAlertIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { AuthFlow } from "../types"
 
 
 interface SignUpCardProps {

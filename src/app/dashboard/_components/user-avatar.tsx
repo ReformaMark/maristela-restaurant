@@ -14,7 +14,7 @@ import { useAuthActions } from "@convex-dev/auth/react"
 
 export const UserAvatar = () => {
     const { signOut } = useAuthActions()
-    const { data, isLoading } = useCurrentUser()
+    const { data, isLoading, } = useCurrentUser()
 
     if (isLoading) {
         return <Loader2Icon className="size-4 animate-spin text-muted-foreground" />

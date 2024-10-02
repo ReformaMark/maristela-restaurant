@@ -1,44 +1,29 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
-    BellIcon,
     CalendarIcon,
     PackageIcon,
     ShoppingCartIcon,
     TrendingUpIcon,
     Users2Icon
 } from 'lucide-react'
-import { MobileSheet } from "./_components/mobile-sheet"
-import { OverviewCard } from "./_components/overview-card"
-import { Sidebar } from "./_components/sidebar"
-import { UserAvatar } from "./_components/user-avatar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ProductPopularityCard } from "./_components/product-popularity-card"
-import { OrderStatusDistributionCard } from "./_components/order-status-distribution-card"
 import { LocationProductPreferencesCard } from "./_components/location-product-preferences-card"
 import { LocationSalesPerformanceCard } from "./_components/location-sales-performance-card"
+import { OrderStatusDistributionCard } from "./_components/order-status-distribution-card"
+import { OverviewCard } from "./_components/overview-card"
+import { ProductPopularityCard } from "./_components/product-popularity-card"
 
 const DashboardPage = () => {
     return (
         <div className="flex h-screen bg-yellow-50">
             {/* Desktop sidebar */}
-            <Sidebar className="hidden w-64 border-r bg-gray-100/60 lg:block border-red-200" />
+
 
             {/* Main Content */}
             <main className="flex-1 overflow-y-auto">
-                {/* Top Navigation */}
-                <header className="flex h-14 items-center justify-between border-b border-red-200 px-4 bg-gray-100/60">
-                    <MobileSheet />
 
-                    <div className="flex items-center space-x-2">
-                        <Button variant="ghost" size="icon" className="hover:bg-gray-200">
-                            <BellIcon className="h-5 w-5" />
-                        </Button>
-
-                        <UserAvatar />
-                    </div>
-                </header>
 
                 {/* Dashboard Content */}
                 <div className="container mx-auto p-4">
