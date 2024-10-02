@@ -9,6 +9,8 @@ import { FaSearch, FaShoppingBag, FaUser } from 'react-icons/fa'
 import { motion } from "framer-motion"
 import { useEffect, useState } from 'react';
 import { useScroll } from '@/lib/hooks/useScrollToSection';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
 
 function Header() {
   const pathname = usePathname();
@@ -16,6 +18,8 @@ function Header() {
   const [showNav, setShowNav] = useState(true);
   const {scrollY ,prevScrollY } = useScroll()
   const isLoggedIn = data?._id ? true : false
+  const cartItems = useQuery(api.cartItems.getCartItems)
+
   useEffect(() => {
     if (scrollY > prevScrollY && Number(scrollY) > 100) {
         setShowNav(false);
@@ -23,6 +27,11 @@ function Header() {
         setShowNav(true);
     }
 }, [scrollY]);
+
+if(!cartItems){
+  return  
+} 
+  
 
   return (
     <motion.nav 
@@ -44,7 +53,20 @@ function Header() {
       </div>
       <div className="flex gap-x-6 text-3xl">
         <FaSearch />
-        <Link href={'/cart'} className='text-primary'><FaShoppingBag /></Link>
+       
+          <Link href={'/cart'} className='text-primary relative'>
+            <FaShoppingBag />
+            {cartItems.length > 0 &&
+            <motion.div
+              initial={{ y: 0 }}
+              animate={{ y: 2}}
+              transition={{ duration: 0.5 }}
+              className='absolute size-5 top-[-2px] right-[-4px] flex items-center justify-center rounded-full bg-yellow text-white text-sm'>
+              {cartItems.length || 0}
+            </motion.div>
+            }
+          </Link>
+      
         {/* <Link href={''} className='text-primary'><FaUser /></Link> */}
         {isLoggedIn ? (
           <UserAvatar />
