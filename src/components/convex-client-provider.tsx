@@ -21,11 +21,10 @@ const queryClient = new QueryClient({
 convexQueryClient.connect(queryClient);
 export function ConvexClientProvider({ children }: { children: ReactNode }) {
   return (
-  <ConvexAuthNextjsProvider client={convex}>
-    <QueryClientProvider client={queryClient}>
-
-      {children}
-    </QueryClientProvider>
-  </ConvexAuthNextjsProvider>
+    <ConvexAuthNextjsProvider client={convex}>
+      <QueryClientProvider client={queryClient}>
+        {children}
+      </QueryClientProvider>
+    </ConvexAuthNextjsProvider>
   )
 }

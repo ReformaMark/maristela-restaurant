@@ -1,9 +1,11 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { BoxIcon, ChartBarIcon, CogIcon, HomeIcon, TruckIcon, User2Icon } from "lucide-react";
+import { BoxIcon, HomeIcon, TruckIcon } from "lucide-react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SidebarSection } from "./sidebar-section";
 
 export const Sidebar = ({ className }: { className?: string }) => {
     const pathname = usePathname()
@@ -15,11 +17,54 @@ export const Sidebar = ({ className }: { className?: string }) => {
                     <span className="font-semibold">Admin Dashboard</span>
                 </div>
                 <nav className="flex-1 space-y-2 p-4">
-                    <Button variant="ghost" className={cn("w-full justify-start hover:bg-red-200", pathname === "/dashboard" && "bg-red-100")}>
+                    <Link
+                        href="/dashboard"
+                        className={cn("w-full", pathname === "/dashboard" && "bg-red-100", buttonVariants({
+                            variant: "ghost",
+                            className: "hover:bg-red-200 justify-start",
+                        }))}
+                    >
                         <HomeIcon className="mr-2 h-4 w-4" />
                         Overview
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start hover:bg-red-200">
+                    </Link>
+
+                    <SidebarSection
+                        label="Products"
+                        icon={BoxIcon}
+                    >
+                        <Link
+                            href="/dashboard/products"
+                            className={cn("w-full", pathname === "/dashboard/products" && "bg-red-100", buttonVariants({
+                                variant: "ghost",
+                                className: "hover:bg-red-200 justify-start text-sm",
+                            }))}
+                        >
+                            Add Products
+                        </Link>
+
+                        <Link
+                            href="/dashboard/edit-products"
+                            className={cn("w-full", pathname === "/dashboard/edit-products" && "bg-red-100", buttonVariants({
+                                variant: "ghost",
+                                className: "hover:bg-red-200 justify-start text-sm",
+                            }))}
+                        >
+                            Edit Products
+                        </Link>
+                    </SidebarSection>
+
+                    <Link
+                        href="/dashboard/orders"
+                        className={cn("w-full", pathname === "/dashboard/orders" && "bg-red-100", buttonVariants({
+                            variant: "ghost",
+                            className: "hover:bg-red-200 justify-start",
+                        }))}
+                    >
+                        <TruckIcon className="mr-2 h-4 w-4" />
+                        Orders
+                    </Link>
+
+                    {/* <Button variant="ghost" className="w-full justify-start hover:bg-red-200">
                         <BoxIcon className="mr-2 h-4 w-4" />
                         Products
                     </Button>
@@ -38,7 +83,7 @@ export const Sidebar = ({ className }: { className?: string }) => {
                     <Button variant="ghost" className="w-full justify-start hover:bg-red-200">
                         <CogIcon className="mr-2 h-4 w-4" />
                         Settings
-                    </Button>
+                    </Button> */}
                 </nav>
             </div>
         </div>
