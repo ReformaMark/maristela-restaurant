@@ -1,4 +1,5 @@
 import { convexAuthNextjsMiddleware, createRouteMatcher, isAuthenticatedNextjs, nextjsMiddlewareRedirect } from "@convex-dev/auth/nextjs/server";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useCurrentUser } from "./features/auth/api/use-current-user";
 
 const isAuthPage = createRouteMatcher(["/auth"])
