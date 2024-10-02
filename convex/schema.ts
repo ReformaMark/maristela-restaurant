@@ -15,7 +15,7 @@ const schema = defineSchema({
         lastName: v.optional(v.string()),
         role: v.union(v.literal("user"), v.literal("admin")),
         address: v.optional(v.string()),
-        cartItems: v.optional(v.array(v.id('cart'))),
+        cartItems: v.optional(v.array(v.id('cartItems'))),
         ratings: v.optional(v.array(v.id("ratings"))),
         orders: v.optional(v.array(v.id("orders"))),
         transactions: v.optional(v.array(v.id("transactions"))),
@@ -78,7 +78,7 @@ const schema = defineSchema({
         familyMealId: v.optional(v.id('familyMeals')),
         quantity: v.number(),
         userId: v.id('users'),
-    })
+    }).index('by_menuId', ['menuId']).index('by_familyMealId', ['familyMealId']).index('by_userId',['userId']),
 })
 
 export default schema;

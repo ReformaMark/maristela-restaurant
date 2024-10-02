@@ -22,7 +22,7 @@ function Header() {
     } else {
         setShowNav(true);
     }
-}, [scrollY, prevScrollY]);
+}, [scrollY]);
 
   return (
     <motion.nav 
@@ -44,7 +44,7 @@ function Header() {
       </div>
       <div className="flex gap-x-6 text-3xl">
         <FaSearch />
-        <Link href={''} className='text-primary'><FaShoppingBag /></Link>
+        <Link href={'/cart'} className='text-primary'><FaShoppingBag /></Link>
         {/* <Link href={''} className='text-primary'><FaUser /></Link> */}
         {isLoggedIn ? (
           <UserAvatar />
