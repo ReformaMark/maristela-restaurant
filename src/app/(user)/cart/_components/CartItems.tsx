@@ -8,6 +8,7 @@ import { toast, Toaster } from 'sonner'
 import QtyBtn from './QtyBtn'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
+import { formatPrice } from '@/lib/utils'
 
 function CartItems() {
     const cartartItems = useQuery(api.cartItems.getCartItems)
@@ -21,8 +22,9 @@ function CartItems() {
 
     //calculate the total price of all the items in the cart
     const subTotal = cartartItems && cartartItems.reduce((accumulator, item) => {
-        return accumulator + (item?.menu?.price || 0) ;
+        return accumulator + ((item?.menu?.price||0) * (item?.quantity || 0)) ;
     }, 0);
+
   return (
     <div className='px-48 text-text'>
         <h1 className='text-primary font-bold text-xl mb-5 text-center uppercase'>Shopping Cart</h1>
@@ -44,9 +46,9 @@ function CartItems() {
                     </div>
                 </div>
                
-                <h1  className='c col-span-2 pl-5'>₱ {item?.menu?.price?.toFixed(2)}</h1>
+                <h1  className='c col-span-2 pl-5'>{formatPrice(item?.menu?.price || 0)}</h1>
                 <QtyBtn cartItemId={item?._id} quantity={item?.quantity}/>
-                <h1  className='c col-span-2 pl-5'>₱ {calcTotal(item?.quantity,item?.menu?.price).toFixed(2)}</h1>
+                <h1  className='c col-span-2 pl-5'>{formatPrice(calcTotal(item?.quantity,item?.menu?.price))}</h1>
                 <IoClose  className='c col-span-1 hover:text-primary transition-colors duration-300 ease-in-out cursor-pointer ml-5' onClick={() => toast.error(`${item?.menu?.name} was removed from your cart!`)}/>
                 <Toaster richColors/>
             </div>
@@ -55,7 +57,7 @@ function CartItems() {
         )}
         </div>
         <div className="w-full px-10 py-5 border-2 border-gray-200">
-            <h1 className='text-right text-black font-medium uppercase'>Subtotal  -  ₱ {subTotal?.toFixed(2)}</h1>
+            <h1 className='text-right text-black font-medium uppercase'>Subtotal  -  {formatPrice(subTotal || 0)}</h1>
             <div className="flex justify-between items-center mt-5">
                 <Button variant={'outline'} onClick={()=> router.back()} className='uppercase font-medium bg-white text-black text-sm'>Continue shopping</Button>
                 <Button variant={'default'} className='uppercase font-medium text-sm'>Checkout</Button>
