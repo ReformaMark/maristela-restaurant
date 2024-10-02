@@ -1,23 +1,22 @@
-import { convexAuthNextjsMiddleware, createRouteMatcher, isAuthenticatedNextjs, nextjsMiddlewareRedirect } from "@convex-dev/auth/nextjs/server";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { useCurrentUser } from "./features/auth/api/use-current-user";
+import {
+    convexAuthNextjsMiddleware,
+    createRouteMatcher,
+    nextjsMiddlewareRedirect
+} from "@convex-dev/auth/nextjs/server";
 
 const isAuthPage = createRouteMatcher(["/auth"])
-const isAdminPage = createRouteMatcher(["/dashboard"])
-// const { data } = useCurrentUser()
+// include all dashboard pages
+const isAdminPage = createRouteMatcher(["/dashboard/*"])
 
-// export const isAdmin = () => {
-//     if (!data) return false
-//     return data.role === "admin"
-// }
 
-export default convexAuthNextjsMiddleware((request) => {
-    if (isAuthPage(request) && isAuthenticatedNextjs()) {
+export default convexAuthNextjsMiddleware((request, { convexAuth }) => {
+
+    if (isAuthPage(request) && convexAuth.isAuthenticated()) {
         return nextjsMiddlewareRedirect(request, "/")
     }
 
     // TODO: if is not authed and the user is not an admin redirect to homepage (if the user is trying to access adm dashboard)
-    if (isAdminPage(request) && !isAuthenticatedNextjs()) {
+    if (isAdminPage(request) && !convexAuth.isAuthenticated()) {
         return nextjsMiddlewareRedirect(request, "/")
     }
 })

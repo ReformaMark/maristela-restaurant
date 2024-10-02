@@ -16,8 +16,8 @@ export const SidebarSection = ({
     const [on, toggle] = useToggle(false)
 
     return (
-        <div className="flex flex-col mt-3 cursor-pointer" onClick={toggle}>
-            <div className="flex items-center px-4 group">
+        <div className="flex flex-col mt-3 cursor-pointer">
+            <div className="flex items-center px-4 group" onClick={toggle}>
 
                 <Icon className="mr-2 h-4 w-4" />
 
@@ -33,6 +33,7 @@ export const SidebarSection = ({
                     <Button
                         variant="ghost"
                         className="p-0.5 text-sm shrink-0 size-6"
+
                     >
                         <ChevronRightIcon className={cn("size-4 transition-transform", on && "rotate-90")} />
                     </Button>

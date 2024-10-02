@@ -22,16 +22,15 @@ import {
     ImageIcon,
     PackageIcon,
     PlusIcon,
-    ShoppingBag,
-    UploadIcon
+    ShoppingBag
 } from 'lucide-react'
+import Image from "next/image"
 import React, { useRef, useState } from "react"
 import { FaPesoSign } from "react-icons/fa6"
 import { toast } from "sonner"
 import { api } from "../../../../convex/_generated/api"
 import { Id } from "../../../../convex/_generated/dataModel"
 import { menuCategories, MenuCategoryType } from "../../../../data/menu-data"
-import Image from "next/image"
 
 type ProductData = {
     category: MenuCategoryType;
@@ -60,6 +59,7 @@ const initialProductData: ProductData = {
 
 export const CreateMenuCard = () => {
     const [productData, setProductData] = useState<ProductData>(initialProductData)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
     const { mutate: generateUploadUrl } = useGenerateUploadUrl()
 
@@ -356,7 +356,18 @@ export const CreateMenuCard = () => {
                                         onClick={triggerFileInput}
                                     >
                                         {!!productData.image ? (
-                                            <Image src={previewUrl!} alt="Product preview" className="h-full w-full rounded-lg object-cover" />
+                                            // change this src to url object to accept images
+                                            <div className="relative h-full w-full">
+                                                <Image
+                                                    src={URL.createObjectURL(productData.image)}
+                                                    alt="Product preview"
+                                                    layout="fill"
+                                                    objectFit="cover"
+                                                    className="rounded-lg"
+                                                />
+                                            </div>
+                                            // <Image src={URL.createObjectURL(productData.image)} alt="Product preview" className="h-full w-full rounded-lg object-cover" fill />
+
                                             // <div className="p-2">
                                             //     <div className="relative size-[260px] flex items-center justify-center group/image">
                                             //         <button
@@ -387,7 +398,7 @@ export const CreateMenuCard = () => {
                                             </div>
                                         )}
                                     </div>
-                                    <Button
+                                    {/* <Button
                                         type="button"
                                         variant="outline"
                                         onClick={triggerFileInput}
@@ -395,7 +406,7 @@ export const CreateMenuCard = () => {
                                     >
                                         <UploadIcon className="mr-2 h-4 w-4" />
                                         Upload Image
-                                    </Button>
+                                    </Button> */}
                                     <input
                                         ref={fileInputRef}
                                         type="file"
