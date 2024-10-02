@@ -1,10 +1,7 @@
 
 import { query } from "./_generated/server";
-import {
-    getAll,
-    getOneFrom,
-    getManyFrom,
-    getManyVia,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+import {getAll,getOneFrom,getManyFrom,getManyVia,
 } from "convex-helpers/server/relationships";
 
   export const allMenus = query({
