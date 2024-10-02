@@ -1,9 +1,11 @@
-import React from 'react'
+
+import CartItems from './_components/CartItems'
 
 function page() {
+   
   return (
     <div className='mt-32'>
-        Cart page
+        <CartItems/>
     </div> 
   )
 }

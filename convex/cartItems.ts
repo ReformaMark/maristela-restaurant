@@ -1,7 +1,9 @@
 
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { getManyFrom } from "convex-helpers/server/relationships";
+import { asyncMap } from "convex-helpers";
 
 export const addToCart = mutation({
     args: {
@@ -32,3 +34,30 @@ export const addToCart = mutation({
         }
     },
 });
+
+export const getCartItems = query({
+    handler: async (ctx)=>{
+        const userId = await getAuthUserId(ctx)
+        if(userId !== null ){
+           
+            const bareCartItems = await getManyFrom(ctx.db, 'cartItems', 'by_userId', userId);
+         
+            const cartItems = await asyncMap(bareCartItems, async (cartItem)=> {
+                if(cartItem.menuId) {
+                    const menu = await ctx.db.get(cartItem.menuId)
+                
+                    return { 
+                        ...cartItem,
+                        ...menu, 
+                        ...(menu?.imageId) ?
+                        {url: await ctx.storage.getUrl(menu?.imageId)} : ""
+                    }
+                }
+            })
+
+            return cartItems
+        } else {
+            return null
+        }
+    }
+})
