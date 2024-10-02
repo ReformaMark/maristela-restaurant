@@ -9,10 +9,10 @@ import {
     CardTitle,
   } from "@/components/ui/card"
 import { Button } from './ui/button'
-import { FaShoppingBag } from 'react-icons/fa'
+import { FaCheck, FaShoppingBag } from 'react-icons/fa'
 
 import Stars from '@/components/Stars' 
-import { useMutation } from 'convex/react'
+import { useMutation, useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import { Id } from '../../convex/_generated/dataModel'
 import { toast, Toaster } from 'sonner'
@@ -35,6 +35,7 @@ function ProductCard({
 }) {
 
   const addToCartItem = useMutation(api.cartItems.addToCart)
+  const cartItems = useQuery(api.cartItems.getCartItems)
 
   const handleAddToCart = async () => {
     toast.promise(
@@ -48,6 +49,17 @@ function ProductCard({
       }
     );
   };
+
+  const isAlreadyAdded = () =>{
+    const isExisting = cartItems?.find((item)=> item?.menu?._id === menuId)
+    if(isExisting) {
+
+      return true
+    } else {
+      return false
+    }
+
+  }
   
   return (
     
@@ -65,7 +77,17 @@ function ProductCard({
           </CardHeader>
           <CardFooter className='flex flex-col items-center'>
             <h1 className='font-semibold text-xl mb-3'>₱ {price}</h1>
-            <Button onClick={handleAddToCart} variant={'outline'} className=' border-2 border-yellow hover:border-primary text-yellow hover:text-primary font-semibold flex items-center gap-x-3'> <FaShoppingBag /> Add to cart</Button>
+            { isAlreadyAdded() ? (
+              <Button disabled onClick={handleAddToCart} variant={'outline'} className=' border-2 border-yellow hover:border-primary text-yellow hover:text-primary font-semibold flex items-center gap-x-3'> 
+                <FaCheck className=''/>
+                Added to cart
+              </Button>
+              ) : (
+                <Button onClick={handleAddToCart} variant={'outline'} className=' border-2 border-yellow hover:border-primary text-yellow hover:text-primary font-semibold flex items-center gap-x-3'> 
+                <FaShoppingBag /> 
+                Add to cart
+              </Button>
+            )}
           </CardFooter>
           <Toaster/>
       </Card>

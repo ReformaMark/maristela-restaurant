@@ -14,19 +14,27 @@ export const addToCart = mutation({
     handler: async (ctx, args) => {
         const userId = await getAuthUserId(ctx)
         console.log(userId)
+
         if(userId){
-            
-            const cartItem = await ctx.db.insert("cartItems", { 
-                menuId: args.menuId, 
-                familyMealId:args.familyMealId,
-                userId: userId,
-                quantity: +1,
-            });
-            const item = await ctx.db.get(cartItem);
-            const id = item?.menuId
-            if(id){
-                const menuName = await ctx.db.get(id)
-                return menuName;
+            const cartItems = await getManyFrom(ctx.db, 'cartItems', 'by_userId', userId);
+            const isExisting = cartItems.find((item)=>{item.menuId === args.menuId})
+            if(!isExisting){
+                const cartItem = await ctx.db.insert("cartItems", { 
+                    menuId: args.menuId, 
+                    familyMealId:args.familyMealId,
+                    userId: userId,
+                    quantity: +1,
+                });
+                const item = await ctx.db.get(cartItem);
+                const id = item?.menuId
+                if(id){
+                    const menuName = await ctx.db.get(id)
+                    return menuName;
+                }
+            }
+
+            if(isExisting){
+                return null
             }
             
         } else {
