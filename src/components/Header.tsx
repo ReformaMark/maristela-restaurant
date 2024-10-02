@@ -22,7 +22,7 @@ function Header() {
     } else {
         setShowNav(true);
     }
-}, [scrollY, prevScrollY]);
+}, [scrollY]);
 
   return (
     <motion.nav 

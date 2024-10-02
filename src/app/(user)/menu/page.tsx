@@ -9,7 +9,7 @@ function MenuPage() {
       <h1 className='text-text font-bold text-4xl tracking-wider text-center mb-5'>Maristela&apos;s Restaurant Menu</h1>
         <div className=" flex justify-start gap-x-10">
           <Filters/>
-          <div className="">
+          <div className="s space-y-14">
             <Special/>
             <Recommendation/>
             <Special/>
