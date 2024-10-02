@@ -5,7 +5,7 @@ import {
     getOneFrom,
     getManyFrom,
     getManyVia,
-  } from "convex-helpers/server/relationships";
+} from "convex-helpers/server/relationships";
 
   export const allMenus = query({
     handler: async (ctx) => {
