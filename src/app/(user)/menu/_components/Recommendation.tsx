@@ -6,13 +6,14 @@ import ProductCard from '@/components/ProductCard'
 import { getAverage } from '@/lib/utils'
 import Image from 'next/image'
 import { SkeletonCard } from '@/components/SkeletonCard'
+import { IoStarSharp } from "react-icons/io5";
 
 function Recommendation() {
     const menus = useQuery(api.menus.allMenus)
     const recommendedMenus = menus?.filter(menu=> menu.recommended === true);
   return (
     <div className=''>
-        <h1 className='text-3xl font-bold text-yellow text-center mb-5'>Chef&apos;s Recommendations</h1>
+        <h1 className='text-3xl font-bold text-text text-center mb-5 flex gap-x-3'><IoStarSharp className='text-black'/>Chef&apos;s Recommendations <IoStarSharp className='text-black'/></h1>
         
             {recommendedMenus ?( 
                 <div className="grid grid-cols-4 ">

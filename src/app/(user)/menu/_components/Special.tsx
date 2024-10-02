@@ -11,11 +11,9 @@ import { motion } from 'framer-motion'
 
 function Special() {
     const menus = useQuery(api.menus.allMenus)
-
-  
   return (
     <div className=''>
-        <h1 className='text-3xl font-bold text-yellow text-center mb-5 flex items-center justify-center gap-x-3'><FaCrown className='text-black'/>Special <FaCrown className='text-black'/></h1>
+        <h1 className='text-3xl font-bold text-text text-center mb-5 flex items-center justify-center bg-slate-50 rounded-xl border-y-2 border-y-gray-100 py-3 gap-x-3'><FaCrown className='text-black'/>Special <FaCrown className='text-black'/></h1>
         
             {menus ? (
                 <motion.div
@@ -28,6 +26,7 @@ function Special() {
                         duration: 0.5,
                         ease: [0.4, 0.0, 0.2, 1],
                     }} 
+                    viewport={{once: true}}
                     className="grid grid-cols-3 gap-x-3">
                     {menus?.map((menuItem)=>(
                         <ProductCard  

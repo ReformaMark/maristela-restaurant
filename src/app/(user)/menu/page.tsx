@@ -6,17 +6,12 @@ import Recommendation from './_components/Recommendation'
 function MenuPage() {
   return (
     <div className='pt-32 px-24'>
-      <h1 className='text-text font-bold text-4xl tracking-wider text-center mb-5'>Maristela&apos;s Restaurant Menu</h1>
+      <h1 className='text-primary font-bold text-4xl tracking-wider text-center mb-5'>Maristela&apos;s Restaurant Menu</h1>
         <div className=" flex justify-start gap-x-10">
           <Filters/>
-          <div className="s space-y-14">
+          <div className="s space-y-14 pb-10 ">
             <Special/>
             <Recommendation/>
-            <Special/>
-            <Special/>
-            <Special/>
-            <Special/>
-            <Special/>
 
           </div>
         </div>
