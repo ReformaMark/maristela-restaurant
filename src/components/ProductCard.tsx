@@ -31,7 +31,7 @@ function ProductCard({
     goodFor?: string;
     price:number,
     average: number,
-    menuId: Id<"menus">
+    menuId?: Id<"menus">
 }) {
 
   const addToCartItem = useMutation(api.cartItems.addToCart)
