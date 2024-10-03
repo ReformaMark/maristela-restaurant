@@ -11,11 +11,11 @@ export function cn(...inputs: ClassValue[]) {
 export function getAverage({
   ratings
 }:{
-  ratings:  Doc<'ratings'>[]
+  ratings?:  Doc<'ratings'>[]
 }){
-  
-  const averageRating = ratings.reduce((sum, rating) => sum + (rating.stars ?? 0), 0) / ratings.length;
-  return Number.isNaN(averageRating) ? 0 : averageRating
+
+  const averageRating = ratings && ratings.reduce((sum, rating) => sum + (rating.stars ?? 0), 0) / ratings.length;
+  return !averageRating ? 0 : Number.isNaN(averageRating) ? 0 : averageRating
 }
 
 export function formatPrice(

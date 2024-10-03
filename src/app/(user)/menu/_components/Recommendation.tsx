@@ -10,10 +10,14 @@ import { IoStarSharp } from "react-icons/io5";
 
 function Recommendation() {
     const menus = useQuery(api.menus.allMenus)
-    const recommendedMenus = menus?.filter(menu=> menu.recommended === true);
+    const recommendedMenus = menus?.filter(menu=> menu.recommended === true && menu.special === false);
   return (
-    <div className=''>
-        <h1 className='text-3xl font-bold text-text text-center mb-5 flex gap-x-3'><IoStarSharp className='text-black'/>Chef&apos;s Recommendations <IoStarSharp className='text-black'/></h1>
+    <div className='shadow-md p-5'>
+        <h1 className='text-2xl font-bold text-white text-center mb-5 flex items-center justify-center bg-black rounded-xl border-y-2 border-y-gray-100 py-3 gap-x-3'>
+            <IoStarSharp className='text-white'/>
+            Chef&apos;s Recommendations 
+            <IoStarSharp className='text-white'/>
+        </h1>
         
             {recommendedMenus ?( 
                 <div className="grid grid-cols-4 ">
@@ -26,7 +30,7 @@ function Recommendation() {
                             average={getAverage({ ratings: menuItem.ratings })}
                             >
                             
-                            <Image src={menuItem.url ? menuItem.url : ""} alt={menuItem.name} height={100} width={100} className='h-40 w-full object-cover rounded-lg hover:scale-105 transition-all duration-500 ease-linear'/>
+                            <Image src={menuItem.url ? menuItem.url : ""} alt={menuItem.name} height={200} width={200} className='h-40 w-full object-cover rounded-lg hover:scale-105 transition-all duration-500 ease-linear'/>
                         </ProductCard>
                     ))}
                 </div>

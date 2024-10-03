@@ -11,11 +11,17 @@ import { motion } from 'framer-motion'
 
 function Special() {
     const menus = useQuery(api.menus.allMenus)
+    const specialMenus =  menus?.filter(menu=> menu.special === true);
   return (
-    <div className=''>
-        <h1 className='text-3xl font-bold text-text text-center mb-5 flex items-center justify-center bg-slate-50 rounded-xl border-y-2 border-y-gray-100 py-3 gap-x-3'><FaCrown className='text-black'/>Special <FaCrown className='text-black'/></h1>
-        
-            {menus ? (
+    <div className='shadow-md p-5'>
+        <div className='p-1 border-2 border-black/50 text-2xl font-bold text-text text-center mb-5 rounded-xl'>
+            <h1 className='flex gap-x-3 items-center justify-center  rounded-xl py-2'>
+                <FaCrown className='text-black size-10'/>
+                Signature Dishes of Maristela&apos;s Restaurant 
+                <FaCrown className='text-black size-10'/>
+            </h1>
+        </div>
+            {specialMenus ? (
                 <motion.div
                     initial={{
                         opacity: 0,
@@ -27,8 +33,8 @@ function Special() {
                         ease: [0.4, 0.0, 0.2, 1],
                     }} 
                     viewport={{once: true}}
-                    className="grid grid-cols-3 gap-x-3">
-                    {menus?.map((menuItem)=>(
+                    className="grid grid-cols-3 gap-x-3 justify-center">
+                    {specialMenus?.map((menuItem)=>(
                         <ProductCard  
                             key={menuItem._id} 
                             title={menuItem.name} 
@@ -36,7 +42,7 @@ function Special() {
                             menuId={menuItem._id}
                             average={getAverage({ ratings: menuItem.ratings })}>
                         
-                            <Image src={menuItem.url ? menuItem.url : ""} alt={menuItem.name} height={100} width={100} className='h-40 w-full object-cover rounded-lg hover:scale-105 transition-all duration-500 ease-linear'/>
+                            <Image src={menuItem.url ? menuItem.url : ""} alt={menuItem.name} height={400} width={400} className='h h-52 w-full object-cover rounded-lg hover:scale-105 transition-all duration-500 ease-linear'/>
                         </ProductCard>
                     ))}
                 </motion.div>

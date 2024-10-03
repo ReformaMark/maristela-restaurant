@@ -19,7 +19,7 @@ function Header() {
   const {scrollY ,prevScrollY } = useScroll()
   const isLoggedIn = data?._id ? true : false
   const cartItems = useQuery(api.cartItems.getCartItems)
-
+  
   useEffect(() => {
     if (scrollY > prevScrollY && Number(scrollY) > 100) {
         setShowNav(false);
@@ -28,10 +28,6 @@ function Header() {
     }
 }, [scrollY]);
 
-if(!cartItems){
-  return  
-} 
-  
 
   return (
     <motion.nav 
@@ -56,7 +52,7 @@ if(!cartItems){
        
           <Link href={'/cart'} className='text-primary relative'>
             <FaShoppingBag />
-            {cartItems.length > 0 &&
+            {cartItems && cartItems.length > 0 &&
             <motion.div
               initial={{ y: 0 }}
               animate={{ y: 2}}
