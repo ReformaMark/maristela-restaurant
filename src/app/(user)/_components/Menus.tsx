@@ -1,9 +1,9 @@
 'use client'
 import React from 'react'
 import { useQuery } from 'convex/react'
-import { api } from '../../../../../convex/_generated/api'
+import { api } from '../../../../convex/_generated/api'
 import { DocumentByName } from 'convex/server'
-import { DataModel } from '../../../../../convex/_generated/dataModel'
+import { DataModel } from '../../../../convex/_generated/dataModel'
 import Recommendation from './Recommendation'
 import CategoryTemplate from './CategoryTemplate'
 

@@ -1,5 +1,5 @@
 'use client'
-import MenuPopover from '@/app/(landing-page)/_components/MenuPopover';
+import MenuPopover from '@/app/(landing-page)/about/_components/MenuPopover';
 import { UserAvatar } from '@/app/dashboard/_components/user-avatar';
 import { useCurrentUser } from '@/features/auth/api/use-current-user';
 import { Loader2Icon } from 'lucide-react';
@@ -11,6 +11,15 @@ import { useEffect, useState } from 'react';
 import { useScroll } from '@/lib/hooks/useScrollToSection';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { FiMenu } from "react-icons/fi";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 
 function Header() {
   const pathname = usePathname();
@@ -34,38 +43,59 @@ function Header() {
       initial={{ y: 0 }}
       animate={{ y: showNav ? 0 : -100 }}
       transition={{ duration: 0.3 }}
-      className='flex fixed z-50 inset-0 justify-between items-center text-text px-24  h-24 w-full bg-white shadow-lg '>
-      <h1 className='text-primary font-parisienne font-bold text-sm sm:text-lg md:text-xl lg:text-2xl'>Maristela&apos;s Restaurant</h1>
-      <div className='flex items-center justify-between gap-x-6 '>
-        <Link href={'/'} className={`${pathname === "/" ? "text-primary" : "text-text"} hover:text-primary text-xs font-thin md:text-lg lg:text-lg transition-colors duration-300 ease-linear'}{'${pathname === "/home" ? "text-primary" : "text-text"} hover:text-primary text-xs font-thin md:text-lg lg:text-lg transition-colors duration-300 ease-linear`}>Home</Link>
+      className='fixed z-50 inset-0 flex justify-between items-center py-6  text-white px-5 sm:px-10 md:px-15 lg:px-24  h-fit w-full bg-primary shadow-lg '>
+      <div className="t transition-all duration-300 ease-in-out md:hidden">
+        <Sheet>
+          <SheetTrigger><FiMenu className='size-8 md:hidden text-white'/></SheetTrigger>
+          <SheetContent side={'left'}>
+            <SheetHeader>
+              <SheetTitle className='border-b-2 border-b-gray-100 py-10'> <UserAvatar /></SheetTitle>
+              <SheetDescription>
+                <div className="">
+                  
+                </div>
+              </SheetDescription> 
+            </SheetHeader>
+          </SheetContent>
+        </Sheet>
+      </div>
+      <Link href={'/'} className='text-white font-parisienne font-bold text-sm sm:text-lg md:text-xl lg:text-2xl'>Maristela&apos;s Restaurant</Link>
+      {/* <Image src={Logo} alt='Logo' className='size-10 md:hidden'/> */}
+      
+      <div className='hidden md:flex items-center justify-between gap-x-6 '>
+        <Link href={'/'} className={`${pathname === "/" ? "text-yellow" : "text-white"} hover:text-yellow text-xs font-thin md:text-lg lg:text-lg transition-colors duration-300 ease-linear`}>
+          Home
+        </Link>
         <MenuPopover />
-        <Link href={'shop-detail'} className={`${pathname === "/shop-detail" ? "text-primary" : "text-text"} hover:text-primary text-xs font-thin md:text-lg lg:text-lg transition-colors duration-300 ease-linear'}{'${pathname === "/home" ? "text-primary" : "text-text"} hover:text-primary text-xs font-thin md:text-lg lg:text-lg transition-colors duration-300 ease-linear`}>
+        <Link href={'/about'} className={`${pathname === "/about" ? "text-yellow" : "text-white"} hover:text-yellow text-xs font-thin md:text-lg lg:text-lg transition-colors duration-300 ease-linear`}>
           About Us
         </Link>
 
-        <Link href={'/contact'} className={`${pathname === "/contact" ? "text-primary" : "text-text"} hover:text-primary text-xs font-thin md:text-lg lg:text-lg transition-colors duration-300 ease-linear'}{'${pathname === "/home" ? "text-primary" : "text-text"} hover:text-primary text-xs font-thin md:text-lg lg:text-lg transition-colors duration-300 ease-linear`}>
+        <Link href={'/contact'} className={`${pathname === "/contact" ? "text-yellow" : "text-white"} hover:text-yellow text-xs font-thin md:text-lg lg:text-lg transition-colors duration-300 ease-linear`}>
           Contact
         </Link>
       </div>
-      <div className="flex gap-x-6 text-3xl">
-        <FaSearch />
+      <div className="flex gap-x-6 text-xs lg:text-3xl">
+        <FaSearch className='hidden md:block'/>
        
-          <Link href={'/cart'} className='text-primary relative'>
-            <FaShoppingBag />
-            {cartItems && cartItems.length > 0 &&
-            <motion.div
-              initial={{ y: 0 }}
-              animate={{ y: 2}}
-              transition={{ duration: 0.5 }}
-              className='absolute size-5 top-[-2px] right-[-4px] flex items-center justify-center rounded-full bg-yellow text-white text-sm'>
-              {cartItems.length || 0}
-            </motion.div>
-            }
-          </Link>
+        <Link href={'/cart'} className='text-primary relative'>
+          <FaShoppingBag className='size-8 text-white'/>
+          {cartItems && cartItems.length > 0 &&
+          <motion.div
+            initial={{ y: 0 }}
+            animate={{ y: 2}}
+            transition={{ duration: 0.5 }}
+            className='absolute size-5 top-[-2px] right-[-4px] flex items-center justify-center rounded-full bg-yellow text-white text-sm'>
+            {cartItems.length || 0}
+          </motion.div>
+          }
+        </Link>
       
         {/* <Link href={''} className='text-primary'><FaUser /></Link> */}
         {isLoggedIn ? (
-          <UserAvatar />
+          <div className="hidden md:block">
+            <UserAvatar />
+          </div>
         )
           : isLoading ? (<Loader2Icon className='w-6 h-6 animate-spin' />)
             : (

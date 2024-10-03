@@ -11,19 +11,20 @@ import {
 import { Button } from './ui/button'
 import { FaCheck, FaCrown, FaShoppingBag } from 'react-icons/fa'
 
-import Stars from '@/components/Stars' 
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import { Id } from '../../convex/_generated/dataModel'
 import { toast, Toaster } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { IoStarSharp } from 'react-icons/io5'
+import { Star } from 'lucide-react'
+import { formatPrice } from '@/lib/utils'
  
 
 function ProductCard({
     children,
     title,
-    goodFor,
+    // goodFor,
     price,
     average,
     menuId,
@@ -32,7 +33,7 @@ function ProductCard({
 }:{
     children: React.ReactNode,
     title: string,
-    goodFor?: string;
+    // goodFor?: string;
     price:number,
     average: number,
     menuId?: Id<"menus">,
@@ -86,15 +87,18 @@ function ProductCard({
                   </div>
                 )}
             </CardContent>
-              <CardTitle className='text-xl font-medium text-center'>{title}</CardTitle>
-              <h1 className='text-center text-sm'>{goodFor}</h1>
-              <div className="flex justify-center items-center gap-x-3">
-                <Stars edit={false} average={average}/>
-              
+              <CardTitle className='flex justify-center items-center text-lg md:text-xl font-semibold text-center min-h-14 mb-0'>{title}</CardTitle>
+              <div className="flex justify-between items-center px-2">
+                <div className="flex items-center">
+                  <h1 className='text-center text-text text-lg md:text-xl'>{average}/5</h1> 
+                  <Star fill='yellow' color='yellow'/>
+                </div>
+                <h1 className='font-medium text-xl'>{formatPrice(price)}</h1>
               </div>
+              
           </CardHeader>
           <CardFooter className='flex flex-col items-center'>
-            <h1 className='font-semibold text-xl mb-3'>₱ {price}</h1>
+           
             { user ? isAlreadyAdded() ? (
               <Button disabled onClick={handleAddToCart} variant={'outline'} className=' border-2 border-yellow hover:border-primary text-yellow hover:text-primary font-semibold flex items-center gap-x-3'> 
                 <FaCheck className=''/>

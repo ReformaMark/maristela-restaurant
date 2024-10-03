@@ -19,15 +19,15 @@ function QtyBtn({
         return
     }
   return (
-    <div className='c col-span-2 pl-5 flex items-center gap-x-2'>
+    <div className='c col-span-2 pl-0 md:pl-5 text-xs md:text-lg flex items-center gap-x-2'>
         <FaMinus 
             onClick={()=>addSubtract({operation:"subtract", cartItemId})}
-            className='px-2 border border-gray-200 text-sm size-7 cursor-pointer'
+            className='px-1 md:px-2 border border-gray-200 text-sm size-7 cursor-pointer'
         />
         {quantity}
         <FaPlus
             onClick={()=>addSubtract({operation:"add", cartItemId})} 
-            className='px-2 border border-gray-200 text-sm size-7 cursor-pointer'
+            className='px-1 md:px-2 border border-gray-200 text-sm size-7 cursor-pointer'
         />
     </div>
   )

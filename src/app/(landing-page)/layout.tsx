@@ -32,7 +32,7 @@ export default function RootLayout({
     <ConvexAuthNextjsServerProvider>
     <html lang="en">
       <body
-        className={''}
+        className={'overflow-hidden'}
       >
         <ConvexClientProvider>
           <Header/>

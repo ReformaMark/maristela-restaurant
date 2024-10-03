@@ -26,37 +26,36 @@ function CartItems() {
     }, 0);
 
   return (
-    <div className='px-48 text-text'>
+    <div className='px- sm:px-20 md:px-32 lg:px-48 text-text'>
         <h1 className='text-primary font-bold text-xl mb-5 text-center uppercase'>Shopping Cart</h1>
-        <h1 className='text-text text-xs mb-2'>You have {cartartItems?.length} item(s) in your order.</h1>
-        <div className="border-gray-200 border-2 text-text shadow-sm font-thin text-lg  grid grid-cols-12">
-            <h1 className='c col-span-5 pl-10 border-r-2 border-gray-100'>Name</h1>
-            <h1 className='c col-span-2 pl-10 border-r-2 border-gray-100'>Price</h1>
-            <h1 className='c col-span-2 pl-10 border-r-2 border-gray-100'>QTY.</h1>
-            <h1 className='c col-span-2 pl-10 border-r-2 border-gray-100'>Total</h1>
+        <h1 className='text-text text-[0.5rem] md:text-sm mb-2'>You have {cartartItems?.length} item(s) in your order.</h1>
+        <div className="border-gray-200 border-2 text-text shadow-sm font-thin text-xs md:text-lg py-1 grid grid-cols-12">
+            <h1 className='c col-span-5 pl-3 md:pl-10 border-r-2 border-gray-100'>Name</h1>
+            <h1 className='c col-span-2 pl-3 md:pl-10 border-r-2 border-gray-100'>Price</h1>
+            <h1 className='c col-span-2 pl-3 md:pl-10 border-r-2 border-gray-100'>QTY.</h1>
+            <h1 className='c col-span-2 pl-3 md:pl-10 border-r-2 border-gray-100'>Total</h1>
             <h1 className='c col-span-1'></h1>
         </div>
         <div className="min-h-[60vh] max-h-[60vh] overflow-y-scroll border-x-2 border-gray-200">
         {cartartItems ? cartartItems.map((item)=>(
-            <div key={item?._id} className="grid shadow-sm grid-cols-12 items-center w-full h-fit pl-5 border-b-2 border-b-gray-200  py-2">
+            <div key={item?._id} className="grid shadow-sm grid-cols-12 items-center w-full h-fit pl-1 md:pl-5 border-b-2 border-b-gray-200  py-2">
                 <div className="flex items-center gap-x-2 col-span-5">
-                    <Image src={item?.url ? item.url : ""} width={100} height={100} alt={item?.menu?.name || ''} className='s size-20 p-2 shadow-md'/>
-                    <div className="">
-                        <h1>{item?.menu?.name}</h1>
+                    <Image src={item?.url ? item.url : ""} width={100} height={100} alt={item?.menu?.name || ''} className='size-12 md:size-20 p-1 md:p-2 shadow-md'/>
+                    <div className="text-[0.5rem] md:text-lg">
+                        <h1 className=''>{item?.menu?.name}</h1>
                     </div>
                 </div>
-               
-                <h1  className='c col-span-2 pl-5'>{formatPrice(item?.menu?.price || 0)}</h1>
+                <h1  className='col-span-2 text-xs md:text-lg pl-1 md:pl-5'>{formatPrice(item?.menu?.price || 0)}</h1>
                 <QtyBtn cartItemId={item?._id} quantity={item?.quantity}/>
-                <h1  className='c col-span-2 pl-5'>{formatPrice(calcTotal(item?.quantity,item?.menu?.price))}</h1>
-                <IoClose  className='c col-span-1 hover:text-primary transition-colors duration-300 ease-in-out cursor-pointer ml-5' onClick={() => toast.error(`${item?.menu?.name} was removed from your cart!`)}/>
+                <h1  className='col-span-2 text-xs md:text-lg pl-3 md:pl-5'>{formatPrice(calcTotal(item?.quantity,item?.menu?.price))}</h1>
+                <IoClose  className='col-span-1 hover:text-primary transition-colors duration-300 ease-in-out cursor-pointer ml-2 md:ml-5' onClick={() => toast.error(`${item?.menu?.name} was removed from your cart!`)}/>
                 <Toaster richColors/>
             </div>
         )):(
             <></>
         )}
         </div>
-        <div className="w-full px-10 py-5 border-2 border-gray-200">
+        <div className="w-full px-2 md:px-10 py-5 border-2 border-gray-200">
             <h1 className='text-right text-black font-medium uppercase'>Subtotal  -  {formatPrice(subTotal || 0)}</h1>
             <div className="flex justify-between items-center mt-5">
                 <Button variant={'outline'} onClick={()=> router.back()} className='uppercase font-medium bg-white text-black text-sm'>Continue shopping</Button>

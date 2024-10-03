@@ -2,7 +2,7 @@
 import { useQuery } from 'convex/react'
 import Link from 'next/link'
 import React from 'react'
-import { api } from '../../../../../convex/_generated/api'
+import { api } from '../../../../convex/_generated/api'
 import Image from 'next/image'
 import Pasta from '@/../public/img/CANTON_BIHON-removebg-preview.png'
 import Silog from '@/../public/img/CHICKSILOG-removebg-preview.png'
@@ -49,7 +49,7 @@ function Categories() {
     <div className='drop-shadow-md'>
         <h1 className='text-primary text-xl font-semibold px-3'>Categories</h1>
         <div className="pb-3 ">
-            <ul className='grid grid-cols-9 gap-x-3'>
+            <ul className='grid grid-cols-3 md:grid-cols-9 gap-x-3 w-full '>
                 <Link href={'/'} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
                     <Image src={Pork} alt='Pork' width={200} height={200} className='s size-32 object-cover  hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
                     <div className="flex justify-center gap-x-1 items-center mt-[-30px] text-xs">
