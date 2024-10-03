@@ -12,7 +12,10 @@ import { menuCategories } from "../data/menu-data";
 
 export const allMenus = query({
     handler: async (ctx) => {
-        const menus = await ctx.db.query("menus").collect();
+        const menus = await ctx.db
+            .query("menus")
+            .order("desc")
+            .collect();
 
         return Promise.all(menus.map(async (menu) => {
             const ratings = await getManyFrom(ctx.db, 'ratings', 'by_menu', menu._id, "menuId");
@@ -26,7 +29,6 @@ export const allMenus = query({
         }));
     }
 });
-
 export const create = mutation({
     args: {
         image: v.id("_storage"),
@@ -92,5 +94,88 @@ export const create = mutation({
         })
 
         return menuId
+    }
+})
+
+export const updateMenu = mutation({
+    args: {
+        id: v.id('menus'),
+        image: v.optional(v.id("_storage")),
+        category: v.optional(v.union(
+            v.literal('Chicken'),
+            v.literal('Pork'),
+            v.literal('Pancit & Pasta'),
+            v.literal('Extras'),
+            v.literal('Beverages'),
+            v.literal('Sizzling Plate'),
+            v.literal('Super Silog Meals'),
+            v.literal('Seafood'),
+            v.literal('Veggies'),
+        )),
+        name: v.optional(v.string()),
+        prepTime: v.optional(v.string()),
+        description: v.optional(v.string()),
+        recommended: v.optional(v.boolean()),
+        special: v.optional(v.boolean()),
+        price: v.optional(v.number()),
+        quantity: v.optional(v.number()),
+    },
+    handler: async (ctx, args) => {
+        const userId = await getAuthUserId(ctx)
+
+        if (!userId) {
+            throw new Error("Unauthorized")
+        }
+
+        const user = await ctx.db.get(userId)
+
+        if (user?.role !== "admin") {
+            throw new Error("Unauthorized")
+        }
+
+        if (args.id.length === 0) {
+            throw new Error("Invalid input, id cannot be empty")
+        }
+
+        await ctx.db.patch(args.id, {
+            category: args.category,
+            name: args.name,
+            price: args.price,
+            prepTime: args.prepTime,
+            description: args.description,
+            recommended: args.recommended,
+            special: args.special,
+            imageId: args.image,
+            quantity: args.quantity,
+        })
+
+        return args.id
+    }
+})
+
+export const deleteMenu = mutation({
+    args: {
+        id: v.id('menus')
+    },
+    handler: async (ctx, args) => {
+        const userId = await getAuthUserId(ctx)
+
+        if (!userId) {
+            throw new Error("Unauthorized")
+        }
+
+        const user = await ctx.db.get(userId)
+
+        if (user?.role !== "admin") {
+            throw new Error("Unauthorized")
+        }
+
+        if (args.id.length === 0) {
+            throw new Error("Invalid input, id cannot be empty")
+        }
+
+        await ctx.db.delete(args.id)
+
+        return args.id
     }
 })
