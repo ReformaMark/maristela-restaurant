@@ -1,12 +1,10 @@
 import React from 'react'
-import { Doc } from '../../../../../convex/_generated/dataModel'
 import { AugmentedMenu } from './Menus'
 import { SkeletonCard } from '@/components/SkeletonCard'
 import Image from 'next/image'
 import ProductCard from '@/components/ProductCard'
 import { getAverage } from '@/lib/utils'
 import { MenuCategoryType } from '../../../../../data/menu-data'
-import { IoStarSharp } from 'react-icons/io5'
 
 function CategoryTemplate({
     menus,

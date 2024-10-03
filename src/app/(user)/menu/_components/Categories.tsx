@@ -95,7 +95,7 @@ function Categories() {
                 <Link href={'/'} className=" hover:text-primary  text-text text-lg font-medium transition-all duration-400 ease-in-out">
                     <Image src={Silog} alt='Pork' width={200} height={200} className='s size-32 object-cover  hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
                     <div className="flex justify-center gap-x-1 items-center mt-[-30px] text-xs">
-                        <li>Silog Meals</li>
+                        <li>Silog Meals</li> 
                         <h1>({numberOfSSM()})</h1>
                     </div>
                 </Link>
@@ -110,6 +110,20 @@ function Categories() {
                     <Image src={Vegggies} alt='Pork' width={200} height={200} className='s size-32 object-cover  hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
                     <div className="flex justify-center gap-x-1 items-center mt-[-30px] text-xs">
                         <li>Veggies</li>
+                        <h1>({numberOfVeggies()})</h1>
+                    </div>
+                </Link>
+                <Link href={'/'} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
+                    <Image src={Desserts} alt='Pork' width={200} height={200} className='s size-32 object-cover  hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
+                    <div className="flex justify-center gap-x-1 items-center mt-[-30px] text-xs">
+                        <li>Desserts</li>
+                        <h1>({numberOfVeggies()})</h1>
+                    </div>
+                </Link>
+                <Link href={'/'} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
+                    <Image src={Vegggies} alt='Pork' width={200} height={200} className='s size-32 object-cover  hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
+                    <div className="flex justify-center gap-x-1 items-center mt-[-30px] text-xs">
+                        <li>Family Meals</li>
                         <h1>({numberOfVeggies()})</h1>
                     </div>
                 </Link>

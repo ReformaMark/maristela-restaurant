@@ -1,7 +1,6 @@
 import React from 'react'
 import Special from './_components/Special'
 import Filters from './_components/Filters'
-import Recommendation from './_components/Recommendation'
 import Menus from './_components/Menus'
 import Image from 'next/image'
 import Logo from '@/../public/img/maristela-removebg1.png'
