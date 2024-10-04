@@ -28,6 +28,7 @@ function Recommendation() {
                             price={menuItem.price} 
                             menuId={menuItem._id}
                             average={getAverage({ ratings: menuItem.ratings })}
+                            image={menuItem.url ? menuItem.url : ""}
                             >
                             
                             <Image src={menuItem.url ? menuItem.url : ""} alt={menuItem.name} height={200} width={200} className='h-32 md:h-52 w-full object-cover rounded-lg hover:scale-105 transition-all duration-500 ease-linear'/>
