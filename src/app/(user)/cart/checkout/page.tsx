@@ -63,7 +63,7 @@ function CheckoutPage() {
         e.preventDefault()
         toast.promise(promise, {
             loading: 'Placing your order...',
-            success: (data) => {
+            success: () => {
                 return `It's a prank! Hinde pa po tapos!`;
             },
             error: 'Error',
