@@ -64,7 +64,14 @@ const schema = defineSchema({
     transactions: defineTable({
         orders: v.array(v.id('orders')),
         mop: v.string(),
+        status: v.union(
+            v.literal('unconfirmed'),
+            v.literal('confirmed'),
+            v.literal('delivered'),
+            v.literal('unsuccessful'),
+        ),
         userId: v.id('users'),
+        shippingId: v.id('shippingAddress')
     }),
     ratings: defineTable({
         stars: v.optional(v.number()),
@@ -79,6 +86,17 @@ const schema = defineSchema({
         quantity: v.number(),
         userId: v.id('users'),
     }).index('by_menuId', ['menuId']).index('by_familyMealId', ['familyMealId']).index('by_userId',['userId']),
+
+    shippingAddress: defineTable({
+        userId: v.id('users'),
+        firstname: v.string(),
+        lastName: v.string(),
+        streetAddress: v.string(),
+        apartmmentNumer: v.optional(v.string()),
+        address:v.string(),
+        phoneNumber: v.string(),
+
+    }).index('by_userId', ['userId'])
 })
 
 export default schema;

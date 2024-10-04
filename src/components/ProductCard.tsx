@@ -3,20 +3,17 @@ import React, { useState } from 'react'
 import {
     Card,
     CardContent,
- 
-    CardFooter,
     CardHeader,
-    CardTitle,
+  
   } from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from './ui/button'
-import { FaCheck, FaCrown, FaMinus, FaPlus, FaShoppingBag } from 'react-icons/fa'
+import { FaCheck, FaCrown, FaMinus, FaPlus } from 'react-icons/fa'
 
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
@@ -64,11 +61,11 @@ function ProductCard({
 
   const handleAddToCart = async () => {
     toast.promise(
-      addToCartItem({menuId}),
+      addToCartItem({menuId, quantity}),
       {
         loading: 'Loading...',
         success: (data) => {
-          return `${data?.name}has been added to the cart`;
+          return `${data?.name} has been added to the cart`;
         },
         error: 'Error adding item to cart',
       }
@@ -100,7 +97,7 @@ function ProductCard({
     <Dialog>
       <DialogTrigger>
         <Card className='shadow-sm hover:shadow-lg rounded-3xl bg-gray-100 p-0 h-fit transition-all duration-500 ease-in'>
-            <CardHeader className='border-b-2 border-gray-100 mb-3 p-0'>
+            <CardHeader className='border-b-2 border-gray-100 p-0 pb-2'>
               <CardContent className='p-0 relative'>
                   {children}
                   {signature === true && (
@@ -114,18 +111,33 @@ function ProductCard({
                     </div>
                   )}
               </CardContent>
-                <CardTitle className='flex justify-center items-center text-lg md:text-xl font-semibold text-center min-h-14 mb-0'>{title}</CardTitle>
-                <div className="flex justify-between items-center px-2">
+                <div className='flex justify-between px-2 items-center text-lg md:text-xl font-semibold text-center  mb-0'>
+                  <h1 className='w-10/12 text-left text-sm md:text-lg font-semibold font-sans line-clamp-1'>{title}</h1>
                   <div className="flex items-center">
-                    <h1 className='text-center text-text text-lg md:text-xl'>{average}/5</h1> 
-                    <Star fill='yellow' color='yellow'/>
+                    <h1 className=' text-text text-sm md:text-sm'>{average}/5</h1> 
+                    <Star className='size-5' fill='yellow' color='yellow'/>
                   </div>
-                  <h1 className='font-medium text-xl'>{formatPrice(price)}</h1>
+                  
                 </div>
-                
+                <p className='text-xs text-text line-clamp-2 text-left px-3 min-h-10'>{description}</p>
+                <div className="flex justify-between items-center px-2">
+                  
+                  <h1 className='font-thin text-sm'>for {formatPrice(price)}</h1>
+                  { user ? isAlreadyAdded() ? (
+                    <Button disabled onClick={handleAddToCart} variant={'outline'} className='rounded-full border border-text hover:border-primary text-text hover:text-primary font-semibold flex items-center '> 
+                      <FaCheck className=''/>
+                    </Button>
+                    ) : (
+                      <Button onClick={handleAddToCart} variant={'outline'} className='rounded-full  border border-text hover:border-primary text-text hover:text-primary font-semibold flex items-center '> 
+                     <FaPlus />
+                    </Button>
+                  ) : (
+                    <Button onClick={()=> router.push('/auth')} variant={'outline'} className='rounded-full  border border-text hover:border-primary text-text hover:text-primary font-semibold flex items-center '> 
+                     <FaPlus />
+                    </Button>
+                  )}
+                </div>
             </CardHeader>
-            <CardFooter className='flex flex-col items-center'>
-            </CardFooter>
             <Toaster/>
         </Card>
       </DialogTrigger>
@@ -133,7 +145,6 @@ function ProductCard({
         <div className="relative overflow-auto max-h-[90vh] pb-20">
           <DialogHeader className='p-0 h-full'>
             <div className='p-0'>
-             
                 <Image 
                   src={image} 
                   alt={title}
@@ -141,42 +152,31 @@ function ProductCard({
                   height={1000}
                   className='object-cover w-full h-1/3 rounded-lg'
                 />
-            
-              
               <div className="px-5">
                 <h1 className='text-2xl mb-2'>{title}</h1>
                 <h1>{formatPrice(price)}</h1>
+                <p className='text-sm text-text'>{description}</p>
               </div>
             </div>
-            <DialogDescription>
-              <h1>{description}</h1>
-            </DialogDescription>
           </DialogHeader>
-          <div className='fixed flex justify-between px-10 items-center bottom-0 bg-white border-t-2  border-t-black py-2 w-full'>
+          <div className='fixed flex justify-between px-20 items-center bottom-0 bg-white border-t-2  border-t-black py-5 w-full'>
             <div className=' text-xs md:text-lg flex items-center gap-x-2'>
                 <FaMinus 
                     onClick={()=>handleQuantity('subtract')}
-                    className='px-1 md:px-2 border border-gray-200 text-sm size-7 cursor-pointer'
+                    className='px-1 md:px-2 rounded-full  border border-gray-200 text-sm size-7 cursor-pointer'
                 />
                 {quantity}
                 <FaPlus
                     onClick={()=>handleQuantity('add')}
-                    className='px-1 md:px-2 border border-gray-200 text-sm size-7 cursor-pointer'
+                    className='px-1 md:px-2 rounded-full border border-gray-200 text-sm size-7 cursor-pointer'
                 />
             </div>
-            { user ? isAlreadyAdded() ? (
-              <Button disabled onClick={handleAddToCart} variant={'outline'} className=' border-2 border-yellow hover:border-primary text-yellow hover:text-primary font-semibold flex items-center gap-x-3'> 
-                <FaCheck className=''/>
-                Added to cart
-              </Button>
-              ) : (
-                <Button onClick={handleAddToCart} variant={'outline'} className=' border-2 border-yellow hover:border-primary text-yellow hover:text-primary font-semibold flex items-center gap-x-3'> 
-                <FaShoppingBag /> 
+            { user ?  (
+                <Button onClick={handleAddToCart} variant={'outline'} className=' w-2/3  hover:text-primary text-white bg-primary hover:scale-105 font-semibold flex items-center gap-x-3'> 
                 Add to cart
               </Button>
             ) : (
               <Button onClick={()=> router.push('/auth')} variant={'outline'} className=' border-2 border-yellow hover:border-primary text-yellow hover:text-primary font-semibold flex items-center gap-x-3'> 
-                <FaShoppingBag /> 
                 Add to cart
               </Button>
             )}

@@ -8,7 +8,8 @@ import { asyncMap } from "convex-helpers";
 export const addToCart = mutation({
     args: {
         menuId: v.optional(v.id('menus')),
-        familyMealId: v.optional(v.id('familyMeals'))
+        familyMealId: v.optional(v.id('familyMeals')),
+        quantity: v.number()
 
     },
     handler: async (ctx, args) => {
@@ -17,13 +18,13 @@ export const addToCart = mutation({
 
         if(userId){
             const cartItems = await getManyFrom(ctx.db, 'cartItems', 'by_userId', userId);
-            const isExisting = cartItems.find((item)=>{item.menuId === args.menuId})
+            const isExisting = cartItems.find((item)=>item.menuId === args.menuId)
             if(!isExisting){
                 const cartItem = await ctx.db.insert("cartItems", { 
                     menuId: args.menuId, 
                     familyMealId:args.familyMealId,
                     userId: userId,
-                    quantity: +1,
+                    quantity: +args.quantity,
                 });
                 const item = await ctx.db.get(cartItem);
                 const id = item?.menuId
@@ -31,12 +32,13 @@ export const addToCart = mutation({
                     const menuName = await ctx.db.get(id)
                     return menuName;
                 }
+            } else {
+               await ctx.db.patch(isExisting._id, {quantity: isExisting.quantity+args.quantity})
+               if(isExisting.menuId){
+                const menuName = await ctx.db.get(isExisting.menuId)
+                return menuName
+                }
             }
-
-            if(isExisting){
-                return null
-            }
-            
         } else {
             return null
         }
@@ -79,8 +81,7 @@ export const addSubtract = mutation({
         if(args.operation.toLowerCase() === "subtract"){
             const cartItem = await ctx.db.get(args.cartItemId)
             if(cartItem)
-             cartItem && cartItem.quantity > 1 ?
-               await ctx.db.patch(args.cartItemId, {quantity: cartItem?.quantity - 1}) :
+             cartItem && cartItem.quantity > 1 ? await ctx.db.patch(args.cartItemId, {quantity: cartItem?.quantity - 1}) :
                await ctx.db.delete(args.cartItemId)
 
         }
