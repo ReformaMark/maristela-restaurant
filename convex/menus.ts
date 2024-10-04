@@ -2,13 +2,10 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import {
-    getAll,
-    getOneFrom,
     getManyFrom,
-    getManyVia,
 } from "convex-helpers/server/relationships";
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { menuCategories } from "../data/menu-data";
+
 
 export const allMenus = query({
     handler: async (ctx) => {
@@ -29,6 +26,26 @@ export const allMenus = query({
         }));
     }
 });
+
+export const getOneMenu = query({
+    args: {
+        menuId: v.optional(v.id('menus'))
+    },
+    handler: async (ctx, args)=>{
+       if(args.menuId){
+        const menu = await ctx.db.get(args.menuId)
+            if(menu){
+                return {
+                    ...menu,
+                    ...(menu.imageId === undefined)
+                        ? ""
+                        : { url: await ctx.storage.getUrl(menu.imageId) },
+                }
+            }
+        } 
+    }
+})
+
 export const create = mutation({
     args: {
         image: v.id("_storage"),

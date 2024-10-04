@@ -32,11 +32,14 @@ function CategoryTemplate({
                     <ProductCard  
                         key={menuItem._id} 
                         title={menuItem.name} 
-                        price={menuItem.price} 
+                        price={menuItem.price}
+                        image={menuItem.url ? menuItem.url : ""}
+                        description={menuItem.description}
                         menuId={menuItem._id}
                         signature={menuItem.special}
                         recommend={menuItem.recommended}
                         average={getAverage({ratings: menuItem.ratings })}
+                    
                         >
                         
                         <Image src={menuItem.url ? menuItem.url : ""} alt={menuItem.name} height={200} width={200} className='h-32 md:h-52 w-full object-cover rounded-lg hover:scale-105 transition-all duration-500 ease-linear'/>
