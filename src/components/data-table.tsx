@@ -32,13 +32,15 @@ import { DataTablePagination } from "./data-table-pagination"
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
-    filter?: string
+    filter?: string;
+    onRowClick?: (row: TData) => void;
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
     filter,
+    onRowClick,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -64,7 +66,7 @@ export function DataTable<TData, TValue>({
             {/* Input code */}
             <div className="flex items-center py-4">
                 <Input
-                    placeholder="Filter products"
+                    placeholder={`Filter ${filter}`}
                     value={(table.getColumn(`${filter}`)?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
                         table.getColumn(`${filter}`)?.setFilterValue(event.target.value)
@@ -101,9 +103,10 @@ export function DataTable<TData, TValue>({
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
                                     className="hover:bg-red-50"
+                                    onClick={() => onRowClick && onRowClick(row.original)}
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
+                                        <TableCell key={cell.id} className="cursor-pointer">
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()

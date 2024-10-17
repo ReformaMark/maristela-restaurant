@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const createOrders = mutation({
     args: {
@@ -31,3 +32,47 @@ export const createOrders = mutation({
 
     },
 });
+
+export const getAllOrders = query({
+    args: {},
+    handler: async (ctx) => {
+        const userId = await getAuthUserId(ctx)
+
+        if (userId === null) {
+            return []
+        }
+
+        const user = await ctx.db.get(userId)
+
+        if (user?.role !== "admin") {
+            return []
+        }
+
+        const orders = await ctx.db
+            .query("orders")
+            .collect()
+
+        const ordersWithDetails = await Promise.all(orders.map(async (order) => {
+            const user = await ctx.db.get(order.userId)
+            const menuItem = order.menuId ? await ctx.db.get(order.menuId) : null
+            const familyMeal = order.familyMealId ? await ctx.db.get(order.familyMealId) : null
+
+            return {
+                ...order,
+                user: {
+                    name: user?.name,
+                    email: user?.email,
+                    image: user?.image,
+                },
+                menuItem: {
+
+                },
+                familyMeal: {
+
+                }
+            }
+        }))
+
+        return ordersWithDetails
+    }
+})
