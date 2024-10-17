@@ -11,13 +11,12 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { CalculateOrder } from "@/lib/types"
 import { calculateTotal, formatPrice, statusColors } from "@/lib/utils"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, MoreHorizontal } from "lucide-react"
-import { transactionData } from "../../../../../data/transactions-data"
+import { TransactionWithDetails } from "../../../../../data/transactions-data"
 
-export const transactionColumns: ColumnDef<typeof transactionData[0]>[] = [
+export const transactionColumns: ColumnDef<TransactionWithDetails>[] = [
     {
         accessorKey: "_id",
         header: "Order ID",
@@ -42,15 +41,19 @@ export const transactionColumns: ColumnDef<typeof transactionData[0]>[] = [
     {
         accessorKey: "user.name",
         header: "Customer",
+        cell: ({ row }) => {
+            return <div>
+                {row.original.user.name} {row.original.user.lastName}
+            </div>
+        },
     },
     {
         accessorKey: "orders",
         header: "Total",
         cell: ({ row }) => {
-            const total = calculateTotal(row.original.orders.map((order) => ({
-                ...order,
-                familyMeal: order.familyMeal ? { price: order.familyMeal.price } : null,
-            } as CalculateOrder)))
+            const shippingFee = 80
+
+            const total = calculateTotal(row.original.orders) + shippingFee
 
             return formatPrice(total)
         },

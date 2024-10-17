@@ -1,7 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { Doc } from "../../convex/_generated/dataModel"
-import { CalculateOrder } from "./types"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -9,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatDate({
   convexDate
-}:{
+}: {
   convexDate: number
 }) {
   const roundedTimestamp = Math.floor(convexDate);
@@ -49,8 +48,9 @@ export function formatPrice(
   }).format(numericPrice);
 }
 
-export const calculateTotal = (orders: CalculateOrder[]) => {
-  return orders.reduce((total, order) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const calculateTotal = (orders: any[]) => {
+  return orders?.reduce((total, order) => {
     const price = order.menuItem ? order.menuItem.price : order.familyMeal?.price
     return total + (price! * order.quantity)
   }, 0)

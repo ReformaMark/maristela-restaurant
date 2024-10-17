@@ -1,7 +1,9 @@
+import { Doc } from "../convex/_generated/dataModel";
+
 export const transactionData = [
     {
         _id: "transaction-1",
-        _creationTime: "2023-11-23",
+        _creationTime: 1234567890,
         userId: "user-1",
         shippingId: "shipping-1",
         mop: "cash",
@@ -186,3 +188,12 @@ export const transactionData = [
         }
     }
 ]
+
+export type TransactionWithDetails = Doc<"transactions"> & {
+    user: Doc<"users">;
+    shippingAddress: Doc<"shippingAddress"> | null;
+    orders: Array<Doc<"orders"> & {
+      menuItem: Doc<"menus"> | null;
+      familyMeal: Doc<"familyMeals"> | null;
+    }>;
+  };
