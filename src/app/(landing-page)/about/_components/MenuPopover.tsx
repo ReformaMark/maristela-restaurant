@@ -25,7 +25,7 @@ function MenuPopover() {
         <Link href={''} className='hover:text-primary px-3 py-1 min-w-40 hover:bg-yellow w-full'>Special</Link>
     </div>
     }>
-        <h1  className='hover:text-primary text-xs font-thin md:text-lg lg:text-lg transition-colors duration-300 ease-linear flex items-center'>
+        <h1  className='hover:text-primary text-text text-xs font-thin md:text-lg lg:text-lg transition-colors duration-300 ease-linear flex items-center'>
             Menu 
             <PiCaretDown className='ml-1' />
         </h1>

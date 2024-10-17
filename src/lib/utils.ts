@@ -7,6 +7,18 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export function formatDate({
+  convexDate
+}:{
+  convexDate: number
+}) {
+  const roundedTimestamp = Math.floor(convexDate);
+
+  const readableDate = new Date(roundedTimestamp);
+  const formattedDate = readableDate.toLocaleString();
+
+  return formattedDate
+}
 
 export function getAverage({
   ratings

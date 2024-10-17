@@ -80,10 +80,13 @@ export const addSubtract = mutation({
     handler: async (ctx, args)=>{
         if(args.operation.toLowerCase() === "subtract"){
             const cartItem = await ctx.db.get(args.cartItemId)
-            if(cartItem)
-             cartItem && cartItem.quantity > 1 ? await ctx.db.patch(args.cartItemId, {quantity: cartItem?.quantity - 1}) :
-               await ctx.db.delete(args.cartItemId)
-
+            if(cartItem){
+                if(cartItem.quantity > 1) {
+                    await ctx.db.patch(args.cartItemId, {quantity: cartItem?.quantity - 1})
+                } else {
+                    await ctx.db.delete(args.cartItemId)
+                }
+            }
         }
         if(args.operation.toLowerCase() === "add"){
             const cartItem = await ctx.db.get(args.cartItemId)
@@ -92,5 +95,14 @@ export const addSubtract = mutation({
             return await ctx.db.patch(args.cartItemId, {quantity: cartItem?.quantity + 1}) 
             
         }
+    }
+})
+
+export const deleteCartItems = mutation({
+    args:{
+        cartItemsId: v.id('cartItems')
+    },
+    handler: async(ctx, args) =>{
+        await ctx.db.delete(args.cartItemsId)
     }
 })

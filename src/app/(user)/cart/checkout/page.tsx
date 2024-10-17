@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useQuery } from 'convex/react'
+import { useMutation, useQuery } from 'convex/react'
 import { api } from '../../../../../convex/_generated/api'
 import { toast, Toaster } from 'sonner'
 import { formatPrice } from '@/lib/utils'
@@ -28,11 +28,21 @@ const initialShipppinginfo: ShippingAddress = {
 }
 
 function CheckoutPage() {
+    const user = useQuery(api.users.current)
+    const [isLoading, setIsLoading ] = useState<boolean>(false)
     const [shippingInfo, setShippingInfo] = useState<ShippingAddress>(initialShipppinginfo)
-    const cartartItems = useQuery(api.cartItems.getCartItems)
+    const cartItems = useQuery(api.cartItems.getCartItems)
+    const createOrder = useMutation(api.orders.createOrders)
+    const createTransaction = useMutation(api.transactions.createTransaction)
+    const createShippingAddress = useMutation(api.shippingAddress.createShippinngAddress)
+    const deleteCartitems = useMutation(api.cartItems.deleteCartItems)
     // const user = useQuery(api.users.current)
     const router = useRouter()
 
+    if(!user){
+        router.replace('/auth')
+        return
+    }
  
     //calculate the total price of an item
     function calcTotal(quantity?:number,price?:number){
@@ -40,11 +50,11 @@ function CheckoutPage() {
     }
 
     //calculate the total price of all the items in the cart
-    const subTotal = cartartItems && cartartItems.reduce((accumulator, item) => {
+    const subTotal = cartItems && cartItems.reduce((accumulator, item) => {
         return accumulator + ((item?.menu?.price||0) * (item?.quantity || 0)) ;
     }, 0);
 
-    if(cartartItems && cartartItems?.length < 1){
+    if(cartItems && cartItems?.length < 1){
         router.back()
     }
 
@@ -57,19 +67,87 @@ function CheckoutPage() {
         }))
     }
 
-    const promise = () => new Promise((resolve) => setTimeout(() => resolve({ name: 'Sonner' }), 2000));
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        toast.promise(promise, {
-            loading: 'Placing your order...',
-            success: () => {
-                return `It's a prank! Hinde pa po tapos!`;
-            },
-            error: 'Error',
-            });
+        setIsLoading(true)
+        // Ensure cart items are available
+        if (!cartItems || cartItems.length === 0) {
+            return
+        }
+    
+        try {
+            // Create orders for each item in the cart
+            const orders = await Promise.all(
+                cartItems.map(async (item) => {
+                    if (!item) {
+                        return null
+                    }
+    
+                    const menuName = item.menu?.name
+                    const totalPrice = item.quantity * (item.menu?.price || 1)
+                    const ids = await createOrder({
+                        menuId: item.menuId,
+                        menuName: menuName,
+                        quantity: item.quantity,
+                        status: 'confirmed',
+                        totalPrice: totalPrice,
+                        userId: user._id,
+                    })
+    
+                    return ids || null
+                })
+            )
+    
+            // Filter out any null values from failed order creations
+            const validOrders = orders.filter(order => order !== null)
+    
+            if (validOrders.length === 0) {
+                throw new Error("Failed to create orders.")
+            }
+    
+            // Create shipping info
+            const shippingId = await createShippingAddress({
+                userId: user._id,
+                firstname: shippingInfo.firstname,
+                lastName: shippingInfo.lastName,
+                streetAddress: shippingInfo.streetAddress,
+                apartmmentNumer: shippingInfo.apartmmentNumer,
+                address: shippingInfo.address,
+                phoneNumber: shippingInfo.phoneNumber
+            })
+    
+            if (!shippingId) {
+                throw new Error("Failed to create shipping address.")
+            }
+    
+            // Display success message
+            toast.promise(createTransaction({
+                orders: validOrders,
+                status: 'Pending',
+                mop: 'COD',
+                shippingId: shippingId,
+                userId: user._id,
 
-    }   
+            }), {
+                loading: 'Placing your order...',
+                success: "Order placed successfully!",
+                error: 'Error occurred while placing the order.',
+            })
+            cartItems.forEach((item)=>{
+                if(!item){
+                    throw new Error("Failed to delete your cart items.")
+                }
+                deleteCartitems({cartItemsId: item._id})
+            })
+            
+            setIsLoading(false)
+        } catch (error) {
+            console.error("Order submission failed:", error)
+            // Handle the error, e.g., display an error notification
+            toast.error("Failed to place the order. Please try again.")
+        }
+    } 
 
 
   return (
@@ -192,7 +270,7 @@ function CheckoutPage() {
             </div>
             <div className="col-span-5 border border-gray-200  rounded-lg 600 p-5">
                 <h1 className='uppercase text-lg font-semibold mb-5 text-center'>Order Summary</h1>
-                {cartartItems && cartartItems.map((item)=>(
+                {cartItems && cartItems.map((item)=>(
                     <div key={item?._id} className="flex justify-between border-b-1 border-gray-800 ">
                         <h1 className=''>{item?.quantity} x {item?.menu?.name}</h1>
 
@@ -215,7 +293,7 @@ function CheckoutPage() {
                     type="submit"
                     form="create-shipping-form"
                     className="bg-primary uppercase text-bold w-full mt-5 tracking-widest text-white transition-all duration-300 ease-in hover:bg-primary/90"
-                    
+                    disabled={isLoading}
                 >
                   Place Order
                 </Button>

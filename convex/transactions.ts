@@ -1,16 +1,19 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { getManyFrom } from "convex-helpers/server/relationships";
+import { asyncMap } from "convex-helpers";
 
 export const createTransaction = mutation({
     args: {
         orders: v.array(v.id('orders')),
         mop: v.string(),
         status: v.union(
-            v.literal('unconfirmed'),
-            v.literal('confirmed'),
-            v.literal('delivered'),
-            v.literal('unsuccessful'),
+            v.literal('Pending'),
+            v.literal('Confirmed'),
+            v.literal('Out for Delivery'),
+            v.literal('Completed'),
+            v.literal('Cancelled'),
         ),
         userId: v.id('users'),
         shippingId: v.id('shippingAddress')
@@ -73,3 +76,126 @@ export const getAllTransactions = query({
         return transactionWithDetails
     }
 })
+export const cancelTransaction = mutation({
+  args: {
+    transactionId: v.id('transactions')
+  },
+  handler: async (ctx, args)=>{
+    const userId = await getAuthUserId(ctx)
+    if(userId !== null ){
+      const transaction = await ctx.db.get(args.transactionId) 
+      if(transaction && transaction?.status === "Pending"){
+        await ctx.db.patch(args.transactionId, { status: "Cancelled" });
+
+      } else {
+        
+      }
+    } else {
+
+    }
+  }
+})
+
+export const getTransactions = query({ 
+
+    handler: async (ctx)=>{
+        const userId = await getAuthUserId(ctx)
+        if(userId !== null ){
+           
+            const bareTransactions = await getManyFrom(ctx.db, 'transactions', 'by_userId', userId);
+
+            const sortedTransactions = bareTransactions.sort((a, b) => b._creationTime - a._creationTime);
+         
+            const transactions = await asyncMap(sortedTransactions, async (transaction)=> {
+
+                if(transaction.orders) {
+                    const orders = await Promise.all(transaction.orders.map(async (orderId) => {
+                        const order = await ctx.db.get(orderId); // Fetch order details
+                        
+                        if(order === null) {
+                            return null
+                        }
+                        if(!order.menuId) {
+                            return null
+                        }
+                        // Fetch menu details using menuId from the order
+                        const menu = await ctx.db.get(order.menuId); 
+
+                
+                        return {
+                          ...order,
+                          menu: menu ? menu : null, // Attach menu details
+                          ...(menu?.imageId) ?
+                        {url: await ctx.storage.getUrl(menu?.imageId)} : ""
+                        };
+                      }));
+                    
+                    const shippingAddress =  await ctx.db.get(transaction.shippingId);
+
+                    return { 
+                        ...transaction,
+                        orders, 
+                        shippingAddress: shippingAddress
+                    }
+                }
+            })
+
+            return transactions
+        } else {
+            return null
+        }
+
+    }
+
+})
+
+export const getTransaction = query({
+    args: {
+      transactionid: v.id('transactions')
+    },
+    handler: async (ctx, args) => {
+      const userId = await getAuthUserId(ctx);
+  
+      if (userId !== null) {
+        // Fetch the transaction
+        const transaction = await ctx.db.get(args.transactionid);
+  
+        if (transaction === null) {
+          return null;
+        }
+  
+        // Fetch orders and their associated menu details
+        const orders = await Promise.all(
+          transaction.orders.map(async (orderId) => {
+            const order = await ctx.db.get(orderId); // Fetch order details
+  
+            if (order === null || !order.menuId) {
+              return null;
+            }
+  
+            // Fetch menu details using menuId from the order
+            const menu = await ctx.db.get(order.menuId);
+  
+            return {
+              ...order,
+              menu: menu ? menu : null, // Attach menu details
+              url: menu?.imageId ? await ctx.storage.getUrl(menu.imageId) : null // Attach image URL if available
+            };
+          })
+        );
+  
+        // Fetch shipping address
+        const shippingAddress = await ctx.db.get(transaction.shippingId);
+  
+        // Return the complete transaction object
+        return {
+          ...transaction,
+          orders: orders.filter(order => order !== null), // Ensure only valid orders are included
+          shippingAddress
+        };
+      } else {
+        return null;
+      }
+    }
+});
+  

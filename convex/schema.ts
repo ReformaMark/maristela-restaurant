@@ -65,14 +65,16 @@ const schema = defineSchema({
         orders: v.array(v.id('orders')),
         mop: v.string(),
         status: v.union(
-            v.literal('unconfirmed'),
-            v.literal('confirmed'),
-            v.literal('delivered'),
-            v.literal('unsuccessful'),
+            v.literal('Pending'),
+            v.literal('Confirmed'),
+            v.literal('Out for Delivery'),
+            v.literal('Completed'),
+            v.literal('Cancelled'),
         ),
         userId: v.id('users'),
         shippingId: v.id('shippingAddress')
-    }),
+    }).index('by_shippingId',['shippingId']).index('by_userId', ['userId']),
+
     ratings: defineTable({
         stars: v.optional(v.number()),
         feedbackMessage: v.optional(v.string()),
@@ -90,7 +92,7 @@ const schema = defineSchema({
     shippingAddress: defineTable({
         userId: v.id('users'),
         firstname: v.string(),
-        lastName: v.string(),
+        lastName: v.string(), 
         streetAddress: v.string(),
         apartmmentNumer: v.optional(v.string()),
         address:v.string(),
