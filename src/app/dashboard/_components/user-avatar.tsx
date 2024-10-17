@@ -11,6 +11,8 @@ import { Loader2Icon, LogOutIcon } from "lucide-react"
 
 import { useCurrentUser } from "@/features/auth/api/use-current-user"
 import { useAuthActions } from "@convex-dev/auth/react"
+import { TbChecklist } from "react-icons/tb"
+import Link from "next/link"
 
 export const UserAvatar = () => {
     const { signOut } = useAuthActions()
@@ -40,6 +42,12 @@ export const UserAvatar = () => {
                 </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" side="bottom" className="w-60">
+                <Link href={'/orders'} className="">
+                    <DropdownMenuItem onClick={() => {}} className="h-10 cursor-pointer">
+                        <TbChecklist  className="size-4 mr-2 " />
+                        Orders & reordering
+                    </DropdownMenuItem>
+                </Link>
                 <DropdownMenuItem onClick={() => signOut()} className="h-10 cursor-pointer">
                     <LogOutIcon className="size-4 mr-2 " />
                     Log out
