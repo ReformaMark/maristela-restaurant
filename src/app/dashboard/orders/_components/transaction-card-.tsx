@@ -2,16 +2,57 @@
 
 import { DataTable } from "@/components/data-table"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAllTransactions } from "@/features/transactions/api/use-all-transactions"
 import { calculateTotal, formatPrice } from "@/lib/utils"
-import { Loader2Icon } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useConvexMutation } from "@convex-dev/react-query"
+import { useMutation } from "@tanstack/react-query"
+import { CheckCircle, Clock, Loader2Icon, Package, Truck } from "lucide-react"
+import { Fragment, useEffect, useMemo, useState } from "react"
+import { toast } from "sonner"
+import { api } from "../../../../../convex/_generated/api"
+import { Id } from "../../../../../convex/_generated/dataModel"
 import { transactionColumns } from "./transaction-columns"
 
 export const TransactionCard = () => {
     const { data, isLoading } = useAllTransactions()
     const [selectedTransaction, setSelectedTransaction] = useState(data?.[0])
+    const [activeTab, setActiveTab] = useState("new")
+
+    const filteredTransactions = useMemo(() => {
+        if (activeTab === "new") {
+            return data?.filter(t => ["Pending", "Confirmed", "Out for Delivery"].includes(t.status))
+        } else {
+            return data?.filter(t => ["Completed", "Cancelled"].includes(t.status))
+        }
+    }, [data, activeTab])
+
+    const { mutate, isPending } = useMutation({
+        mutationFn: useConvexMutation(api.transactions.handleTransactionStatus),
+        onSuccess: () => {
+            toast.success("Successfully updated transaction!")
+        },
+        onError: () => {
+            toast.error(`Failed to update transaction`);
+        }
+    })
+
+    const handleStatusChange = async (newStatus: "Pending" | "Confirmed" | "Out for Delivery" | "Completed" | "Cancelled") => {
+        await mutate({
+            status: newStatus,
+            transactionId: selectedTransaction?._id as Id<"transactions">
+        })
+    }
 
     useEffect(() => {
         setSelectedTransaction(data?.[0])
@@ -31,12 +72,37 @@ export const TransactionCard = () => {
         No data.
     </div>
 
-
-
     const fullName = selectedTransaction?.user?.name + " " + selectedTransaction?.user?.lastName
+    const shippingFullName = selectedTransaction?.shippingAddress?.firstname + " " + selectedTransaction?.shippingAddress?.lastName
     const shippingFee = 80
 
+    const renderStatusWizard = () => {
+        const statuses = ['Pending', 'Confirmed', 'Out for Delivery', 'Completed', 'Cancelled']
+        const currentIndex = statuses.indexOf(selectedTransaction?.status as string)
 
+        return (
+            <div className="flex flex-row items-center justify-between mb-4 text-sm">
+                {statuses.map((status, index) => (
+                    <Fragment key={status}>
+                        <div className="flex flex-col items-center mb-2 sm:mb-0">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${index <= currentIndex ? 'bg-primary' : 'bg-gray-300'}`}>
+                                {index === 0 && <Clock className="w-5 h-5 text-white" />}
+                                {index === 1 && <CheckCircle className="w-5 h-5 text-white" />}
+                                {index === 2 && <Truck className="w-5 h-5 text-white" />}
+                                {index === 3 && <Package className="w-5 h-5 text-white" />}
+                            </div>
+                            <span className="text-xs mt-1 text-center">
+                                {status}
+                            </span>
+                        </div>
+                        {index < statuses.length - 1 && (
+                            <div className={`hidden sm:block flex-1 h-1 ${index < currentIndex ? 'bg-primary' : 'bg-gray-300'}`} />
+                        )}
+                    </Fragment>
+                ))}
+            </div>
+        )
+    }
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -48,13 +114,30 @@ export const TransactionCard = () => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <DataTable
-                            //@ts-expect-error need to know how to get exact type
-                            columns={transactionColumns}
-                            data={data}
-                            filter="name"
-                            onRowClick={(row) => setSelectedTransaction(row)}
-                        />
+                        <Tabs defaultValue="new" className="w-full" onValueChange={(value) => setActiveTab(value)}>
+                            <TabsList className="grid w-full grid-cols-2">
+                                <TabsTrigger value="new">New Orders</TabsTrigger>
+                                <TabsTrigger value="completed">Completed & Cancelled</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="new">
+                                <DataTable
+                                    //@ts-expect-error need to know how to get exact type
+                                    columns={transactionColumns}
+                                    //@ts-expect-error this is not really an error it is just filtered kaya hindi correctly typed
+                                    data={filteredTransactions}
+                                    onRowClick={(row) => setSelectedTransaction(row)}
+                                />
+                            </TabsContent>
+                            <TabsContent value="completed">
+                                <DataTable
+                                    //@ts-expect-error need to know how to get exact type
+                                    columns={transactionColumns}
+                                    //@ts-expect-error this is not really an error it is just filtered kaya hindi correctly typed
+                                    data={filteredTransactions}
+                                    onRowClick={(row) => setSelectedTransaction(row)}
+                                />
+                            </TabsContent>
+                        </Tabs>
                     </CardContent>
                 </Card>
             </div>
@@ -78,6 +161,41 @@ export const TransactionCard = () => {
                         )}
                     </CardHeader>
                     <CardContent className="space-y-4 p-6 text-sm">
+                        {selectedTransaction?.status === "Pending" || selectedTransaction?.status === "Confirmed" || selectedTransaction?.status === "Out for Delivery" ? (
+                            <div className="text-black">
+                                {renderStatusWizard()}
+                                <Select
+                                    value={selectedTransaction?.status}
+                                    onValueChange={handleStatusChange}
+                                    disabled={isPending}
+                                >
+                                    <SelectTrigger className="w-full text-black">
+                                        <SelectValue placeholder="Change status" />
+                                    </SelectTrigger>
+                                    <SelectContent className="text-black">
+                                        <SelectGroup>
+                                            <SelectLabel>Status</SelectLabel>
+                                            <SelectItem value="Pending">Pending</SelectItem>
+                                            <SelectItem value="Confirmed">Confirmed</SelectItem>
+                                            <SelectItem value="Out for Delivery">Out for Delivery</SelectItem>
+                                            <SelectItem value="Completed">Completed</SelectItem>
+                                            <SelectItem value="Cancelled">Cancelled</SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        ) : selectedTransaction?.status === "Completed" ? (
+                            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                                <strong className="font-bold">Completed Order</strong>
+                                <span className="block sm:inline"> This order is completed.</span>
+                            </div>
+                        ) : (
+                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                                <strong className="font-bold">Cancelled Order</strong>
+                                <span className="block sm:inline"> This order has been cancelled.</span>
+                            </div>
+                        )}
+
                         <div className="grid gap-3">
                             <h3 className="font-semibold mb-2">
                                 Order Details
@@ -106,20 +224,12 @@ export const TransactionCard = () => {
                                 </span>
                             </div>
 
-
                             <div className="flex items-center justify-between">
                                 <span className="text-muted-foreground">Shipping fee</span>
                                 <span>
                                     {formatPrice(shippingFee)}
                                 </span>
                             </div>
-
-                            {/* <div className="flex items-center justify-between">
-                                <span className="text-muted-foreground">Tax</span>
-                                <span>
-                                    {formatPrice((calculateTotal(selectedTransaction?.orders ?? []) * 0.1).toFixed(2))}
-                                </span>
-                            </div> */}
 
                             <div className="flex items-center justify-between font-semibold">
                                 <span>Total</span>
@@ -137,7 +247,7 @@ export const TransactionCard = () => {
                                     Shipping Information
                                 </h3>
                                 <address className="grid gap-0.5 not-italic text-muted-foreground">
-                                    <span>{fullName}</span>
+                                    <span>{shippingFullName}</span>
                                     <span>{selectedTransaction?.shippingAddress?.address}</span>
                                     {/* <span>{selectedTransaction?.shippingAddress?.city}, {selectedTransaction?.shippingAddress?.state} {selectedTransaction?.shippingAddress?.zip}</span> */}
                                 </address>

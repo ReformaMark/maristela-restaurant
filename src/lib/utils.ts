@@ -57,8 +57,9 @@ export const calculateTotal = (orders: any[]) => {
 }
 
 export const statusColors = {
-  unconfirmed: 'bg-yellow text-foreground hover:bg-yellow-600',
-  confirmed: 'bg-blue-500 text-foreground hover:bg-blue-600',
-  delivered: 'bg-green-500 text-foreground hover:bg-green-600',
-  unsuccessful: 'bg-primary text-foreground hover:bg-primary/90',
+  Pending: 'bg-yellow hover:bg-yellow/70 text-foreground text-white',
+  Confirmed: 'bg-blue-500 hover:bg-blue-600 text-white',
+  'Out for Delivery': 'bg-purple-500 hover:bg-purple-600 text-white',
+  Completed: 'bg-green-500 hover:bg-green-600 text-white',
+  Cancelled: 'bg-primary hover:bg-primary/70 text-white',
 }

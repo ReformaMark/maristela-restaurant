@@ -1,8 +1,8 @@
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { asyncMap } from "convex-helpers";
+import { getManyFrom } from "convex-helpers/server/relationships";
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { getAuthUserId } from "@convex-dev/auth/server";
-import { getManyFrom } from "convex-helpers/server/relationships";
-import { asyncMap } from "convex-helpers";
 
 export const createTransaction = mutation({
   args: {
@@ -34,7 +34,7 @@ export const createTransaction = mutation({
 
 export const getAllTransactions = query({
   args: {
-    
+
   },
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx)
@@ -51,6 +51,7 @@ export const getAllTransactions = query({
 
     const transactions = await ctx.db
       .query("transactions")
+      .order("desc")
       .collect()
 
 
@@ -203,3 +204,48 @@ export const getTransaction = query({
   }
 });
 
+export const handleTransactionStatus = mutation({
+  args: {
+    transactionId: v.id("transactions"),
+    status: v.union(
+      v.literal('Pending'),
+      v.literal('Confirmed'),
+      v.literal('Out for Delivery'),
+      v.literal('Completed'),
+      v.literal('Cancelled'),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+
+    if (userId === null) {
+      throw new Error("Unauthorized")
+    }
+
+    const user = await ctx.db.get(userId)
+
+    if (user?.role !== "admin") {
+      throw new Error("Unauthorized")
+    }
+
+    const currentTransaction = await ctx.db.get(args.transactionId)
+
+    if (currentTransaction?.status === "Completed" || currentTransaction?.status === "Cancelled") {
+      throw new Error("Invalid Action")
+    }
+
+    if (currentTransaction?.status === "Confirmed" && args.status === "Pending") {
+      throw new Error("Invalid Action, transaction is already confirmed") // how to fetch this error message in the frontend?
+    }
+
+    if (currentTransaction?.status === "Out for Delivery" && args.status === "Confirmed" || args.status === "Pending") {
+      throw new Error("invalid Action, transaction is already out for delivery")
+    }
+
+    const transactionId = await ctx.db.patch(args.transactionId, {
+      status: args.status,
+    })
+
+    return transactionId
+  }
+})

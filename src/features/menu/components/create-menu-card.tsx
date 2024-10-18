@@ -72,8 +72,8 @@ export const CreateMenuCard = () => {
             setPreviewUrl(null)
             toast.success('Product created successfully')
         },
-        onError: (error) => {
-            console.error(error)
+        onError: () => {
+            toast.error('Failed to create product')
         },
     })
 
