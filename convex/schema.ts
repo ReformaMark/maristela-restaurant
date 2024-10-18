@@ -42,11 +42,13 @@ const schema = defineSchema({
         description: v.optional(v.string()),
         quantity: v.optional(v.number()),
     }).index('by_name', ['name']),
+
     familyMeals: defineTable({
         menus: v.array(v.id('menus')),
         price: v.number(),
         goodFor: v.string(),
     }),
+
     orders: defineTable({
         menuId: v.optional(v.id('menus')),
         familyMealId: v.optional(v.id('familyMeals')),
@@ -61,6 +63,7 @@ const schema = defineSchema({
         totalPrice: v.number(),
         userId: v.id('users'),
     }).index('by_user', ['userId']),
+
     transactions: defineTable({
         orders: v.array(v.id('orders')),
         mop: v.string(),
@@ -79,7 +82,8 @@ const schema = defineSchema({
         stars: v.optional(v.number()),
         feedbackMessage: v.optional(v.string()),
         userId: v.id("users"),
-        menuId: v.id('menus')
+        menuId: v.id('menus'),
+        transactionid: v.id('transactions')
     }).index('by_menu', ['menuId']),
 
     cartItems: defineTable({

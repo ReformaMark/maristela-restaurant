@@ -53,14 +53,14 @@ function Orders() {
                         <div className='col-span-1'></div>
                     </div>
                 </div>
-                <div>
+                <div className='space-y-5'>
                     {pendingTransactions ? 
                     pendingTransactions.length >= 1 ? 
                     pendingTransactions.map((transaction)=>(
                         <div key={transaction?._id} className='grid grid-cols-12 justify-evenly w-full'>
                           <div className='col-span-4'>{transaction?._id}</div>
                           <div className='col-span-3'>{formatDate({convexDate: transaction? transaction._creationTime : 0})}</div>
-                          <div className='col-span-2'>{formatPrice(computeCost(transaction?.orders))}</div>
+                          <div className='col-span-2'>{formatPrice(computeCost(transaction?.orders) + 80)}</div>
                           <div className='col-span-2'>{transaction?.status}</div>
                           <div className='col-span-1'>
                             <Link href={`/orders/${transaction?._id}`} className='text-yellow'>View</Link>
@@ -86,7 +86,7 @@ function Orders() {
                         <div className='col-span-1'></div>
                     </div>
                 </div>
-                <div>
+                <div className='space-y-5'>
                     {confirmedTransactions ? confirmedTransactions.length >= 1 ? confirmedTransactions.map((transaction)=>(
                         <div key={transaction?._id} className='grid grid-cols-12 justify-evenly w-full'>
                           <div className='col-span-4'>{transaction?._id}</div>
@@ -117,7 +117,7 @@ function Orders() {
                         <div className='col-span-1'></div>
                     </div>
                 </div>
-                <div>
+                <div className='space-y-5'>
                     {OutfordeliveryTransactions ? OutfordeliveryTransactions.length >= 1 ? OutfordeliveryTransactions.map((transaction)=>(
                         <div key={transaction?._id} className='grid grid-cols-12 justify-evenly w-full'>
                           <div className='col-span-4'>{transaction?._id}</div>
@@ -129,7 +129,7 @@ function Orders() {
                           </div>
                       </div>
                     )): (
-                        <div className='text-center'>No Confirmed transactions.</div>
+                        <div className='text-center'>No out for delivery transactions.</div>
                     ) : (
                         <>Loading...</>
                     )}
@@ -138,7 +138,7 @@ function Orders() {
             </div>
           </TabsContent>
           <TabsContent value="Completed">
-            <div>
+            <div >
                 <div className='text-text w-full my-5'>
                     <div className='grid grid-cols-12 justify-evenly w-full'>
                         <div className='col-span-4'>Order ID</div>
@@ -148,7 +148,7 @@ function Orders() {
                         <div className='col-span-1'></div>
                     </div>
                 </div>
-                <div>
+                <div className='space-y-5'>
                     {completedTransactions ? completedTransactions.length >= 1 ? completedTransactions.map((transaction)=>(
                         <div key={transaction?._id} className='grid grid-cols-12 justify-evenly w-full'>
                           <div className='col-span-4'>{transaction?._id}</div>
@@ -169,7 +169,7 @@ function Orders() {
             </div>
           </TabsContent>
           <TabsContent value="Cancelled">
-            <div>
+            <div >
                 <div className='text-text w-full my-5'>
                     <div className='grid grid-cols-12 justify-evenly w-full'>
                         <div className='col-span-4'>Order ID</div>
@@ -179,7 +179,7 @@ function Orders() {
                         <div className='col-span-1'></div>
                     </div>
                 </div>
-                <div>
+                <div className='space-y-5'>
                     {cancelledTransactions ? cancelledTransactions.length >= 1 ? cancelledTransactions.map((transaction)=>(
                         <div key={transaction?._id} className='grid grid-cols-12 justify-evenly w-full'>
                           <div className='col-span-4'>{transaction?._id}</div>

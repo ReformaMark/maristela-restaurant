@@ -16,12 +16,21 @@ export const allMenus = query({
 
         return Promise.all(menus.map(async (menu) => {
             const ratings = await getManyFrom(ctx.db, 'ratings', 'by_menu', menu._id, "menuId");
+            const ratingsWithUser = await Promise.all(
+                ratings.map(async (rating) => {
+                  const user = await ctx.db.get(rating.userId); // Fetch the user document
+                  return {
+                    ...rating,
+                    user: user ? user : null, // Include the user document, or null if not found
+                  };
+                })
+              );
             return {
                 ...menu,
                 ...(menu.imageId === undefined)
                     ? ""
                     : { url: await ctx.storage.getUrl(menu.imageId) },
-                ratings
+                ratings: ratingsWithUser
             };
         }));
     }

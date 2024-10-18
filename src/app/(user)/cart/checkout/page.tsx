@@ -140,7 +140,7 @@ function CheckoutPage() {
                 }
                 deleteCartitems({cartItemsId: item._id})
             })
-            
+            router.replace('/orders')
             setIsLoading(false)
         } catch (error) {
             console.error("Order submission failed:", error)

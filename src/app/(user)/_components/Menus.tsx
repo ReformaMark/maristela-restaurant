@@ -2,14 +2,14 @@
 import React from 'react'
 import { useQuery } from 'convex/react'
 import { api } from '../../../../convex/_generated/api'
-import { DocumentByName } from 'convex/server'
-import { DataModel } from '../../../../convex/_generated/dataModel'
+import {  Doc } from '../../../../convex/_generated/dataModel'
 import Recommendation from './Recommendation'
 import CategoryTemplate from './CategoryTemplate'
+import { RatingWithUser } from '@/components/ProductCard'
 
 
-export type AugmentedMenu = DocumentByName<DataModel, "menus"> & {
-    ratings?: DocumentByName<DataModel, "ratings">[];
+export type AugmentedMenu = Doc<'menus'> & {
+    ratings: RatingWithUser[];
     url?: string | null | undefined;
   };
 

@@ -39,6 +39,7 @@ function Special() {
                         title={menuItem.name} 
                         price={menuItem.price} 
                         menuId={menuItem._id}
+                        ratings={menuItem.ratings}
                         average={getAverage({ ratings: menuItem.ratings })}
                         image={menuItem.url ? menuItem.url : ""}
                     >

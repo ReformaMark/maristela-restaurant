@@ -20,6 +20,7 @@ import type * as cartItems from "../cartItems.js";
 import type * as http from "../http.js";
 import type * as menus from "../menus.js";
 import type * as orders from "../orders.js";
+import type * as ratings from "../ratings.js";
 import type * as shippingAddress from "../shippingAddress.js";
 import type * as transactions from "../transactions.js";
 import type * as upload from "../upload.js";
@@ -39,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   menus: typeof menus;
   orders: typeof orders;
+  ratings: typeof ratings;
   shippingAddress: typeof shippingAddress;
   transactions: typeof transactions;
   upload: typeof upload;

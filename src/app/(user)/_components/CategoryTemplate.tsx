@@ -4,7 +4,7 @@ import { SkeletonCard } from '@/components/SkeletonCard'
 import Image from 'next/image'
 import ProductCard from '@/components/ProductCard'
 import { getAverage } from '@/lib/utils'
-import { MenuCategoryType } from '../../../../data/menu-data'
+
 
 function CategoryTemplate({
     menus,
@@ -12,7 +12,7 @@ function CategoryTemplate({
 
 }:{
     menus?: AugmentedMenu[],
-    categoryName: MenuCategoryType,
+    categoryName: string,
 
 }) {
   const filteredMenus =  menus?.filter(menu=> menu.category == categoryName);
@@ -39,7 +39,7 @@ function CategoryTemplate({
                         signature={menuItem.special}
                         recommend={menuItem.recommended}
                         average={getAverage({ratings: menuItem.ratings })}
-                    
+                        ratings={menuItem.ratings}
                         >
                         
                         <Image src={menuItem.url ? menuItem.url : ""} alt={menuItem.name} height={200} width={200} className='h-32 md:h-52 w-full object-cover rounded-lg hover:scale-105 transition-all duration-500 ease-linear'/>

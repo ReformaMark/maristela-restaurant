@@ -33,7 +33,9 @@ export const createTransaction = mutation({
 });
 
 export const getAllTransactions = query({
-  args: {},
+  args: {
+    
+  },
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx)
 

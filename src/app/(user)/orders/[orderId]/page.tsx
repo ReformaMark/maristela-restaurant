@@ -20,6 +20,7 @@ import { formatDate, formatPrice } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import RatingStars from '@/components/Stars'
 
 function TransactionPage({
     params
@@ -67,10 +68,10 @@ function TransactionPage({
             <h1 className='text-xs text-text'>Order Id: {transaction?._id}</h1>
             <Dialog>
                 <DialogTrigger className='text-yellow font-semibold'>View Reciept</DialogTrigger>
-                <DialogContent className='max-w-3xl pt-10'>
+                <DialogContent className='max-w-3xl pt-10 max-h-screen overflow-auto'>
                     <DialogHeader >
                     <DialogTitle>Reciept</DialogTitle>
-                    <div className='flex justify-between items-center border-yellow border-2 rounded-lg p-5'>
+                    <div className='flex justify-between items-center border-yellow border-2 rounded-lg p-5 '>
                         <div className="flex items-center gap-x-5">
                             <Image src={Logo} alt='Logo' className=' size-16 object-cover'/>
                             <div className="">
@@ -172,14 +173,23 @@ function TransactionPage({
                     </div>
                     <div className="min-h-[50vh]">
                     {transaction?.orders.map((order)=>(
-                        <div key={order._id}  className="grid grid-cols-12 w-full items-center py-3 border-b border-b-gray-100">
-                                <div className='col-span-6 flex gap-x-4 items-center'>
-                                <Image src={order ? order.url !== null ? order.url : "" : ""} alt='Image' width={200} height={200} className='size-10 object-contain'/>
-                                <h1>{order.menuName}</h1>
+                        <div key={order._id} className="py-3 border-b border-b-gray-100">
+                            <div className="grid grid-cols-12 w-full items-center ">
+                                    <div className='col-span-6 flex gap-x-4 items-center'>
+                                    <Image src={order ? order.url !== null ? order.url : "" : ""} alt='Image' width={200} height={200} className='size-10 object-contain'/>
+                                    <h1>{order.menuName}</h1>
+                                    </div>
+                                <h1 className='col-span-2'>{formatPrice(order.menu? order.menu.price : 0)}</h1>
+                                <h1 className='col-span-2'>{order.quantity}</h1>
+                                <h1 className='col-span-2 text-right'>{formatPrice(order.totalPrice)}</h1>
+                            </div>
+                            {transaction.status === 'Completed' && (
+                                <div className="flex items-center gap-x-1">
+                                    <h1 className='text-text text-sm'>Rate this product: </h1>
+                                    <RatingStars edit={true} size={30} menuId={order.menuId} transactionId={transaction._id}/>
+
                                 </div>
-                            <h1 className='col-span-2'>{formatPrice(order.menu? order.menu.price : 0)}</h1>
-                            <h1 className='col-span-2'>{order.quantity}</h1>
-                            <h1 className='col-span-2 text-right'>{formatPrice(order.totalPrice)}</h1>
+                            )}
                         </div>
                     ))}
                     </div>
@@ -194,9 +204,9 @@ function TransactionPage({
                         <h1 className='text-lg'>{formatPrice(computeCost(transaction?.orders) + 80)}</h1>
                     </div>
                     {transaction && transaction.status === "Pending" ? (
-                        <div className="flex  md:justify-end mt-5">
+                        <div className="flex flex-col md:items-end md:justify-end mt-5">
                            <Dialog open={isOpen}>
-                               <DialogTrigger> <Button variant={'destructive'} onClick={()=> setIsOpen(true)} className='w-full '>Cancel Order</Button></DialogTrigger>
+                               <DialogTrigger> <Button variant={'destructive'} onClick={()=> setIsOpen(true)} className=''>Cancel Order</Button></DialogTrigger>
                                <DialogContent>
                                    <DialogHeader>
                                    <DialogTitle>Cancel Order?</DialogTitle>

@@ -50,83 +50,77 @@ function Categories() {
         <h1 className='text-primary text-xl font-semibold px-3'>Categories</h1>
         <div className="pb-3 ">
             <ul className='grid grid-cols-3 md:grid-cols-9 gap-x-3 w-full '>
-                <Link href={'/'} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
+                <Link href={`/Pork`} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
                     <Image src={Pork} alt='Pork' width={200} height={200} className='s size-32 object-cover  hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
                     <div className="flex justify-center gap-x-1 items-center mt-[-30px] text-xs">
                         <li>Pork</li>
                         <h1>({numberOfPork()})</h1>
                     </div>
                 </Link>
-                <Link href={'/'} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
+                <Link href={`/Chicken`}  className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
                     <Image src={Chicken} alt='Pork' width={200} height={200} className='s size-32 object-cover  hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
                     <div className="flex justify-center gap-x-1 items-center mt-[-30px] text-xs">
                         <li>Chicken</li>
                         <h1>({numberOfChicken()})</h1>
                     </div>
                 </Link>
-                <Link href={'/'} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
+                <Link href={`/Pancit & Pasta`} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
                     <Image src={Pasta} alt='Pork' width={200} height={200} className='s size-32 object-cover  hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
                     <div className="flex justify-center gap-x-1 items-center mt-[-30px] text-xs">
                         <li>Pancit & Pasta</li>
                         <h1>({numberOfPP()})</h1>
                     </div>
                 </Link>
-                <Link href={'/'} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
+                <Link href={`/Extras`} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
                     <Image src={Extra} alt='Pork' width={200} height={200} className='s size-32 object-cover  hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
                     <div className="flex justify-center gap-x-1 items-center mt-[-30px] text-xs">
                         <li>Extras</li>
                         <h1>({numberOfExtras()})</h1>
                     </div>
                 </Link>
-                <Link href={'/'} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
+                <Link href={`/Beverages`} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
                     <Image src={Beverages} alt='Pork' width={200} height={200} className='s size-32 object-cover  hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
                     <div className="flex justify-center gap-x-1 items-center mt-[-30px] text-xs">
                         <li>Beverages</li>
                         <h1>({numberOfBeverages()})</h1>
                     </div>
                 </Link>
-                <Link href={'/'} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
+                <Link href={`/Sizzling Plate`} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
                     <Image src={SizzlingPlate} alt='Pork' width={200} height={200} className='s size-32 object-cover  hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
                     <div className="flex justify-center gap-x-1 items-center mt-[-30px] text-xs">
                         <li>Sizzling Plate</li>
                         <h1>({numberOfSP()})</h1>
                     </div>
                 </Link>
-                <Link href={'/'} className=" hover:text-primary  text-text text-lg font-medium transition-all duration-400 ease-in-out">
+                <Link href={`/Super Silog Meals`} className=" hover:text-primary  text-text text-lg font-medium transition-all duration-400 ease-in-out">
                     <Image src={Silog} alt='Pork' width={200} height={200} className='s size-32 object-cover  hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
                     <div className="flex justify-center gap-x-1 items-center mt-[-30px] text-xs">
                         <li>Silog Meals</li> 
                         <h1>({numberOfSSM()})</h1>
                     </div>
                 </Link>
-                <Link href={'/'} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
+                <Link href={`/Seafood`} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
                     <Image src={Seafood} alt='Pork' width={200} height={200} className='s size-32 object-cover  hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
                     <div className="flex justify-center gap-x-1 items-center mt-[-30px] text-xs">
                         <li>Seafood</li>
                         <h1>({numberOfSeafood()})</h1>
                     </div>
                 </Link>
-                <Link href={'/'} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
+                <Link href={`/Veggies`} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
                     <Image src={Vegggies} alt='Pork' width={200} height={200} className='s size-32 object-cover  hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
                     <div className="flex justify-center gap-x-1 items-center mt-[-30px] text-xs">
                         <li>Veggies</li>
                         <h1>({numberOfVeggies()})</h1>
                     </div>
                 </Link>
-                <Link href={'/'} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
+                <Link href={`/Desserts`} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
                     <Image src={Desserts} alt='Pork' width={200} height={200} className='s size-32 object-cover  hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
                     <div className="flex justify-center gap-x-1 items-center mt-[-30px] text-xs">
                         <li>Desserts</li>
                         <h1>({numberOfVeggies()})</h1>
                     </div>
                 </Link>
-                <Link href={'/'} className=" hover:text-primary text-text text-lg font-medium transition-colors duration-400 ease-in-out">
-                    <Image src={Vegggies} alt='Pork' width={200} height={200} className='s size-32 object-cover  hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
-                    <div className="flex justify-center gap-x-1 items-center mt-[-30px] text-xs">
-                        <li>Family Meals</li>
-                        <h1>({numberOfVeggies()})</h1>
-                    </div>
-                </Link>
+              
                 
             </ul>
         </div>

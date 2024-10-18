@@ -58,7 +58,7 @@ function CartItems() {
         <div className="w-full px-2 md:px-10 py-5 border-2 border-gray-200">
             <h1 className='text-right text-black font-medium uppercase'>Subtotal  -  {formatPrice(subTotal || 0)}</h1>
             <div className="flex justify-between items-center mt-5">
-                <Button variant={'outline'} onClick={()=> router.back()} className='uppercase font-medium bg-white text-black text-sm'>Continue shopping</Button>
+                <Button variant={'outline'} onClick={()=> router.push('/')} className='uppercase font-medium bg-white text-black text-sm'>Continue shopping</Button>
                 <Button variant={'default'} onClick={()=> router.push('/cart/checkout')} className='uppercase font-medium text-sm'>Checkout</Button>
             </div>
         </div>
