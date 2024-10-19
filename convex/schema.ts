@@ -41,6 +41,7 @@ const schema = defineSchema({
         prepTime: v.optional(v.string()),
         description: v.optional(v.string()),
         quantity: v.optional(v.number()),
+        isArchived: v.optional(v.boolean()),
     }).index('by_name', ['name']),
 
     familyMeals: defineTable({

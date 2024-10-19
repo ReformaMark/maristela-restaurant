@@ -36,7 +36,8 @@ export type MenuDataWithRatings = {
     quantity?: number | undefined;
     _id: Id<"menus">;
     _creationTime: number;
-    url?: string | null | undefined
+    url?: string | null | undefined;
+    isArchived?: boolean | undefined;
     ratings: {
         _id: Id<"ratings">;
         menuId: Id<"menus">;

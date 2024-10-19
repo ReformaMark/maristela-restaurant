@@ -151,7 +151,7 @@ export const EditProductModal = ({
             <ConfirmDialog />
 
             <Dialog open={editOpen} onOpenChange={setEditOpen}>
-                <DialogContent className="sm:max-w-[700px]">
+                <DialogContent className="sm:max-w-[700px]" onClick={(e) => e.stopPropagation()}>
                     <DialogHeader>
                         <DialogTitle className="text-red-600">Edit Product</DialogTitle>
                     </DialogHeader>

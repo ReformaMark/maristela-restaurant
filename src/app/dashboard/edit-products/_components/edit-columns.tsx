@@ -127,31 +127,56 @@ export const EditColumns: ColumnDef<MenuDataWithRatings>[] = [
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const [ConfirmDialog, confirm] = useConfirm(
                 "Are you sure?",
-                "This will delete the product permanently.",
+                "You can undo this action later.",
             )
             const [editOpen, setEditOpen] = useState(false)
+            const [dropdownOpen, setDropdownOpen] = useState(false)
+            const [isArchived, setIsArchived] = useState(row.original.isArchived);
 
-            const { mutate: deleteProduct, isPending } = useMutation({
-                mutationFn: useConvexMutation(api.menus.deleteMenu),
+            // const { mutate: deleteProduct, isPending } = useMutation({
+            //     mutationFn: useConvexMutation(api.menus.deleteMenu),
+            //     onSuccess: () => {
+            //         toast.success('Product deleted successfully')
+            //     },
+            //     onError: () => {
+            //         toast.error("Failed to delete product")
+            //     }
+            // })
+
+            const { mutate: archiveProduct, isPending: archivePending } = useMutation({
+                mutationFn: useConvexMutation(api.menus.archiveMenu),
                 onSuccess: () => {
-                    toast.success('Product deleted successfully')
+                    toast.success(isArchived ? "Product archived" : "Product restored")
                 },
                 onError: (error) => {
-                    console.error(error)
-
+                    console.log(error)
+                    toast.error("Failed to archive product")
                 }
             })
 
             const productData = row.original
 
-            const handleDelete = async () => {
+            // const handleDelete = async () => {
+            //     const ok = await confirm()
+
+            //     if (!ok) return
+
+            //     await deleteProduct({
+            //         id: productData._id
+            //     })
+            // }
+
+            const handleArchive = async (isArchived: boolean) => {
                 const ok = await confirm()
 
                 if (!ok) return
 
-                deleteProduct({
-                    id: productData._id
+                await archiveProduct({
+                    id: productData._id,
+                    isArchived,
                 })
+
+                setIsArchived(isArchived)
             }
 
             return (
@@ -164,35 +189,59 @@ export const EditColumns: ColumnDef<MenuDataWithRatings>[] = [
                         setEditOpen={() => setEditOpen(!editOpen)}
                     />
 
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[160px]">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem
-                                onClick={() => setEditOpen(true)}
-                                className="text-yellow cursor-pointer"
-                            >
-                                <PencilIcon className="mr-2 h-4 w-4" />
-                                Edit
-                            </DropdownMenuItem>
-
-                            <DropdownMenuSeparator />
-
-                            <DropdownMenuItem
-                                onClick={handleDelete}
-                                className="text-red-600 cursor-pointer"
-                                disabled={isPending}
-                            >
-                                <Trash2Icon className="mr-2 h-4 w-4" />
-                                Delete
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    {row.original.isArchived ? (
+                        <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                    <span className="sr-only">Open menu</span>
+                                    <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-[160px]">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                    onClick={() => handleArchive(false)}
+                                    className="text-green-600 cursor-pointer"
+                                    disabled={archivePending}
+                                >
+                                    <CheckIcon className="mr-2 h-4 w-4" />
+                                    Restore
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    ) : (
+                        <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                    <span className="sr-only">Open menu</span>
+                                    <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-[160px]">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        setEditOpen(true)
+                                        setDropdownOpen(false)
+                                    }}
+                                    className="text-yellow cursor-pointer"
+                                >
+                                    <PencilIcon className="mr-2 h-4 w-4" />
+                                    Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                    onClick={() => handleArchive(true)}
+                                    className="text-red-600 cursor-pointer"
+                                    disabled={archivePending}
+                                >
+                                    <Trash2Icon className="mr-2 h-4 w-4" />
+                                    Archive
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )}
                 </>
             )
         }

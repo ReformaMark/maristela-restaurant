@@ -18,13 +18,13 @@ export const allMenus = query({
             const ratings = await getManyFrom(ctx.db, 'ratings', 'by_menu', menu._id, "menuId");
             const ratingsWithUser = await Promise.all(
                 ratings.map(async (rating) => {
-                  const user = await ctx.db.get(rating.userId); // Fetch the user document
-                  return {
-                    ...rating,
-                    user: user ? user : null, // Include the user document, or null if not found
-                  };
+                    const user = await ctx.db.get(rating.userId); // Fetch the user document
+                    return {
+                        ...rating,
+                        user: user ? user : null, // Include the user document, or null if not found
+                    };
                 })
-              );
+            );
             return {
                 ...menu,
                 ...(menu.imageId === undefined)
@@ -40,10 +40,10 @@ export const getOneMenu = query({
     args: {
         menuId: v.optional(v.id('menus'))
     },
-    handler: async (ctx, args)=>{
-       if(args.menuId){
-        const menu = await ctx.db.get(args.menuId)
-            if(menu){
+    handler: async (ctx, args) => {
+        if (args.menuId) {
+            const menu = await ctx.db.get(args.menuId)
+            if (menu) {
                 return {
                     ...menu,
                     ...(menu.imageId === undefined)
@@ -51,7 +51,7 @@ export const getOneMenu = query({
                         : { url: await ctx.storage.getUrl(menu.imageId) },
                 }
             }
-        } 
+        }
     }
 })
 
@@ -117,6 +117,7 @@ export const create = mutation({
             imageId: args.image,
             quantity: args.quantity,
             available: isAvailable,
+            isArchived: false,
         })
 
         return menuId
@@ -203,5 +204,35 @@ export const deleteMenu = mutation({
         await ctx.db.delete(args.id)
 
         return args.id
+    }
+})
+
+export const archiveMenu = mutation({
+    args: {
+        id: v.id('menus'),
+        isArchived: v.boolean(),
+    },
+    handler: async (ctx, args) => {
+        const userId = await getAuthUserId(ctx)
+
+        if (!userId) {
+            throw new Error("Unauthorized")
+        }
+
+        const user = await ctx.db.get(userId)
+
+        if (user?.role !== "admin") {
+            throw new Error("Unauthorized")
+        }
+
+        if (args.isArchived !== true && args.isArchived !== false) {
+            throw new Error("Invalid action")
+        }
+
+        const transactionId = await ctx.db.patch(args.id, {
+            isArchived: args.isArchived
+        })
+
+        return args.isArchived;
     }
 })
