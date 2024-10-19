@@ -42,7 +42,8 @@ const schema = defineSchema({
         description: v.optional(v.string()),
         quantity: v.optional(v.number()),
         isArchived: v.optional(v.boolean()),
-    }).index('by_name', ['name']),
+        totalUnitsSold: v.optional(v.number()),
+    }).index('by_name', ['name']).index('by_totalUnitsSold', ['totalUnitsSold']),
 
     familyMeals: defineTable({
         menus: v.array(v.id('menus')),
@@ -77,7 +78,7 @@ const schema = defineSchema({
         ),
         userId: v.id('users'),
         shippingId: v.id('shippingAddress')
-    }).index('by_shippingId',['shippingId']).index('by_userId', ['userId']),
+    }).index('by_shippingId', ['shippingId']).index('by_userId', ['userId']),
 
     ratings: defineTable({
         stars: v.optional(v.number()),
@@ -92,15 +93,15 @@ const schema = defineSchema({
         familyMealId: v.optional(v.id('familyMeals')),
         quantity: v.number(),
         userId: v.id('users'),
-    }).index('by_menuId', ['menuId']).index('by_familyMealId', ['familyMealId']).index('by_userId',['userId']),
+    }).index('by_menuId', ['menuId']).index('by_familyMealId', ['familyMealId']).index('by_userId', ['userId']),
 
     shippingAddress: defineTable({
         userId: v.id('users'),
         firstname: v.string(),
-        lastName: v.string(), 
+        lastName: v.string(),
         streetAddress: v.string(),
         apartmmentNumer: v.optional(v.string()),
-        address:v.string(),
+        address: v.string(),
         phoneNumber: v.string(),
 
     }).index('by_userId', ['userId'])

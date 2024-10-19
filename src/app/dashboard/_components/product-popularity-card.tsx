@@ -1,94 +1,119 @@
-"use client"
+"use client";
 
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
     ChartConfig,
     ChartContainer,
+    ChartLegendContent,
     ChartTooltip,
-    ChartTooltipContent,
-    ChartLegend,
-    ChartLegendContent
-} from "@/components/ui/chart"
+    ChartTooltipContent
+} from "@/components/ui/chart";
+import { useProductPopularity } from "@/features/dashboard/api/use-product-popularity";
+import { useState } from "react";
+import { Bar, BarChart, CartesianGrid, Cell, LabelList, Legend, Pie, PieChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
-import { productPopularityData } from "../../../../data/chart-data"
-
-const chartConfig = {
-    productA: {
-        label: "Product A",
-        color: "#4c0519",
-    },
-    productB: {
-        label: "Product B",
-        color: "#e11d48",
-    },
-    productC: {
-        label: "Product C",
-        color: "#fda4af",
-    },
-    productD: {
-        label: "Product D",
-        color: "#f43f5e",
-    },
-    productE: {
-        label: "Product E",
-        color: "#9f1239",
-    },
-} satisfies ChartConfig
-
-// const chartData = [
-//     { month: "January", desktop: 186, mobile: 80 },
-//     { month: "February", desktop: 305, mobile: 200 },
-//     { month: "March", desktop: 237, mobile: 120 },
-//     { month: "April", desktop: 73, mobile: 190 },
-//     { month: "May", desktop: 209, mobile: 130 },
-//     { month: "June", desktop: 214, mobile: 140 },
-// ]
-
-// const chartConfig = {
-//     desktop: {
-//         label: "Desktop",
-//         color: "#2563eb",
-//     },
-//     mobile: {
-//         label: "Mobile",
-//         color: "#60a5fa",
-//     },
-// } satisfies ChartConfig
-
+const COLORS = [
+    "#FF6384", // Pink
+    "#36A2EB", // Blue
+    "#FFCE56", // Yellow
+    "#4BC0C0", // Teal
+    "#9966FF", // Purple
+    "#FF9F40", // Orange
+    "#FF6384", // Pink (repeated for more than 6 items)
+    "#36A2EB", // Blue (repeated for more than 6 items)
+];
 
 export const ProductPopularityCard = () => {
+    const { data, isLoading } = useProductPopularity();
+    const [viewType, setViewType] = useState<'bar' | 'pie'>('bar');
+
+    if (isLoading) return <div>Loading...</div>;
+    if (!data || data.length === 0) return <div>No data available</div>;
+
+    const chartData = data
+        .filter(item => item.totalUnitsSold > 0)
+        .map((item, index) => ({
+            name: item.name,
+            sales: item.totalUnitsSold || 0,
+            color: COLORS[index % COLORS.length],
+        }));
+
+    const chartConfig = chartData.reduce((acc, item) => {
+        acc[item.name] = {
+            label: item.name,
+            color: item.color,
+        };
+        return acc;
+    }, {} as ChartConfig);
+
+    const renderBarChart = () => (
+        <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
+            <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} />
+                    <YAxis />
+                    <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                    <Legend content={<ChartLegendContent />} />
+                    <Bar dataKey="sales" radius={8}>
+                        {chartData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                        <LabelList dataKey="sales" position="top" />
+                    </Bar>
+                </BarChart>
+            </ResponsiveContainer>
+        </ChartContainer>
+    );
+
+    const renderPieChart = () => (
+        <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
+            <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                    <Pie
+                        data={chartData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="sales"
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    >
+                        {chartData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                    </Pie>
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Legend content={<ChartLegendContent />} />
+                </PieChart>
+            </ResponsiveContainer>
+        </ChartContainer>
+    );
+
     return (
         <Card className="col-span-full lg:col-span-2">
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Product Popularity</CardTitle>
+                <div className="space-x-2">
+                    <Button
+                        variant={viewType === 'bar' ? 'default' : 'outline'}
+                        onClick={() => setViewType('bar')}
+                    >
+                        Bar
+                    </Button>
+                    <Button
+                        variant={viewType === 'pie' ? 'default' : 'outline'}
+                        onClick={() => setViewType('pie')}
+                    >
+                        Pie
+                    </Button>
+                </div>
             </CardHeader>
             <CardContent className="flex-1 pb-0">
-                <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-                    <BarChart accessibilityLayer data={productPopularityData}>
-                        <CartesianGrid vertical={false} />
-
-                        <XAxis
-                            dataKey="month"
-                            tickLine={false}
-                            tickMargin={10}
-                            axisLine={false}
-                            tickFormatter={(value) => value.slice(0, 3)}
-                        />
-
-                        <ChartTooltip content={<ChartTooltipContent />} />
-
-                        <ChartLegend content={<ChartLegendContent />} />
-
-                        <Bar dataKey="productA" fill="var(--color-productA)" radius={4} />
-                        <Bar dataKey="productB" fill="var(--color-productB)" radius={4} />
-                        <Bar dataKey="productC" fill="var(--color-productC)" radius={4} />
-                        <Bar dataKey="productD" fill="var(--color-productD)" radius={4} />
-                        <Bar dataKey="productE" fill="var(--color-productE)" radius={4} />
-                    </BarChart>
-                </ChartContainer>
+                {viewType === 'bar' ? renderBarChart() : renderPieChart()}
             </CardContent>
         </Card>
-    )
-}
+    );
+};

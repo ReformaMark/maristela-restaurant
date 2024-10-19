@@ -1,18 +1,23 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { CancelledOrdersCard } from "@/features/dashboard/components/cancelled-orders-card"
+import { CompletedOrdersCard } from "@/features/dashboard/components/completed-orders-card"
+import { ConfirmedOrdersCard } from "@/features/dashboard/components/confirmed-orders-card"
+import { LowSellingProducts } from "@/features/dashboard/components/low-selling-products"
+import { OutOfDeliveryCard } from "@/features/dashboard/components/out-of-delivery-card"
+import { TopSellingProducts } from "@/features/dashboard/components/top-selling-products"
+import { TotalMenuCard } from "@/features/dashboard/components/total-menu-card"
+import { TotalOrdersCard } from "@/features/dashboard/components/total-orders-card"
+import { TotalRevenueCard } from "@/features/dashboard/components/total-revenue-card"
+import { TotalUsersCard } from "@/features/dashboard/components/total-users-card"
+import { UnconfirmedOrdersCard } from "@/features/dashboard/components/unconfirmed-orders-card"
 import {
-    CalendarIcon,
-    PackageIcon,
-    ShoppingCartIcon,
-    TrendingUpIcon,
-    Users2Icon
+    CalendarIcon
 } from 'lucide-react'
 import { LocationProductPreferencesCard } from "./_components/location-product-preferences-card"
 import { LocationSalesPerformanceCard } from "./_components/location-sales-performance-card"
 import { OrderStatusDistributionCard } from "./_components/order-status-distribution-card"
-import { OverviewCard } from "./_components/overview-card"
 import { ProductPopularityCard } from "./_components/product-popularity-card"
 
 const DashboardPage = () => {
@@ -46,81 +51,19 @@ const DashboardPage = () => {
 
                         <TabsContent value="overview" className="mt-6 space-y-4">
                             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                                <OverviewCard
-                                    title="Total Users"
-                                    icon={Users2Icon}
-                                    data="2,345"
-                                    description="+2.5% from last month"
-                                    className="bg-gradient-to-br from-red-500 to-yellow-500 text-white"
-                                />
+                                <TotalUsersCard />
 
-                                <OverviewCard
-                                    title="Total Orders"
-                                    icon={ShoppingCartIcon}
-                                    data="5,678"
-                                    description="+12% from last month"
-                                />
+                                <TotalOrdersCard />
 
-                                <OverviewCard
-                                    title="Total Products"
-                                    icon={PackageIcon}
-                                    data="1,234"
-                                    description="+5% from last month"
-                                />
+                                <TotalMenuCard />
 
-                                <OverviewCard
-                                    title="Total Revenue"
-                                    icon={TrendingUpIcon}
-                                    data="$2,345"
-                                    description="+7.2% from last month"
-                                />
+                                <TotalRevenueCard />
                             </div>
 
                             <div className="grid gap-4 md:grid-cols-2">
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Top Selling Products</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="space-y-4">
-                                            {['Product A', 'Product B', 'Product C', 'Product D', 'Product E'].map((product, index) => (
-                                                <div key={index} className="flex items-center">
-                                                    <Avatar className="h-9 w-9">
-                                                        <AvatarImage src={`/placeholder.svg?height=36&width=36`} alt={product} />
-                                                        <AvatarFallback>{product[0]}</AvatarFallback>
-                                                    </Avatar>
-                                                    <div className="ml-4 space-y-1">
-                                                        <p className="text-sm font-medium leading-none">{product}</p>
-                                                        <p className="text-sm text-muted-foreground">{1000 - index * 100} units sold</p>
-                                                    </div>
-                                                    <div className="ml-auto font-medium">PHP{(5000 - index * 500).toLocaleString()}</div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Low Selling Products</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="space-y-4">
-                                            {['Product V', 'Product W', 'Product X', 'Product Y', 'Product Z'].map((product, index) => (
-                                                <div key={index} className="flex items-center">
-                                                    <Avatar className="h-9 w-9">
-                                                        <AvatarImage src={`/placeholder.svg?height=36&width=36`} alt={product} />
-                                                        <AvatarFallback>{product[0]}</AvatarFallback>
-                                                    </Avatar>
-                                                    <div className="ml-4 space-y-1">
-                                                        <p className="text-sm font-medium leading-none">{product}</p>
-                                                        <p className="text-sm text-muted-foreground">{50 - index * 10} units sold</p>
-                                                    </div>
-                                                    <div className="ml-auto font-medium">PHP{(500 - index * 100).toLocaleString()}</div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </CardContent>
-                                </Card>
+                                <TopSellingProducts />
+
+                                <LowSellingProducts />
                             </div>
 
                             <Card>
@@ -134,34 +77,16 @@ const DashboardPage = () => {
                         </TabsContent>
 
                         <TabsContent value="more-details" className="mt-6 space-y-4">
-                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                                <OverviewCard
-                                    title="Unconfirmed Orders"
-                                    icon={ShoppingCartIcon}
-                                    data="345"
-                                    description="-32% from last month"
-                                />
+                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                                <UnconfirmedOrdersCard />
 
-                                <OverviewCard
-                                    title="Confirmed Orders"
-                                    icon={ShoppingCartIcon}
-                                    data="1,234"
-                                    description="+76% from last month"
-                                />
+                                <ConfirmedOrdersCard />
 
-                                <OverviewCard
-                                    title="Delivered Orders"
-                                    icon={ShoppingCartIcon}
-                                    data="253"
-                                    description="+2% from last month"
-                                />
+                                <OutOfDeliveryCard />
 
-                                <OverviewCard
-                                    title="Unsuccessful Orders"
-                                    icon={ShoppingCartIcon}
-                                    data="198"
-                                    description="+11% from last month"
-                                />
+                                <CompletedOrdersCard />
+
+                                <CancelledOrdersCard />
                             </div>
 
                             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

@@ -2,9 +2,6 @@ const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max 
 
 export const productPopularityData = [
     { month: "All", productA: randomInt(50, 150), productB: randomInt(50, 150), productC: randomInt(50, 150), productD: randomInt(50, 150), productE: randomInt(50, 150) },
-    // { month: "February", productA: 150, productB: 186, productC: 30, productD: 15, productE: 55 },
-    // { month: "March", productA: 110, productB: 50, productC: 125, productD: 210, productE: 22 },
-    // { month: "April", productA: 90, productB: 70, productC: 20, productD: 115, productE: 33 },
 ]
 
 export const orderStatusData = [

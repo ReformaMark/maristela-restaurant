@@ -1,8 +1,9 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { asyncMap } from "convex-helpers";
 import { getManyFrom } from "convex-helpers/server/relationships";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
 
 export const createTransaction = mutation({
   args: {
@@ -216,36 +217,92 @@ export const handleTransactionStatus = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx)
+    const userId = await getAuthUserId(ctx);
 
     if (userId === null) {
-      throw new Error("Unauthorized")
+      throw new ConvexError("Unauthorized");
     }
 
-    const user = await ctx.db.get(userId)
+    const user = await ctx.db.get(userId);
 
     if (user?.role !== "admin") {
-      throw new Error("Unauthorized")
+      throw new ConvexError("Unauthorized");
     }
 
-    const currentTransaction = await ctx.db.get(args.transactionId)
+    const currentTransaction = await ctx.db.get(args.transactionId);
 
-    if (currentTransaction?.status === "Completed" || currentTransaction?.status === "Cancelled") {
-      throw new Error("Invalid Action")
+    if (!currentTransaction) {
+      throw new ConvexError("Transaction not found");
     }
 
-    if (currentTransaction?.status === "Confirmed" && args.status === "Pending") {
-      throw new Error("Invalid Action, transaction is already confirmed") // how to fetch this error message in the frontend?
+    if (currentTransaction.status === "Completed" || currentTransaction.status === "Cancelled") {
+      throw new ConvexError("Invalid Action: Transaction is already completed or cancelled");
     }
 
-    if (currentTransaction?.status === "Out for Delivery" && args.status === "Confirmed" || args.status === "Pending") {
-      throw new Error("invalid Action, transaction is already out for delivery")
+    if (currentTransaction.status === "Confirmed" && args.status === "Pending") {
+      throw new ConvexError("Invalid Action: Transaction is already confirmed");
     }
 
-    const transactionId = await ctx.db.patch(args.transactionId, {
+    if (currentTransaction.status === "Out for Delivery" && (args.status === "Confirmed" || args.status === "Pending")) {
+      throw new ConvexError("Invalid Action: Transaction is already out for delivery");
+    }
+
+    if (currentTransaction.status === "Pending" && (args.status === "Completed" || args.status === "Out for Delivery")) {
+      throw new ConvexError("Transaction is only at pending, confirm it first");
+    }
+
+    // If the new status is "Confirmed", we need to check stock and update totalUnitsSold
+    if (args.status === "Confirmed") {
+      let insufficientStockItems = [];
+
+      for (const orderId of currentTransaction.orders) {
+        const order = await ctx.db.get(orderId);
+        if (!order) continue;
+
+        const menuItem = await ctx.db.get(order.menuId as Id<"menus">);
+        if (!menuItem) continue;
+
+        // Check if there's enough stock
+        if ((menuItem.quantity as number) < order.quantity) {
+          insufficientStockItems.push(menuItem.name);
+        }
+      }
+
+      if (insufficientStockItems.length > 0) {
+        // Cancel the transaction if there's not enough stock for any item
+        await ctx.db.patch(args.transactionId, { status: "Cancelled" });
+        // throw new ConvexError(`Insufficient stock for: ${insufficientStockItems.join(", ")}. Transaction cancelled.`);
+
+        return {
+          status: "Cancelled",
+          message: `Insufficient stock for: ${insufficientStockItems.join(", ")}. Transaction cancelled.`,
+        }
+      }
+
+      // If we have sufficient stock for all items, proceed with updating quantities
+      for (const orderId of currentTransaction.orders) {
+        const order = await ctx.db.get(orderId);
+        if (!order) continue;
+
+        const menuItem = await ctx.db.get(order.menuId as Id<"menus">);
+        if (!menuItem) continue;
+
+        // Update the menu item's quantity and totalUnitsSold
+        await ctx.db.patch(order.menuId as Id<"menus">, {
+          quantity: (menuItem.quantity as number) - order.quantity,
+          totalUnitsSold: ((menuItem.totalUnitsSold as number) || 0) + order.quantity,
+        });
+      }
+    }
+
+    // Update the transaction status
+    const updatedTransactionId = await ctx.db.patch(args.transactionId, {
       status: args.status,
-    })
+    });
 
-    return transactionId
+    return {
+      transaction: updatedTransactionId,
+      message: "Transaction status updated successfully",
+    };
   }
-})
+});

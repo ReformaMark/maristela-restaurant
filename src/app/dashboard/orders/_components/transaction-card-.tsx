@@ -17,6 +17,7 @@ import { useAllTransactions } from "@/features/transactions/api/use-all-transact
 import { calculateTotal, formatPrice } from "@/lib/utils"
 import { useConvexMutation } from "@convex-dev/react-query"
 import { useMutation } from "@tanstack/react-query"
+import { ConvexError } from "convex/values"
 import { CheckCircle, Clock, Loader2Icon, Package, Truck } from "lucide-react"
 import { Fragment, useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
@@ -39,11 +40,23 @@ export const TransactionCard = () => {
 
     const { mutate, isPending } = useMutation({
         mutationFn: useConvexMutation(api.transactions.handleTransactionStatus),
-        onSuccess: () => {
-            toast.success("Successfully updated transaction!")
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onSuccess: (data: any) => {
+            toast.success(`${data.message}`)
         },
-        onError: () => {
-            toast.error(`Failed to update transaction`);
+
+        onError: (error) => {
+            let errorMessage = "Failed to update transaction";
+
+            if (error instanceof ConvexError) {
+                errorMessage = error.data;
+            } else if (error instanceof Error) {
+                errorMessage = error.message;
+            } else if (typeof error === 'string') {
+                errorMessage = error;
+            }
+
+            toast.error(errorMessage)
         }
     })
 
