@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { OrderStatusDistributionCard } from "./_components/order-status-distribution-card"
 import { ProductPopularityCard } from "./_components/product-popularity-card"
+import { SalesForecastCard } from "@/features/dashboard/components/sales-forecast-card"
 
 const DashboardPage = () => {
     return (
@@ -64,14 +65,7 @@ const DashboardPage = () => {
                                 <LowSellingProducts />
                             </div>
 
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Sales Forecast</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    {/* <Line data={salesForecastData} /> */}
-                                </CardContent>
-                            </Card>
+                            <SalesForecastCard />
                         </TabsContent>
 
                         <TabsContent value="more-details" className="mt-6 space-y-4">

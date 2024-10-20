@@ -32,6 +32,9 @@ const schema = defineSchema({
             v.literal('Super Silog Meals'),
             v.literal('Seafood'),
             v.literal('Veggies'),
+            v.literal('Desserts'),
+            v.literal('Silog Meals'),
+            v.literal('Special'),
         ),
         name: v.string(),
         available: v.boolean(),
@@ -64,7 +67,8 @@ const schema = defineSchema({
         ),
         totalPrice: v.number(),
         userId: v.id('users'),
-    }).index('by_user', ['userId']),
+        orderDate: v.optional(v.number()),
+    }).index('by_user', ['userId']).index('by_orderDate', ['orderDate']),
 
     transactions: defineTable({
         orders: v.array(v.id('orders')),
