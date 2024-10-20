@@ -15,8 +15,6 @@ import { UnconfirmedOrdersCard } from "@/features/dashboard/components/unconfirm
 import {
     CalendarIcon
 } from 'lucide-react'
-import { LocationProductPreferencesCard } from "./_components/location-product-preferences-card"
-import { LocationSalesPerformanceCard } from "./_components/location-sales-performance-card"
 import { OrderStatusDistributionCard } from "./_components/order-status-distribution-card"
 import { ProductPopularityCard } from "./_components/product-popularity-card"
 
@@ -94,9 +92,9 @@ const DashboardPage = () => {
 
                                 <OrderStatusDistributionCard />
 
-                                <LocationProductPreferencesCard />
+                                {/* <LocationProductPreferencesCard /> */}
 
-                                <LocationSalesPerformanceCard />
+                                {/* <LocationSalesPerformanceCard /> */}
                             </div>
                         </TabsContent>
                     </Tabs>

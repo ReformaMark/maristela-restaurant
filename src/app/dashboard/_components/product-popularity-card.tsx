@@ -68,17 +68,20 @@ export const ProductPopularityCard = () => {
     );
 
     const renderPieChart = () => (
-        <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
+        <ChartContainer
+            config={chartConfig}
+            className="min-h-[300px] w-full"
+        >
             <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                     <Pie
                         data={chartData}
+                        dataKey="sales"
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        outerRadius={80}
+                        // outerRadius={80}
                         fill="#8884d8"
-                        dataKey="sales"
                         label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                     >
                         {chartData.map((entry, index) => (

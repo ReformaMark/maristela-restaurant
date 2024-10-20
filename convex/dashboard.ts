@@ -91,7 +91,8 @@ export const topSellingProducts = query({
                 name: product.name,
                 unitsSold: product.totalUnitsSold ?? 0,
                 revenue: (product.totalUnitsSold ?? 0) * product.price,
-                image: { url: await ctx.storage.getUrl(product.imageId as string) }
+                image: { url: await ctx.storage.getUrl(product.imageId as string) },
+                category: product.category
             }))
         )
     },
@@ -113,7 +114,8 @@ export const lowSellingProducts = query({
                 name: product.name,
                 unitsSold: product.totalUnitsSold ?? 0,
                 revenue: (product.totalUnitsSold ?? 0) * product.price,
-                image: { url: await ctx.storage.getUrl(product.imageId as string) }
+                image: { url: await ctx.storage.getUrl(product.imageId as string) },
+                category: product.category,
             }))
         )
     },
@@ -132,5 +134,47 @@ export const getProductPopularity = query({
             name: menu.name,
             totalUnitsSold: menu.totalUnitsSold || 0
         }))
+    }
+})
+
+export const getOrderPopularity = query({
+    args: {},
+    handler: async (ctx) => {
+        const transactions = await ctx.db
+            .query("transactions")
+            .filter((q) =>
+                q.or(
+                    q.eq(q.field("status"), "Completed"),
+                    q.eq(q.field("status"), "Cancelled"),
+                )
+            )
+            .collect()
+
+        const statusCounts = {
+            Completed: 0,
+            Cancelled: 0
+        };
+
+        transactions.forEach(transaction => {
+            statusCounts[transaction.status as keyof typeof statusCounts]++
+        })
+
+        const totalOrders = statusCounts.Completed + statusCounts.Cancelled;
+
+        return [
+            {
+                orderType: "Completed",
+                value: statusCounts.Completed,
+                percentage: (statusCounts.Completed / totalOrders) * 100,
+                fill: "#22c55e"
+            },
+            {
+                orderType: "Cancelled",
+                value: statusCounts.Cancelled,
+                percentage: (statusCounts.Cancelled / totalOrders) * 100,
+                fill: "#dc2626"
+            }
+        ]
+
     }
 })
