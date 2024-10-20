@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-
+import { format } from 'date-fns';
 import { calculateTotal, formatPrice, statusColors } from "@/lib/utils"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
@@ -27,7 +27,12 @@ export const transactionColumns: ColumnDef<TransactionWithDetails>[] = [
             )
         },
         cell: ({ row }) => {
-            return new Date(row.getValue("_creationTime")).toLocaleDateString()
+            const orderDate = row.original.orders[0].orderDate;
+            if (orderDate) {
+                const formattedDate = format(new Date(orderDate), 'MM/dd/yyyy');
+                return formattedDate;
+            }
+            return 'N/A';
         },
     },
     {

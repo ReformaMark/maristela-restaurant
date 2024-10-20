@@ -46,8 +46,6 @@ export const LocationProductPreferencesCard = () => {
         santaTeresita: mockData.reduce((acc, curr) => acc + curr.santaTeresita, 0)
     }), [])
 
-    console.log(JSON.stringify(mockData, null, 2))
-
     return (
         <Card className="col-span-full md:col-span-2">
             <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">

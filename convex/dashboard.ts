@@ -70,7 +70,10 @@ export const totalRevenue = query({
             return null
         }
 
-        return (await ctx.db.query("orders").collect()).reduce((acc, order) => {
+        return (await ctx.db.query("orders")
+            .filter((q) => q.eq(q.field("status"), "confirmed"))
+            .collect()
+        ).reduce((acc, order) => {
             return acc + order.totalPrice
         }, 0)
     }
@@ -91,7 +94,7 @@ export const topSellingProducts = query({
                 name: product.name,
                 unitsSold: product.totalUnitsSold ?? 0,
                 revenue: (product.totalUnitsSold ?? 0) * product.price,
-                image: { url: await ctx.storage.getUrl(product.imageId as string) },
+                image: { url: product.imageId ? await ctx.storage.getUrl(product.imageId) : null },
                 category: product.category
             }))
         )
@@ -114,7 +117,7 @@ export const lowSellingProducts = query({
                 name: product.name,
                 unitsSold: product.totalUnitsSold ?? 0,
                 revenue: (product.totalUnitsSold ?? 0) * product.price,
-                image: { url: await ctx.storage.getUrl(product.imageId as string) },
+                image: { url: product.imageId ? await ctx.storage.getUrl(product.imageId) : null },
                 category: product.category,
             }))
         )

@@ -24,9 +24,13 @@ import { toast } from "sonner"
 import { api } from "../../../../../convex/_generated/api"
 import { Id } from "../../../../../convex/_generated/dataModel"
 import { transactionColumns } from "./transaction-columns"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+
+type TransactionType = NonNullable<ReturnType<typeof useAllTransactions>['data']>[number];
 
 export const TransactionCard = () => {
-    const { data, isLoading } = useAllTransactions()
+    const { data, isLoading, hasMore, loadMore } = useAllTransactions()
     const [selectedTransaction, setSelectedTransaction] = useState(data?.[0])
     const [activeTab, setActiveTab] = useState("new")
 
@@ -136,8 +140,7 @@ export const TransactionCard = () => {
                                 <DataTable
                                     //@ts-expect-error need to know how to get exact type
                                     columns={transactionColumns}
-                                    //@ts-expect-error this is not really an error it is just filtered kaya hindi correctly typed
-                                    data={filteredTransactions}
+                                    data={filteredTransactions as TransactionType[]}
                                     onRowClick={(row) => setSelectedTransaction(row)}
                                 />
                             </TabsContent>
@@ -145,12 +148,16 @@ export const TransactionCard = () => {
                                 <DataTable
                                     //@ts-expect-error need to know how to get exact type
                                     columns={transactionColumns}
-                                    //@ts-expect-error this is not really an error it is just filtered kaya hindi correctly typed
-                                    data={filteredTransactions}
+                                    data={filteredTransactions as TransactionType[]}
                                     onRowClick={(row) => setSelectedTransaction(row)}
                                 />
                             </TabsContent>
                         </Tabs>
+                        {hasMore && (
+                            <Button onClick={loadMore} className="mt-4">
+                                Load More
+                            </Button>
+                        )}
                     </CardContent>
                 </Card>
             </div>

@@ -19,11 +19,8 @@ export const LowSellingProducts = () => {
                 .map((product, index) => (
                     <div key={index} className="flex items-center">
                         <Avatar className="h-9 w-9">
-                            {product.image ? (
-                                <AvatarImage src={product.image.url as string} alt={product.name} />
-                            ) : (
-                                <AvatarFallback>{product.name.charAt(0).toUpperCase()}</AvatarFallback>
-                            )}
+                            <AvatarImage src={product.image.url as string} alt={product.name} />
+                            <AvatarFallback>{product.name.charAt(0).toUpperCase()}</AvatarFallback>
                         </Avatar>
                         <div className="ml-4 space-y-1">
                             <p className="text-sm font-medium leading-none">{product.name}</p>
@@ -44,11 +41,8 @@ export const LowSellingProducts = () => {
                 .map((product, index) => (
                     <div key={index} className="flex items-center">
                         <Avatar className="h-9 w-9">
-                            {product.image ? (
-                                <AvatarImage src={product.image.url as string} alt={product.name} />
-                            ) : (
-                                <AvatarFallback>{product.name.charAt(0).toUpperCase()}</AvatarFallback>
-                            )}
+                            <AvatarImage src={product.image.url as string} alt={product.name} />
+                            <AvatarFallback>{product.name.charAt(0).toUpperCase()}</AvatarFallback>
                         </Avatar>
                         <div className="ml-4 space-y-1">
                             <p className="text-sm font-medium leading-none">{product.name}</p>
