@@ -5,6 +5,127 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
 
+export const getPendingTransactions = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      return null;
+    }
+
+    const user = await ctx.db.get(userId);
+
+    if (user?.role !== "admin") {
+      return null;
+    }
+
+    const transactions = await ctx.db
+      .query("transactions")
+      .filter((q) => q.eq(q.field("status"), "Pending"))
+      .collect();
+
+    return transactions;
+  }
+})
+
+export const getConfirmedTransactions = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      return null;
+    }
+
+    const user = await ctx.db.get(userId);
+
+    if (user?.role !== "admin") {
+      return null;
+    }
+
+    const transactions = await ctx.db
+      .query("transactions")
+      .filter((q) => q.eq(q.field("status"), "Confirmed"))
+      .collect();
+
+    return transactions;
+  }
+})
+
+export const getOutForDeliveryTransactions = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      return null;
+    }
+
+    const user = await ctx.db.get(userId);
+
+    if (user?.role !== "admin") {
+      return null;
+    }
+
+    const transactions = await ctx.db
+      .query("transactions")
+      .filter((q) => q.eq(q.field("status"), "Out for Delivery"))
+      .collect();
+
+    return transactions;
+  }
+})
+
+export const getCompletedTransactions = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      return null;
+    }
+
+    const user = await ctx.db.get(userId);
+
+    if (user?.role !== "admin") {
+      return null;
+    }
+
+    const transactions = await ctx.db
+      .query("transactions")
+      .filter((q) => q.eq(q.field("status"), "Completed"))
+      .collect();
+
+    return transactions;
+  }
+})
+
+export const getCancelledTransactions = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      return null;
+    }
+
+    const user = await ctx.db.get(userId);
+
+    if (user?.role !== "admin") {
+      return null;
+    }
+
+    const transactions = await ctx.db
+      .query("transactions")
+      .filter((q) => q.eq(q.field("status"), "Cancelled"))
+      .collect();
+
+    return transactions;
+  }
+})
+
+
 export const createTransaction = mutation({
   args: {
     orders: v.array(v.id('orders')),

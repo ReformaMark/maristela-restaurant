@@ -1,122 +1,160 @@
-"use client";
+"use client"
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
 import {
     ChartConfig,
     ChartContainer,
-    ChartLegendContent,
     ChartTooltip,
-    ChartTooltipContent
-} from "@/components/ui/chart";
-import { useProductPopularity } from "@/features/dashboard/api/use-product-popularity";
-import { useState } from "react";
-import { Bar, BarChart, CartesianGrid, Cell, LabelList, Legend, Pie, PieChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+    ChartTooltipContent,
+} from "@/components/ui/chart"
+import { useProductPopularity } from "@/features/dashboard/api/use-product-popularity"
+import { TrendingUp } from "lucide-react"
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts"
 
 const COLORS = [
-    "#FF6384", // Pink
-    "#36A2EB", // Blue
-    "#FFCE56", // Yellow
-    "#4BC0C0", // Teal
-    "#9966FF", // Purple
-    "#FF9F40", // Orange
-    "#FF6384", // Pink (repeated for more than 6 items)
-    "#36A2EB", // Blue (repeated for more than 6 items)
-];
+    "hsl(var(--chart-1))",
+    "hsl(var(--chart-2))",
+    "hsl(var(--chart-3))",
+    "hsl(var(--chart-4))",
+    "hsl(var(--chart-5))",
+    "hsl(var(--chart-3))",
+    "hsl(var(--chart-2))",
+    "hsl(var(--chart-4))",
+]
 
-export const ProductPopularityCard = () => {
-    const { data, isLoading } = useProductPopularity();
-    const [viewType, setViewType] = useState<'bar' | 'pie'>('bar');
+export default function ProductPopularityCard() {
+    const { data, isLoading } = useProductPopularity()
 
-    if (isLoading) return <div>Loading...</div>;
-    if (!data || data.length === 0) return <div>No data available</div>;
+    if (isLoading) return <div>Loading...</div>
+    if (!data || data.length === 0) return <div>No data available</div>
 
     const chartData = data
         .filter(item => item.totalUnitsSold > 0)
+        .sort((a, b) => b.totalUnitsSold - a.totalUnitsSold)
+        .slice(0, 10) // Only show top 10 products
         .map((item, index) => ({
             name: item.name,
             sales: item.totalUnitsSold || 0,
             color: COLORS[index % COLORS.length],
-        }));
+        }))
 
     const chartConfig = chartData.reduce((acc, item) => {
         acc[item.name] = {
             label: item.name,
             color: item.color,
-        };
-        return acc;
-    }, {} as ChartConfig);
+        }
+        return acc
+    }, {} as ChartConfig)
 
-    const renderBarChart = () => (
-        <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
-            <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid vertical={false} />
-                    <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} />
-                    <YAxis />
-                    <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                    <Legend content={<ChartLegendContent />} />
-                    <Bar dataKey="sales" radius={8}>
-                        {chartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                        <LabelList dataKey="sales" position="top" />
-                    </Bar>
-                </BarChart>
-            </ResponsiveContainer>
-        </ChartContainer>
-    );
+    console.log(chartConfig)
 
-    const renderPieChart = () => (
-        <ChartContainer
-            config={chartConfig}
-            className="min-h-[300px] w-full"
-        >
-            <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                    <Pie
-                        data={chartData}
-                        dataKey="sales"
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        // outerRadius={80}
-                        fill="#8884d8"
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    >
-                        {chartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                    </Pie>
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Legend content={<ChartLegendContent />} />
-                </PieChart>
-            </ResponsiveContainer>
-        </ChartContainer>
-    );
+    // const renderBarChart = () => (
+    //     <ResponsiveContainer width="100%" height={300}>
+    //         <BarChart data={chartData} layout="vertical" margin={{ top: 20, right: 30, left: 40, bottom: 5 }}>
+    //             <XAxis type="number" />
+    //             <YAxis type="category" dataKey="name" width={100} />
+    //             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+    //             <Bar dataKey="sales" radius={[0, 4, 4, 0]}>
+    //                 {chartData.map((entry, index) => (
+    //                     <Cell key={`cell-${index}`} fill={entry.color} />
+    //                 ))}
+    //             </Bar>
+    //         </BarChart>
+    //     </ResponsiveContainer>
+    // )
+
+    // const renderPieChart = () => (
+    //     <ResponsiveContainer width="100%" height={300}>
+    //         <PieChart>
+    //             <Pie
+    //                 data={chartData}
+    //                 dataKey="sales"
+    //                 cx="50%"
+    //                 cy="50%"
+    //                 outerRadius={80}
+    //                 fill="hsl(var(--chart-1))"
+    //                 labelLine={false}
+    //                 label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+    //             >
+    //                 {chartData.map((entry, index) => (
+    //                     <Cell key={`cell-${index}`} fill={entry.color} />
+    //                 ))}
+    //             </Pie>
+    //             <ChartTooltip content={<ChartTooltipContent />} />
+    //         </PieChart>
+    //     </ResponsiveContainer>
+    // )
 
     return (
-        <Card className="col-span-full lg:col-span-2">
-            <CardHeader className="flex flex-row items-center justify-between">
+        <Card className="col-span-full md:col-span-2">
+            <CardHeader>
                 <CardTitle>Product Popularity</CardTitle>
-                <div className="space-x-2">
-                    <Button
-                        variant={viewType === 'bar' ? 'default' : 'outline'}
-                        onClick={() => setViewType('bar')}
-                    >
-                        Bar
-                    </Button>
-                    <Button
-                        variant={viewType === 'pie' ? 'default' : 'outline'}
-                        onClick={() => setViewType('pie')}
-                    >
-                        Pie
-                    </Button>
-                </div>
+                <CardDescription>Top 10 products by sales</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 pb-0">
-                {viewType === 'bar' ? renderBarChart() : renderPieChart()}
+            <CardContent>
+                <ChartContainer config={chartConfig}>
+                    <BarChart
+                        accessibilityLayer
+                        data={chartData}
+                        layout="vertical"
+                        margin={{
+                            right: 16,
+                        }}
+                    >
+                        <CartesianGrid horizontal={false} />
+                        <YAxis
+                            dataKey="name"
+                            type="category"
+                            tickLine={false}
+                            tickMargin={10}
+                            axisLine={false}
+                            tickFormatter={(value) => value.slice(0, 3)}
+                            hide
+                        />
+                        <XAxis dataKey="sales" type="number" hide />
+                        <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent indicator="line" />}
+                        />
+                        <Bar
+                            dataKey="sales"
+                            layout="vertical"
+                            fill="hsl(var(--chart-4))"
+                            radius={4}
+                        >
+                            <LabelList
+                                dataKey="name"
+                                position="insideLeft"
+                                offset={8}
+                                className="fill-[--color-label] hidden sm:block"
+                                fontSize={12}
+                            />
+                            <LabelList
+                                dataKey="sales"
+                                position="right"
+                                offset={8}
+                                className="fill-foreground"
+                                fontSize={12}
+                            />
+                        </Bar>
+                    </BarChart>
+                </ChartContainer>
             </CardContent>
+            <CardFooter className="flex-col items-start gap-2 text-sm">
+                <div className="flex gap-2 font-medium leading-none">
+                    Most sold products <TrendingUp className="h-4 w-4" />
+                </div>
+                <div className="leading-none text-muted-foreground">
+                    Showing top 10 products by sales
+                </div>
+            </CardFooter>
         </Card>
-    );
-};
+    )
+}

@@ -1,6 +1,5 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { query } from "./_generated/server";
-import { Id } from "./_generated/dataModel";
 
 export const totalUsers = query({
     handler: async (ctx) => {
@@ -179,5 +178,90 @@ export const getOrderPopularity = query({
             }
         ]
 
+    }
+})
+
+export const getSalesForecast = query({
+    handler: async (ctx) => {
+        try {
+            const userId = await getAuthUserId(ctx)
+            if (!userId) {
+                console.log("Error: No authenticated user found");
+                return null;
+            }
+
+            const user = await ctx.db.get(userId)
+            if (user?.role !== "admin") {
+                console.log("Error: User is not an admin");
+                return null;
+            }
+
+            const transactions = await ctx.db
+                .query("transactions")
+                .filter((q) => q.eq(q.field("status"), "Completed"))
+                .order("desc")
+                .collect()
+
+            if (transactions.length === 0) {
+                console.log("Warning: No completed transactions found");
+            }
+
+            const salesByDate = await Promise.all(
+                transactions.map(async (transaction) => {
+                    try {
+                        const orders = await Promise.all(
+                            transaction.orders.map((orderId) => ctx.db.get(orderId))
+                        );
+                        const totalSales = orders.reduce((sum, order) => sum + (order?.totalPrice || 0), 0);
+                        const date = new Date(orders[0]?.orderDate || 0).toISOString().split('T')[0];
+                        return { date, sales: totalSales }
+                    } catch (error) {
+                        console.error("Error processing transaction:", error);
+                        return null;
+                    }
+                })
+            )
+
+            const validSalesByDate = salesByDate.filter(sale => sale !== null);
+
+            if (validSalesByDate.length === 0) {
+                console.log("Error: No valid sales data found");
+                return null;
+            }
+
+            const aggregatedSales = validSalesByDate.reduce((acc, { date, sales }) => {
+                acc[date] = (acc[date] || 0) + sales
+                return acc
+            }, {} as Record<string, number>)
+
+            const salesData = Object.entries(aggregatedSales)
+                .map(([date, sales]) => ({ date, sales }))
+                .sort((a, b) => a.date.localeCompare(b.date))
+
+            // Simple Exponential Smoothing forecast
+            const alpha = 0.3 // Smoothing factor
+            let forecast = salesData[0].sales
+            const forecasts = salesData.map(({ date, sales }) => {
+                forecast = alpha * sales + (1 - alpha) * forecast;
+                return { date, sales, forecast }
+            })
+
+            // Generating future dates for prediction
+            const lastDate = new Date(salesData[salesData.length - 1].date)
+            for (let i = 1; i <= 7; i++) {
+                const nextDate = new Date(lastDate)
+                nextDate.setDate(lastDate.getDate() + i)
+                forecasts.push({
+                    date: nextDate.toISOString().split('T')[0],
+                    sales: 0,
+                    forecast,
+                })
+            }
+
+            return forecasts;
+        } catch (error) {
+            console.error("Error in getSalesForecast:", error);
+            return null;
+        }
     }
 })

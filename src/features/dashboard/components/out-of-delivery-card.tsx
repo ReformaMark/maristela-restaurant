@@ -5,17 +5,17 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { useAllTransactions } from "@/features/transactions/api/use-all-transactions";
 import { Loader2Icon, Users2Icon } from "lucide-react";
+import { useAllOutForDeliveryTransactions } from "../api/use-all-ofd-transactions";
 
 export const OutOfDeliveryCard = () => {
-    const { data, isLoading } = useAllTransactions()
+    const { data, isLoading } = useAllOutForDeliveryTransactions()
 
     if (isLoading) {
         return <Loader2Icon className="size-4 animate-spin text-muted-foreground" />
     }
 
-    const filteredData = data?.filter((transaction) => transaction.status === "Out for Delivery").length
+    const filteredData = data?.length
 
     return (
         <Card>

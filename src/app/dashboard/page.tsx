@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CancelledOrdersCard } from "@/features/dashboard/components/cancelled-orders-card"
 import { CompletedOrdersCard } from "@/features/dashboard/components/completed-orders-card"
 import { ConfirmedOrdersCard } from "@/features/dashboard/components/confirmed-orders-card"
 import { LowSellingProducts } from "@/features/dashboard/components/low-selling-products"
 import { OutOfDeliveryCard } from "@/features/dashboard/components/out-of-delivery-card"
+import { SalesForecastCard } from "@/features/dashboard/components/sales-forecast-card"
 import { TopSellingProducts } from "@/features/dashboard/components/top-selling-products"
 import { TotalMenuCard } from "@/features/dashboard/components/total-menu-card"
 import { TotalOrdersCard } from "@/features/dashboard/components/total-orders-card"
@@ -15,9 +15,8 @@ import { UnconfirmedOrdersCard } from "@/features/dashboard/components/unconfirm
 import {
     CalendarIcon
 } from 'lucide-react'
-import { OrderStatusDistributionCard } from "./_components/order-status-distribution-card"
-import { ProductPopularityCard } from "./_components/product-popularity-card"
-import { SalesForecastCard } from "@/features/dashboard/components/sales-forecast-card"
+import OrderStatusDistributionCard from "./_components/order-status-distribution-card"
+import ProductPopularityCard from "./_components/product-popularity-card"
 
 const DashboardPage = () => {
     return (
@@ -81,7 +80,7 @@ const DashboardPage = () => {
                                 <CancelledOrdersCard />
                             </div>
 
-                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
                                 <ProductPopularityCard />
 
                                 <OrderStatusDistributionCard />

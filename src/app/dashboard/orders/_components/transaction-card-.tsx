@@ -1,6 +1,7 @@
 "use client"
 
 import { DataTable } from "@/components/data-table"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     Select,
@@ -24,8 +25,6 @@ import { toast } from "sonner"
 import { api } from "../../../../../convex/_generated/api"
 import { Id } from "../../../../../convex/_generated/dataModel"
 import { transactionColumns } from "./transaction-columns"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 
 type TransactionType = NonNullable<ReturnType<typeof useAllTransactions>['data']>[number];
 
