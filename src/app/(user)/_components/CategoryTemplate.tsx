@@ -3,7 +3,6 @@ import { AugmentedMenu } from './Menus'
 import { SkeletonCard } from '@/components/SkeletonCard'
 import Image from 'next/image'
 import ProductCard from '@/components/ProductCard'
-import { getAverage } from '@/lib/utils'
 
 
 function CategoryTemplate({
@@ -36,9 +35,6 @@ function CategoryTemplate({
                         image={menuItem.url ? menuItem.url : ""}
                         description={menuItem.description}
                         menuId={menuItem._id}
-                        signature={menuItem.special}
-                        recommend={menuItem.recommended}
-                        average={getAverage({ratings: menuItem.ratings })}
                         ratings={menuItem.ratings}
                         >
                         

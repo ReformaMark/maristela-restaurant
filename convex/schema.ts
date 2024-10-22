@@ -93,7 +93,11 @@ const schema = defineSchema({
         quantity: v.number(),
         userId: v.id('users'),
     }).index('by_menuId', ['menuId']).index('by_familyMealId', ['familyMealId']).index('by_userId',['userId']),
-
+    favorites: defineTable({
+        menuId: v.optional(v.id('menus')),
+        familyMealId: v.optional(v.id('familyMeals')),
+        userId: v.id('users'),
+    }).index('by_menuId', ['menuId']).index('by_familyMealId', ['familyMealId']).index('by_userId',['userId']),
     shippingAddress: defineTable({
         userId: v.id('users'),
         firstname: v.string(),

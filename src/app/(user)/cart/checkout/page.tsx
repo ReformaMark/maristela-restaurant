@@ -151,7 +151,7 @@ function CheckoutPage() {
 
 
   return (
-    <div className='mt-20 md:mt-20 lg:mt-28 px-1 sm:px-10 md:px-15 lg:px-24  text-text mb-24'>
+    <div className='px-1 sm:px-10 md:px-15 lg:px-24  text-text mb-24'>
         <h1 className='text-primary font-bold text-xl mb-5 text-center uppercase'>Checkout</h1> 
         <Toaster richColors/>
         <div className="grid grid-cols-12 justify-between gap-x-10">

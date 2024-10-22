@@ -45,7 +45,7 @@ export const UserAvatar = () => {
                 <Link href={'/orders'} className="">
                     <DropdownMenuItem onClick={() => {}} className="h-10 cursor-pointer">
                         <TbChecklist  className="size-4 mr-2 " />
-                        Orders & reordering
+                        Orders
                     </DropdownMenuItem>
                 </Link>
                 <DropdownMenuItem onClick={() => signOut()} className="h-10 cursor-pointer">
