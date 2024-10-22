@@ -60,7 +60,7 @@ export const TopSellingProducts = () => {
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Top Selling Products</CardTitle>
-                <div className="space-x-2">
+                <div className="flex flex-col gap-1 space-x-2 xl:flex-row">
                     <Button
                         variant={viewType === 'unitSold' ? 'default' : 'outline'}
                         onClick={() => setViewType('unitSold')}

@@ -6,6 +6,7 @@ import { ConfirmedOrdersCard } from "@/features/dashboard/components/confirmed-o
 import { LowSellingProducts } from "@/features/dashboard/components/low-selling-products"
 import { OutOfDeliveryCard } from "@/features/dashboard/components/out-of-delivery-card"
 import { SalesForecastCard } from "@/features/dashboard/components/sales-forecast-card"
+import { ArimaSalesForecastCard } from "@/features/dashboard/components/arima-sales-forecast-card"
 import { TopSellingProducts } from "@/features/dashboard/components/top-selling-products"
 import { TotalMenuCard } from "@/features/dashboard/components/total-menu-card"
 import { TotalOrdersCard } from "@/features/dashboard/components/total-orders-card"
@@ -65,6 +66,7 @@ const DashboardPage = () => {
                             </div>
 
                             <SalesForecastCard />
+                            <ArimaSalesForecastCard />
                         </TabsContent>
 
                         <TabsContent value="more-details" className="mt-6 space-y-4">

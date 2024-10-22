@@ -18,7 +18,9 @@ export const SalesForecastCard = () => {
     return (
         <Card className="col-span-full">
             <CardHeader>
-                <CardTitle>Sales Forecast</CardTitle>
+                <CardTitle>
+                    Simple Exponential Smoothing forecast
+                </CardTitle>
             </CardHeader>
             <CardContent>
                 <ResponsiveContainer width="100%" height={400}>
