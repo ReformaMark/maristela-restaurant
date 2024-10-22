@@ -59,7 +59,7 @@ function TransactionPage({
     }
 
   return (
-    <div className='mt-20 md:mt-20 lg:mt-28 px-1 sm:px-10 md:px-15 lg:px-24 min-h-screen'>
+    <div className='px-1 sm:px-10 md:px-15 lg:px-24 min-h-screen'>
         <div className="flex gap-x-3 items-center">
             <ArrowLeft onClick={()=> router.back()} className='border-yellow border-2 text-yellow p-1 rounded-full cursor-pointer size-8'/>
             <h1 className='text-text font-semibold'>Order Status</h1>
