@@ -314,16 +314,16 @@ export const getArimaSalesForecast = query({
 
             const lastDate = new Date(filledSalesData[filledSalesData.length - 1].date);
             const lastKnownSales = salesValues[salesValues.length - 1];
-            
+
             for (let i = 0; i < forecastSteps; i++) {
                 const nextDate = new Date(lastDate);
                 nextDate.setDate(lastDate.getDate() + i + 1);
                 let baseForecast = Math.max(0, Math.round(finalForecast[i]));
-                
+
                 // Incorporate last known sales into the forecast
                 const weightLastKnown = Math.max(0, 1 - i / forecastSteps); // Weight decreases as we forecast further
                 baseForecast = Math.round(baseForecast * (1 - weightLastKnown) + lastKnownSales * weightLastKnown);
-                
+
                 // Add some random variation (±10%)
                 const randomFactor = 0.9 + Math.random() * 0.2;
                 forecasts.push({

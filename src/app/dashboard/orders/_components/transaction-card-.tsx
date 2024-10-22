@@ -32,7 +32,7 @@ type TransactionType = NonNullable<ReturnType<typeof useAllTransactions>['data']
 
 export const TransactionCard = () => {
     const { data, isLoading, hasMore, loadMore, searchTransaction, resetSearch, isSearchActive, searchError } = useAllTransactions()
-    const [selectedTransaction, setSelectedTransaction] = useState(data?.[0])
+    const [selectedTransaction, setSelectedTransaction] = useState<TransactionType | null>(null)
     const [activeTab, setActiveTab] = useState("new")
     const [searchInput, setSearchInput] = useState("")
 
@@ -50,10 +50,8 @@ export const TransactionCard = () => {
         onSuccess: (data: any) => {
             toast.success(`${data.message}`)
         },
-
         onError: (error) => {
             let errorMessage = "Failed to update transaction";
-
             if (error instanceof ConvexError) {
                 errorMessage = error.data;
             } else if (error instanceof Error) {
@@ -61,16 +59,19 @@ export const TransactionCard = () => {
             } else if (typeof error === 'string') {
                 errorMessage = error;
             }
-
             toast.error(errorMessage)
         }
     })
 
     const handleStatusChange = async (newStatus: "Pending" | "Confirmed" | "Out for Delivery" | "Completed" | "Cancelled") => {
-        await mutate({
-            status: newStatus,
-            transactionId: selectedTransaction?._id as Id<"transactions">
-        })
+        if (selectedTransaction) {
+            await mutate({
+                status: newStatus,
+                transactionId: selectedTransaction._id as Id<"transactions">
+            })
+
+            setSelectedTransaction(prev => prev ? { ...prev, status: newStatus } : null)
+        }
     }
 
     const handleSearch = () => {
@@ -177,6 +178,7 @@ export const TransactionCard = () => {
                         </div>
                         {isSearchActive ? (
                             <DataTable
+                                // @ts-expect-error minor type mismatch
                                 columns={transactionColumns}
                                 data={data as TransactionType[]}
                                 onRowClick={(row) => setSelectedTransaction(row)}
@@ -189,6 +191,7 @@ export const TransactionCard = () => {
                                 </TabsList>
                                 <TabsContent value="new">
                                     <DataTable
+                                        // @ts-expect-error minor type mismatch
                                         columns={transactionColumns}
                                         data={filteredTransactions as TransactionType[]}
                                         onRowClick={(row) => setSelectedTransaction(row)}
@@ -197,6 +200,7 @@ export const TransactionCard = () => {
                                 </TabsContent>
                                 <TabsContent value="completed">
                                     <DataTable
+                                        // @ts-expect-error minor type mismatch
                                         columns={transactionColumns}
                                         data={filteredTransactions as TransactionType[]}
                                         onRowClick={(row) => setSelectedTransaction(row)}

@@ -423,10 +423,18 @@ export const handleTransactionStatus = mutation({
       }
     }
 
-    // Update the transaction status
+    // Update the transaction status and order status if completed
     const updatedTransactionId = await ctx.db.patch(args.transactionId, {
       status: args.status,
     });
+
+    if (args.status === "Completed") {
+      for (const orderId of currentTransaction.orders) {
+        await ctx.db.patch(orderId, {
+          status: "confirmed",
+        });
+      }
+    }
 
     return {
       transaction: updatedTransactionId,

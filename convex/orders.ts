@@ -21,25 +21,21 @@ export const createOrders = mutation({
     handler: async (ctx, args) => {
         // Insert the order into the "orders" collection
         const orderId = await ctx.db.insert("orders", {
-            menuId: args.menuId,
-            familyMealId: args.familyMealId,
-            menuName: args.menuName || "",
-            quantity: args.quantity,
-            status: args.status,
-            totalPrice: args.totalPrice,
-            userId: args.userId,
+            ...args,
+            menuName: args.menuName ?? "",
+            orderDate: Date.now()
         });
 
         // Fetch the inserted order by its ID
-        const id = await ctx.db.get(orderId);
-        
+        const order = await ctx.db.get(orderId);
+
         // If the order wasn't found, return null explicitly
-        if (!id) {
-            return null;  // Make it explicit that null is returned if no ID
+        if (!order) {
+            return null;  // Make it explicit that null is returned if no order
         }
-        
+
         // Return the order's ID
-        return id._id as Id<'orders'>;
+        return order._id;
     },
 });
 
