@@ -37,15 +37,18 @@ export const ArimaSalesForecastCard = () => {
         )
     }
 
+    // Filter the data to show only the last 30 days of historical data plus the 7-day forecast
+    const filteredData = forecastData.slice(-37);
+
     return (
         <Card className="col-span-full">
             <CardHeader>
-                <CardTitle>ARIMA Sales Forecast (Latest 30 transactions + 7 Days Prediction)</CardTitle>
+                <CardTitle>ARIMA Sales Forecast (Last 30 Days + 7 Days Prediction)</CardTitle>
             </CardHeader>
             <CardContent>
                 <ResponsiveContainer width="100%" height={400}>
                     <LineChart
-                        data={forecastData}
+                        data={filteredData}
                         margin={{
                             top: 5,
                             right: 30,
@@ -53,7 +56,7 @@ export const ArimaSalesForecastCard = () => {
                             bottom: 5,
                         }}
                     >
-                        <CartesianGrid strokeDasharray="3 3" />
+                        <CartesianGrid stroke="3 3" />
                         <XAxis
                             dataKey="date"
                             tickFormatter={(value) => new Date(value).toLocaleDateString()}

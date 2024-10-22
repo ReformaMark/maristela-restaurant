@@ -65,7 +65,6 @@ const DashboardPage = () => {
                                 <LowSellingProducts />
                             </div>
 
-                            <SalesForecastCard />
                             <ArimaSalesForecastCard />
                         </TabsContent>
 

@@ -434,3 +434,49 @@ export const handleTransactionStatus = mutation({
     };
   }
 });
+
+export const getTransactionById = query({
+  args: { transactionId: v.id("transactions") },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      return null;
+    }
+
+    const currentUser = await ctx.db.get(userId);
+
+    if (currentUser?.role !== "admin") {
+      return null;
+    }
+
+    const transaction = await ctx.db.get(args.transactionId);
+
+    if (!transaction) {
+      return null;
+    }
+
+    // Fetch related data
+    const user = await ctx.db.get(transaction.userId);
+    const shippingAddress = await ctx.db.get(transaction.shippingId);
+    const orders = await Promise.all(
+      transaction.orders.map(async (orderId) => {
+        const order = await ctx.db.get(orderId);
+        const menuItem = order?.menuId ? await ctx.db.get(order.menuId) : null;
+        const familyMeal = order?.familyMealId ? await ctx.db.get(order.familyMealId) : null;
+        return {
+          ...order,
+          menuItem,
+          familyMeal,
+        };
+      })
+    );
+
+    return {
+      ...transaction,
+      user,
+      shippingAddress,
+      orders,
+    };
+  },
+});
