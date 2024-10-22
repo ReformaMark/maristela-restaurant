@@ -32,25 +32,25 @@ function Orders() {
     <div className=''>
         <div className="flex gap-x-3 items-center">
             <ArrowLeft onClick={()=> router.back()} className='border-yellow border-2 text-yellow p-1 rounded-full cursor-pointer size-8'/>
-            <h1 className='text-black font-semibold text-2xl tracking-widest'>Order Transaction</h1> 
+            <h1 className='text-sm text-black font-semibold md:text-2xl tracking-widest'>Order Transaction</h1> 
         </div>
-         <Tabs defaultValue="Pending" className="w-full mt-5 bg-white  p-5 rounded-md min-h-screen">
-          <TabsList className='w-full bg-transparent border-b-black border-b rounded-none pb-5 justify-evenly'>
-            <TabsTrigger value="Pending" className='py-3 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-primary border-b-2 text-lg '>Pending</TabsTrigger>
-            <TabsTrigger value="Confirmed"  className='py-3 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-primary border-b-2 text-lg '>Confirmed</TabsTrigger>
-            <TabsTrigger value="Out for delivery" className='py-3 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-primary border-b-2 text-lg '>Out for delivery</TabsTrigger>
-            <TabsTrigger value="Completed" className='py-3 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-primary border-b-2 text-lg '>Completed</TabsTrigger>
-            <TabsTrigger value="Cancelled" className='py-3 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-primary border-b-2 text-lg '>Cancelled</TabsTrigger>
+         <Tabs defaultValue="Pending" className="w-full mt-2 md:mt-5 bg-white p-1  mdLp-5 rounded-md min-h-screen">
+          <TabsList className='w-full bg-transparent md:border-b-black md:border-b rounded-none pb-5 justify-evenly'>
+            <TabsTrigger value="Pending" className='text-[0.5rem] md:text-lg py-3 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-primary border-b-2  '>Pending</TabsTrigger>
+            <TabsTrigger value="Confirmed"  className='text-[0.5rem] md:text-lg py-3 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-primary border-b-2  '>Confirmed</TabsTrigger>
+            <TabsTrigger value="Out for delivery" className='text-[0.5rem] md:text-lg py-3 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-primary border-b-2 '>Out for delivery</TabsTrigger>
+            <TabsTrigger value="Completed" className='text-[0.5rem] md:text-lg py-3 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-primary border-b-2  '>Completed</TabsTrigger>
+            <TabsTrigger value="Cancelled" className='text-[0.5rem] md:text-lg py-3 rounded-none data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-primary border-b-2  '>Cancelled</TabsTrigger>
           </TabsList>
           <TabsContent value="Pending">
             <div>
                 <div className='text-text w-full my-5'>
                     <div className='grid grid-cols-12 justify-evenly w-full'>
-                        <div className='col-span-4'>Order ID</div>
-                        <div className='col-span-3'>Date</div>
-                        <div className='col-span-2'>Cost</div>
-                        <div className='col-span-2'>Status</div>
-                        <div className='col-span-1'></div>
+                        <div className='col-span-4 text-[0.6rem] md:text-sm'>Order ID</div>
+                        <div className='col-span-3 text-[0.6rem] md:text-sm'>Date</div>
+                        <div className='col-span-2 text-[0.6rem] md:text-sm'>Cost</div>
+                        <div className='col-span-2 text-[0.6rem] md:text-sm'>Status</div>
+                        <div className='col-span-1 text-[0.6rem] md:text-sm'></div>
                     </div>
                 </div>
                 <div className='space-y-5'>
@@ -58,11 +58,11 @@ function Orders() {
                     pendingTransactions.length >= 1 ? 
                     pendingTransactions.map((transaction)=>(
                         <div key={transaction?._id} className='grid grid-cols-12 justify-evenly w-full'>
-                          <div className='col-span-4'>{transaction?._id}</div>
-                          <div className='col-span-3'>{formatDate({convexDate: transaction? transaction._creationTime : 0})}</div>
-                          <div className='col-span-2'>{formatPrice(computeCost(transaction?.orders) + 80)}</div>
-                          <div className='col-span-2'>{transaction?.status}</div>
-                          <div className='col-span-1'>
+                          <div className='col-span-4 text-[0.4rem] md:text-sm'>{transaction?._id}</div>
+                          <div className='col-span-3 text-[0.5rem] md:text-sm'>{formatDate({convexDate: transaction? transaction._creationTime : 0})}</div>
+                          <div className='col-span-2 text-[0.5rem] md:text-sm'>{formatPrice(computeCost(transaction?.orders) + 80)}</div>
+                          <div className='col-span-2 text-[0.5rem] md:text-sm'>{transaction?.status}</div>
+                          <div className='col-span-1 text-[0.5rem] md:text-sm'>
                             <Link href={`/orders/${transaction?._id}`} className='text-yellow'>View</Link>
                           </div>
                       </div>

@@ -140,7 +140,7 @@ function CheckoutPage() {
                 }
                 deleteCartitems({ cartItemsId: item._id })
             })
-            router.replace('/orders')
+            router.push('/cart/checkout/order-place')  
             setIsLoading(false)
         } catch (error) {
             console.error("Order submission failed:", error)
@@ -151,11 +151,11 @@ function CheckoutPage() {
 
 
   return (
-    <div className='px-1 sm:px-10 md:px-15 lg:px-24  text-text mb-24'>
+    <div className='px-3 sm:px-10 md:px-15 lg:px-24  text-text mb-24'>
         <h1 className='text-primary font-bold text-xl mb-5 text-center uppercase'>Checkout</h1> 
         <Toaster richColors/>
-        <div className="grid grid-cols-12 justify-between gap-x-10">
-            <div className="col-span-7">
+        <div className="grid grid-cols-12 justify-between md:gap-x-10 space-y-10">
+            <div className="col-span-12 md:col-span-7">
                 <h1 className='text-left text-lg font-medium text-primary tracking-wider'>Shipping Address <span className='text-primary'>*</span></h1>
                 <form
                     id="create-shipping-form"
@@ -268,7 +268,7 @@ function CheckoutPage() {
                 
                 </form>
             </div>
-            <div className="col-span-5 border border-gray-200  rounded-lg 600 p-5">
+            <div className="col-span-12 md:col-span-5 border border-gray-200 p-3  rounded-lg md:p-5">
                 <h1 className='uppercase text-lg font-semibold mb-5 text-center'>Order Summary</h1>
                 {cartItems && cartItems.map((item)=>(
                     <div key={item?._id} className="flex justify-between border-b-1 border-gray-800 ">

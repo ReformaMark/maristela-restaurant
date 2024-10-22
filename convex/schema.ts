@@ -46,7 +46,13 @@ const schema = defineSchema({
         quantity: v.optional(v.number()),
         isArchived: v.optional(v.boolean()),
         totalUnitsSold: v.optional(v.number()),
-    }).index('by_name', ['name']).index('by_totalUnitsSold', ['totalUnitsSold']),
+        })
+        .index('by_name', ['name'])
+        .index('by_totalUnitsSold', ['totalUnitsSold'])
+        .searchIndex("search_name", {
+            searchField: "name",
+            filterFields: ["name"],
+        }),
 
     familyMeals: defineTable({
         menus: v.array(v.id('menus')),

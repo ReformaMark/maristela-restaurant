@@ -36,6 +36,19 @@ export const allMenus = query({
     }
 });
 
+export const searchMenus = query({
+    args: {
+        search: v.string()
+    },
+    handler: async(ctx, args)=>{
+        const search = await ctx.db.query('menus')
+        .withSearchIndex('search_name', (q)=> 
+        q.search('name', args.search))
+        .take(5)
+
+        return search
+    },
+})
 export const getOneMenu = query({
     args: {
         menuId: v.optional(v.id('menus'))
@@ -229,7 +242,7 @@ export const archiveMenu = mutation({
             throw new Error("Invalid action")
         }
 
-        const transactionId = await ctx.db.patch(args.id, {
+       await ctx.db.patch(args.id, {
             isArchived: args.isArchived
         })
 

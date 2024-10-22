@@ -8,14 +8,21 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {  useQuery } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
+import { Loader2Icon } from "lucide-react";
+import Link from "next/link";
 
 function Search() {
   const [searchValue, setSearchValue] = useState<string>("");
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const searchItem = useQuery(api.menus.searchMenus, {search: searchValue})
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
     setIsPopoverOpen(e.target.value.length > 0); // Show popover when typing starts
+  
   };
 
   const handleOnFocus = () => {
@@ -39,8 +46,15 @@ function Search() {
 
           />
         </PopoverTrigger>
-        <PopoverContent>
-          <p>Search suggestions will appear here</p>
+        <PopoverContent className="w-[500px] inset-0 min-h-40 space-y-3 flex flex-col">
+          <h1 className="text-sm font-semibold">Search result</h1>
+          {searchItem ? searchItem.map((item)=>(
+            <Link href={`/search/${item.name}`} key={item._id} className="w-full px-5 hover:bg-yellow py-2 hover:text-primary transition-all duration-300 ease-in">
+              {item.name}
+            </Link>
+          )): (
+            <Loader2Icon className='w-6 h-6 animate-spin' />
+          )}
         </PopoverContent>
       </Popover>
 
