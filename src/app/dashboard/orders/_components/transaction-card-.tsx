@@ -3,6 +3,7 @@
 import { DataTable } from "@/components/data-table"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import {
     Select,
     SelectContent,
@@ -13,19 +14,19 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAllTransactions } from "@/features/transactions/api/use-all-transactions"
 import { calculateTotal, formatPrice } from "@/lib/utils"
 import { useConvexMutation } from "@convex-dev/react-query"
 import { useMutation } from "@tanstack/react-query"
 import { ConvexError } from "convex/values"
-import { CheckCircle, Clock, Loader2Icon, Package, RefreshCcw, Search, Truck } from "lucide-react"
+import { CheckCircle, Clock, Package, RefreshCcw, Search, Truck } from "lucide-react"
 import { Fragment, useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
 import { api } from "../../../../../convex/_generated/api"
 import { Id } from "../../../../../convex/_generated/dataModel"
 import { transactionColumns } from "./transaction-columns"
-import { Input } from "@/components/ui/input"
 
 type TransactionType = NonNullable<ReturnType<typeof useAllTransactions>['data']>[number];
 
@@ -102,11 +103,13 @@ export const TransactionCard = () => {
     }, [searchError, resetSearch]);
 
     if (isLoading) return (
-        <div className="w-full">
-            <div className="flex items-center py-4">
-                <Loader2Icon
-                    className="mr-2 h-4 w-4 animate-spin"
-                />
+        // create a skeleton of the table
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+                <Skeleton className="w-full h-[1000px]" />
+            </div>
+            <div className="lg:col-span-1">
+                <Skeleton className="w-full h-[750px]" />
             </div>
         </div>
     )
@@ -174,11 +177,9 @@ export const TransactionCard = () => {
                         </div>
                         {isSearchActive ? (
                             <DataTable
-                                // @ts-expect-error just a slight type mismatch
                                 columns={transactionColumns}
                                 data={data as TransactionType[]}
                                 onRowClick={(row) => setSelectedTransaction(row)}
-                                loading={isLoading}
                             />
                         ) : (
                             <Tabs defaultValue="new" className="w-full" onValueChange={(value) => setActiveTab(value)}>
@@ -188,17 +189,14 @@ export const TransactionCard = () => {
                                 </TabsList>
                                 <TabsContent value="new">
                                     <DataTable
-                                        // @ts-expect-error just a slight type mismatch
                                         columns={transactionColumns}
                                         data={filteredTransactions as TransactionType[]}
                                         onRowClick={(row) => setSelectedTransaction(row)}
-                                        loading={isLoading}
                                         filter="status"
                                     />
                                 </TabsContent>
                                 <TabsContent value="completed">
                                     <DataTable
-                                        // @ts-expect-error just a slight type mismatch
                                         columns={transactionColumns}
                                         data={filteredTransactions as TransactionType[]}
                                         onRowClick={(row) => setSelectedTransaction(row)}
@@ -275,7 +273,8 @@ export const TransactionCard = () => {
                                 Order Details
                             </h3>
 
-                            {selectedTransaction?.orders.map((order) => (
+                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                            {selectedTransaction?.orders.map((order: any) => (
                                 <div
                                     key={order._id}
                                     className="flex justify-between"

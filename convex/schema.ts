@@ -81,7 +81,8 @@ const schema = defineSchema({
             v.literal('Cancelled'),
         ),
         userId: v.id('users'),
-        shippingId: v.id('shippingAddress')
+        shippingId: v.id('shippingAddress'),
+        checked: v.optional(v.boolean()),
     }).index('by_shippingId', ['shippingId']).index('by_userId', ['userId']),
 
     ratings: defineTable({
