@@ -1,7 +1,9 @@
 "use client"
 
 import { DataTable } from "@/components/data-table"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import {
     Select,
     SelectContent,
@@ -12,22 +14,27 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAllTransactions } from "@/features/transactions/api/use-all-transactions"
 import { calculateTotal, formatPrice } from "@/lib/utils"
 import { useConvexMutation } from "@convex-dev/react-query"
 import { useMutation } from "@tanstack/react-query"
-import { CheckCircle, Clock, Loader2Icon, Package, Truck } from "lucide-react"
+import { ConvexError } from "convex/values"
+import { CheckCircle, Clock, Package, RefreshCcw, Search, Truck } from "lucide-react"
 import { Fragment, useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
 import { api } from "../../../../../convex/_generated/api"
 import { Id } from "../../../../../convex/_generated/dataModel"
 import { transactionColumns } from "./transaction-columns"
 
+type TransactionType = NonNullable<ReturnType<typeof useAllTransactions>['data']>[number];
+
 export const TransactionCard = () => {
-    const { data, isLoading } = useAllTransactions()
-    const [selectedTransaction, setSelectedTransaction] = useState(data?.[0])
+    const { data, isLoading, hasMore, loadMore, searchTransaction, resetSearch, isSearchActive, searchError } = useAllTransactions()
+    const [selectedTransaction, setSelectedTransaction] = useState<TransactionType | null>(null)
     const [activeTab, setActiveTab] = useState("new")
+    const [searchInput, setSearchInput] = useState("")
 
     const filteredTransactions = useMemo(() => {
         if (activeTab === "new") {
@@ -39,31 +46,71 @@ export const TransactionCard = () => {
 
     const { mutate, isPending } = useMutation({
         mutationFn: useConvexMutation(api.transactions.handleTransactionStatus),
-        onSuccess: () => {
-            toast.success("Successfully updated transaction!")
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onSuccess: (data: any) => {
+            toast.success(`${data.message}`)
         },
-        onError: () => {
-            toast.error(`Failed to update transaction`);
+        onError: (error) => {
+            let errorMessage = "Failed to update transaction";
+            if (error instanceof ConvexError) {
+                errorMessage = error.data;
+            } else if (error instanceof Error) {
+                errorMessage = error.message;
+            } else if (typeof error === 'string') {
+                errorMessage = error;
+            }
+            toast.error(errorMessage)
         }
     })
 
     const handleStatusChange = async (newStatus: "Pending" | "Confirmed" | "Out for Delivery" | "Completed" | "Cancelled") => {
-        await mutate({
-            status: newStatus,
-            transactionId: selectedTransaction?._id as Id<"transactions">
-        })
+        if (selectedTransaction) {
+            await mutate({
+                status: newStatus,
+                transactionId: selectedTransaction._id as Id<"transactions">
+            })
+
+            setSelectedTransaction(prev => prev ? { ...prev, status: newStatus } : null)
+        }
+    }
+
+    const handleSearch = () => {
+        if (searchInput) {
+            try {
+                searchTransaction(searchInput as Id<"transactions">)
+            } catch (error) {
+                toast.error("Invalid transaction ID. Please enter a valid ID.")
+                console.error("Search error:", error)
+            }
+        } else {
+            toast.error("Please enter a transaction ID to search.")
+        }
+    }
+
+    const handleReset = () => {
+        resetSearch();
+        setSearchInput("");
     }
 
     useEffect(() => {
         setSelectedTransaction(data?.[0])
     }, [data])
 
+    useEffect(() => {
+        if (searchError) {
+            toast.error("Transaction not found. Please try a different ID.");
+            resetSearch();
+        }
+    }, [searchError, resetSearch]);
+
     if (isLoading) return (
-        <div className="w-full">
-            <div className="flex items-center py-4">
-                <Loader2Icon
-                    className="mr-2 h-4 w-4 animate-spin"
-                />
+        // create a skeleton of the table
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+                <Skeleton className="w-full h-[1000px]" />
+            </div>
+            <div className="lg:col-span-1">
+                <Skeleton className="w-full h-[750px]" />
             </div>
         </div>
     )
@@ -114,30 +161,59 @@ export const TransactionCard = () => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <Tabs defaultValue="new" className="w-full" onValueChange={(value) => setActiveTab(value)}>
-                            <TabsList className="grid w-full grid-cols-2">
-                                <TabsTrigger value="new">New Orders</TabsTrigger>
-                                <TabsTrigger value="completed">Completed & Cancelled</TabsTrigger>
-                            </TabsList>
-                            <TabsContent value="new">
-                                <DataTable
-                                    //@ts-expect-error need to know how to get exact type
-                                    columns={transactionColumns}
-                                    //@ts-expect-error this is not really an error it is just filtered kaya hindi correctly typed
-                                    data={filteredTransactions}
-                                    onRowClick={(row) => setSelectedTransaction(row)}
-                                />
-                            </TabsContent>
-                            <TabsContent value="completed">
-                                <DataTable
-                                    //@ts-expect-error need to know how to get exact type
-                                    columns={transactionColumns}
-                                    //@ts-expect-error this is not really an error it is just filtered kaya hindi correctly typed
-                                    data={filteredTransactions}
-                                    onRowClick={(row) => setSelectedTransaction(row)}
-                                />
-                            </TabsContent>
-                        </Tabs>
+                        <div className="flex items-center space-x-2 mb-4">
+                            <Input
+                                placeholder="Search by Transaction ID"
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
+                            />
+                            <Button onClick={handleSearch}>
+                                <Search className="h-4 w-4 mr-2" />
+                                Search
+                            </Button>
+                            <Button onClick={handleReset} variant="outline" disabled={!isSearchActive}>
+                                <RefreshCcw className="h-4 w-4 mr-2" />
+                                Reset
+                            </Button>
+                        </div>
+                        {isSearchActive ? (
+                            <DataTable
+                                // @ts-expect-error minor type mismatch
+                                columns={transactionColumns}
+                                data={data as TransactionType[]}
+                                onRowClick={(row) => setSelectedTransaction(row)}
+                            />
+                        ) : (
+                            <Tabs defaultValue="new" className="w-full" onValueChange={(value) => setActiveTab(value)}>
+                                <TabsList className="grid w-full grid-cols-2">
+                                    <TabsTrigger value="new">New Orders</TabsTrigger>
+                                    <TabsTrigger value="completed">Completed & Cancelled</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="new">
+                                    <DataTable
+                                        // @ts-expect-error minor type mismatch
+                                        columns={transactionColumns}
+                                        data={filteredTransactions as TransactionType[]}
+                                        onRowClick={(row) => setSelectedTransaction(row)}
+                                        filter="status"
+                                    />
+                                </TabsContent>
+                                <TabsContent value="completed">
+                                    <DataTable
+                                        // @ts-expect-error minor type mismatch
+                                        columns={transactionColumns}
+                                        data={filteredTransactions as TransactionType[]}
+                                        onRowClick={(row) => setSelectedTransaction(row)}
+                                        filter="status"
+                                    />
+                                </TabsContent>
+                            </Tabs>
+                        )}
+                        {hasMore && !isSearchActive && (
+                            <Button onClick={loadMore} className="mt-4">
+                                Load More
+                            </Button>
+                        )}
                     </CardContent>
                 </Card>
             </div>
@@ -201,7 +277,8 @@ export const TransactionCard = () => {
                                 Order Details
                             </h3>
 
-                            {selectedTransaction?.orders.map((order) => (
+                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                            {selectedTransaction?.orders.map((order: any) => (
                                 <div
                                     key={order._id}
                                     className="flex justify-between"

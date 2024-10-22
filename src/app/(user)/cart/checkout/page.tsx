@@ -14,7 +14,7 @@ type ShippingAddress = {
     lastName: string,
     streetAddress: string,
     apartmmentNumer: string,
-    address:string,
+    address: string,
     phoneNumber: string,
 }
 
@@ -29,7 +29,7 @@ const initialShipppinginfo: ShippingAddress = {
 
 function CheckoutPage() {
     const user = useQuery(api.users.current)
-    const [isLoading, setIsLoading ] = useState<boolean>(false)
+    const [isLoading, setIsLoading] = useState<boolean>(false)
     const [shippingInfo, setShippingInfo] = useState<ShippingAddress>(initialShipppinginfo)
     const cartItems = useQuery(api.cartItems.getCartItems)
     const createOrder = useMutation(api.orders.createOrders)
@@ -39,22 +39,22 @@ function CheckoutPage() {
     // const user = useQuery(api.users.current)
     const router = useRouter()
 
-    if(!user){
+    if (!user) {
         router.replace('/auth')
         return
     }
- 
+
     //calculate the total price of an item
-    function calcTotal(quantity?:number,price?:number){
+    function calcTotal(quantity?: number, price?: number) {
         return quantity && price ? quantity * price : 0
     }
 
     //calculate the total price of all the items in the cart
     const subTotal = cartItems && cartItems.reduce((accumulator, item) => {
-        return accumulator + ((item?.menu?.price||0) * (item?.quantity || 0)) ;
+        return accumulator + ((item?.menu?.price || 0) * (item?.quantity || 0));
     }, 0);
 
-    if(cartItems && cartItems?.length < 1){
+    if (cartItems && cartItems?.length < 1) {
         router.back()
     }
 
@@ -75,7 +75,7 @@ function CheckoutPage() {
         if (!cartItems || cartItems.length === 0) {
             return
         }
-    
+
         try {
             // Create orders for each item in the cart
             const orders = await Promise.all(
@@ -83,29 +83,29 @@ function CheckoutPage() {
                     if (!item) {
                         return null
                     }
-    
+
                     const menuName = item.menu?.name
                     const totalPrice = item.quantity * (item.menu?.price || 1)
                     const ids = await createOrder({
                         menuId: item.menuId,
                         menuName: menuName,
                         quantity: item.quantity,
-                        status: 'confirmed',
+                        status: 'unconfirmed',
                         totalPrice: totalPrice,
                         userId: user._id,
                     })
-    
+
                     return ids || null
                 })
             )
-    
+
             // Filter out any null values from failed order creations
             const validOrders = orders.filter(order => order !== null)
-    
+
             if (validOrders.length === 0) {
                 throw new Error("Failed to create orders.")
             }
-    
+
             // Create shipping info
             const shippingId = await createShippingAddress({
                 userId: user._id,
@@ -116,11 +116,11 @@ function CheckoutPage() {
                 address: shippingInfo.address,
                 phoneNumber: shippingInfo.phoneNumber
             })
-    
+
             if (!shippingId) {
                 throw new Error("Failed to create shipping address.")
             }
-    
+
             // Display success message
             toast.promise(createTransaction({
                 orders: validOrders,
@@ -134,11 +134,11 @@ function CheckoutPage() {
                 success: "Order placed successfully!",
                 error: 'Error occurred while placing the order.',
             })
-            cartItems.forEach((item)=>{
-                if(!item){
+            cartItems.forEach((item) => {
+                if (!item) {
                     throw new Error("Failed to delete your cart items.")
                 }
-                deleteCartitems({cartItemsId: item._id})
+                deleteCartitems({ cartItemsId: item._id })
             })
             router.replace('/orders')
             setIsLoading(false)
@@ -147,7 +147,7 @@ function CheckoutPage() {
             // Handle the error, e.g., display an error notification
             toast.error("Failed to place the order. Please try again.")
         }
-    } 
+    }
 
 
   return (
@@ -274,36 +274,36 @@ function CheckoutPage() {
                     <div key={item?._id} className="flex justify-between border-b-1 border-gray-800 ">
                         <h1 className=''>{item?.quantity} x {item?.menu?.name}</h1>
 
-                        <h1>{formatPrice(calcTotal(item?.quantity, item?.menu?.price))}</h1>
+                            <h1>{formatPrice(calcTotal(item?.quantity, item?.menu?.price))}</h1>
+                        </div>
+                    ))}
+                    <div className="flex justify-between mt-10 border-t-2 border-t-gray-500 pt-3">
+                        <h1>Subtotal</h1>
+                        <h1>{formatPrice(subTotal || 0)}</h1>
                     </div>
-                ))}
-                <div className="flex justify-between mt-10 border-t-2 border-t-gray-500 pt-3">
-                    <h1>Subtotal</h1>
-                    <h1>{formatPrice(subTotal || 0)}</h1>
+                    <div className="flex justify-between text-text text-sm">
+                        <h1>Shipping Fee</h1>
+                        <h1>{formatPrice(80)}</h1>
+                    </div>
+                    <div className="flex justify-between text-black font-semibold mt-3">
+                        <h1 className=''>Total</h1>
+                        <h1>{formatPrice(subTotal ? subTotal + 80 : 0)}</h1>
+                    </div>
+                    <Button
+                        type="submit"
+                        form="create-shipping-form"
+                        className="bg-primary uppercase text-bold w-full mt-5 tracking-widest text-white transition-all duration-300 ease-in hover:bg-primary/90"
+                        disabled={isLoading}
+                    >
+                        Place Order
+                    </Button>
+                    <h1 className='text-xs text-text font-thin '>* We are only accepting Cash On Delivery(COD) payment method.</h1>
                 </div>
-                <div className="flex justify-between text-text text-sm">
-                    <h1>Shipping Fee</h1>
-                    <h1>{formatPrice(80)}</h1>
-                </div>
-                <div className="flex justify-between text-black font-semibold mt-3">
-                    <h1 className=''>Total</h1>
-                    <h1>{formatPrice(subTotal ? subTotal+80 : 0)}</h1>
-                </div>
-                <Button
-                    type="submit"
-                    form="create-shipping-form"
-                    className="bg-primary uppercase text-bold w-full mt-5 tracking-widest text-white transition-all duration-300 ease-in hover:bg-primary/90"
-                    disabled={isLoading}
-                >
-                  Place Order
-                </Button>
-                <h1 className='text-xs text-text font-thin '>* We are only accepting Cash On Delivery(COD) payment method.</h1>
             </div>
+
+
         </div>
-        
-        
-    </div>
-  )
+    )
 }
 
 export default CheckoutPage

@@ -58,9 +58,6 @@ export const SignUpCard = ({
             password,
             flow: "signUp",
         })
-            // .then(() => {
-
-            // })
             .catch(() => {
                 setError("Something went wrong!")
             })

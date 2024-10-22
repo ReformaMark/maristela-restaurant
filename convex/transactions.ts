@@ -1,8 +1,130 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { asyncMap } from "convex-helpers";
 import { getManyFrom } from "convex-helpers/server/relationships";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
+
+export const getPendingTransactions = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      return null;
+    }
+
+    const user = await ctx.db.get(userId);
+
+    if (user?.role !== "admin") {
+      return null;
+    }
+
+    const transactions = await ctx.db
+      .query("transactions")
+      .filter((q) => q.eq(q.field("status"), "Pending"))
+      .collect();
+
+    return transactions;
+  }
+})
+
+export const getConfirmedTransactions = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      return null;
+    }
+
+    const user = await ctx.db.get(userId);
+
+    if (user?.role !== "admin") {
+      return null;
+    }
+
+    const transactions = await ctx.db
+      .query("transactions")
+      .filter((q) => q.eq(q.field("status"), "Confirmed"))
+      .collect();
+
+    return transactions;
+  }
+})
+
+export const getOutForDeliveryTransactions = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      return null;
+    }
+
+    const user = await ctx.db.get(userId);
+
+    if (user?.role !== "admin") {
+      return null;
+    }
+
+    const transactions = await ctx.db
+      .query("transactions")
+      .filter((q) => q.eq(q.field("status"), "Out for Delivery"))
+      .collect();
+
+    return transactions;
+  }
+})
+
+export const getCompletedTransactions = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      return null;
+    }
+
+    const user = await ctx.db.get(userId);
+
+    if (user?.role !== "admin") {
+      return null;
+    }
+
+    const transactions = await ctx.db
+      .query("transactions")
+      .filter((q) => q.eq(q.field("status"), "Completed"))
+      .collect();
+
+    return transactions;
+  }
+})
+
+export const getCancelledTransactions = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      return null;
+    }
+
+    const user = await ctx.db.get(userId);
+
+    if (user?.role !== "admin") {
+      return null;
+    }
+
+    const transactions = await ctx.db
+      .query("transactions")
+      .filter((q) => q.eq(q.field("status"), "Cancelled"))
+      .collect();
+
+    return transactions;
+  }
+})
+
 
 export const createTransaction = mutation({
   args: {
@@ -34,52 +156,59 @@ export const createTransaction = mutation({
 
 export const getAllTransactions = query({
   args: {
-
+    limit: v.number(),
+    cursor: v.optional(v.string()),
   },
-  handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx)
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
 
     if (userId === null) {
-      return null
+      return null;
     }
 
-    const user = await ctx.db.get(userId)
+    const user = await ctx.db.get(userId);
 
     if (user?.role !== "admin") {
-      return null
+      return null;
     }
 
     const transactions = await ctx.db
       .query("transactions")
       .order("desc")
-      .collect()
+      .paginate({ numItems: args.limit, cursor: args.cursor || null });
 
+    const transactionWithDetails = await Promise.all(
+      transactions.page.map(async (transaction) => {
+        const user = await ctx.db.get(transaction.userId);
+        const shippingAddress = await ctx.db.get(transaction.shippingId);
+        const orders = await Promise.all(
+          transaction.orders.map(async (orderId) => {
+            const order = await ctx.db.get(orderId);
+            const menuItem = order?.menuId ? await ctx.db.get(order.menuId) : null;
+            const familyMeal = order?.familyMealId ? await ctx.db.get(order.familyMealId) : null;
+            return {
+              ...order,
+              menuItem,
+              familyMeal,
+            };
+          })
+        );
 
-    const transactionWithDetails = await Promise.all(transactions.map(async (transaction) => {
-      const user = await ctx.db.get(transaction.userId)
-      const shippingAddress = await ctx.db.get(transaction.shippingId)
-      const orders = await Promise.all(transaction.orders.map(async (orderId) => {
-        const order = await ctx.db.get(orderId)
-        const menuItem = order?.menuId ? await ctx.db.get(order.menuId) : null
-        const familyMeal = order?.familyMealId ? await ctx.db.get(order.familyMealId) : null
         return {
-          ...order,
-          menuItem,
-          familyMeal,
-        }
-      }))
+          ...transaction,
+          user,
+          shippingAddress,
+          orders,
+        };
+      })
+    );
 
-      return {
-        ...transaction,
-        user,
-        shippingAddress,
-        orders,
-      }
-    }))
-
-    return transactionWithDetails
-  }
-})
+    return {
+      transactions: transactionWithDetails,
+      continueCursor: transactions.continueCursor,
+    };
+  },
+});
 
 export const cancelTransaction = mutation({
   args: {
@@ -216,36 +345,146 @@ export const handleTransactionStatus = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx)
+    const userId = await getAuthUserId(ctx);
 
     if (userId === null) {
-      throw new Error("Unauthorized")
+      throw new ConvexError("Unauthorized");
     }
 
-    const user = await ctx.db.get(userId)
+    const user = await ctx.db.get(userId);
 
     if (user?.role !== "admin") {
-      throw new Error("Unauthorized")
+      throw new ConvexError("Unauthorized");
     }
 
-    const currentTransaction = await ctx.db.get(args.transactionId)
+    const currentTransaction = await ctx.db.get(args.transactionId);
 
-    if (currentTransaction?.status === "Completed" || currentTransaction?.status === "Cancelled") {
-      throw new Error("Invalid Action")
+    if (!currentTransaction) {
+      throw new ConvexError("Transaction not found");
     }
 
-    if (currentTransaction?.status === "Confirmed" && args.status === "Pending") {
-      throw new Error("Invalid Action, transaction is already confirmed") // how to fetch this error message in the frontend?
+    if (currentTransaction.status === "Completed" || currentTransaction.status === "Cancelled") {
+      throw new ConvexError("Invalid Action: Transaction is already completed or cancelled");
     }
 
-    if (currentTransaction?.status === "Out for Delivery" && args.status === "Confirmed" || args.status === "Pending") {
-      throw new Error("invalid Action, transaction is already out for delivery")
+    if (currentTransaction.status === "Confirmed" && args.status === "Pending") {
+      throw new ConvexError("Invalid Action: Transaction is already confirmed");
     }
 
-    const transactionId = await ctx.db.patch(args.transactionId, {
+    if (currentTransaction.status === "Out for Delivery" && (args.status === "Confirmed" || args.status === "Pending")) {
+      throw new ConvexError("Invalid Action: Transaction is already out for delivery");
+    }
+
+    if (currentTransaction.status === "Pending" && (args.status === "Completed" || args.status === "Out for Delivery")) {
+      throw new ConvexError("Transaction is only at pending, confirm it first");
+    }
+
+    // If the new status is "Confirmed", we need to check stock and update totalUnitsSold
+    if (args.status === "Confirmed") {
+      let insufficientStockItems = [];
+
+      for (const orderId of currentTransaction.orders) {
+        const order = await ctx.db.get(orderId);
+        if (!order) continue;
+
+        const menuItem = await ctx.db.get(order.menuId as Id<"menus">);
+        if (!menuItem) continue;
+
+        // Check if there's enough stock
+        if ((menuItem.quantity as number) < order.quantity) {
+          insufficientStockItems.push(menuItem.name);
+        }
+      }
+
+      if (insufficientStockItems.length > 0) {
+        // Cancel the transaction if there's not enough stock for any item
+        await ctx.db.patch(args.transactionId, { status: "Cancelled" });
+        // throw new ConvexError(`Insufficient stock for: ${insufficientStockItems.join(", ")}. Transaction cancelled.`);
+
+        return {
+          status: "Cancelled",
+          message: `Insufficient stock for: ${insufficientStockItems.join(", ")}. Transaction cancelled.`,
+        }
+      }
+
+      // If we have sufficient stock for all items, proceed with updating quantities
+      for (const orderId of currentTransaction.orders) {
+        const order = await ctx.db.get(orderId);
+        if (!order) continue;
+
+        const menuItem = await ctx.db.get(order.menuId as Id<"menus">);
+        if (!menuItem) continue;
+
+        // Update the menu item's quantity and totalUnitsSold
+        await ctx.db.patch(order.menuId as Id<"menus">, {
+          quantity: (menuItem.quantity as number) - order.quantity,
+          totalUnitsSold: ((menuItem.totalUnitsSold as number) || 0) + order.quantity,
+        });
+      }
+    }
+
+    // Update the transaction status and order status if completed
+    const updatedTransactionId = await ctx.db.patch(args.transactionId, {
       status: args.status,
-    })
+    });
 
-    return transactionId
+    if (args.status === "Completed") {
+      for (const orderId of currentTransaction.orders) {
+        await ctx.db.patch(orderId, {
+          status: "confirmed",
+        });
+      }
+    }
+
+    return {
+      transaction: updatedTransactionId,
+      message: "Transaction status updated successfully",
+    };
   }
-})
+});
+
+export const getTransactionById = query({
+  args: { transactionId: v.id("transactions") },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      return null;
+    }
+
+    const currentUser = await ctx.db.get(userId);
+
+    if (currentUser?.role !== "admin") {
+      return null;
+    }
+
+    const transaction = await ctx.db.get(args.transactionId);
+
+    if (!transaction) {
+      return null;
+    }
+
+    // Fetch related data
+    const user = await ctx.db.get(transaction.userId);
+    const shippingAddress = await ctx.db.get(transaction.shippingId);
+    const orders = await Promise.all(
+      transaction.orders.map(async (orderId) => {
+        const order = await ctx.db.get(orderId);
+        const menuItem = order?.menuId ? await ctx.db.get(order.menuId) : null;
+        const familyMeal = order?.familyMealId ? await ctx.db.get(order.familyMealId) : null;
+        return {
+          ...order,
+          menuItem,
+          familyMeal,
+        };
+      })
+    );
+
+    return {
+      ...transaction,
+      user,
+      shippingAddress,
+      orders,
+    };
+  },
+});

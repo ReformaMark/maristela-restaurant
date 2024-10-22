@@ -32,6 +32,9 @@ const schema = defineSchema({
             v.literal('Super Silog Meals'),
             v.literal('Seafood'),
             v.literal('Veggies'),
+            v.literal('Desserts'),
+            v.literal('Silog Meals'),
+            v.literal('Special'),
         ),
         name: v.string(),
         available: v.boolean(),
@@ -42,7 +45,8 @@ const schema = defineSchema({
         description: v.optional(v.string()),
         quantity: v.optional(v.number()),
         isArchived: v.optional(v.boolean()),
-    }).index('by_name', ['name']),
+        totalUnitsSold: v.optional(v.number()),
+    }).index('by_name', ['name']).index('by_totalUnitsSold', ['totalUnitsSold']),
 
     familyMeals: defineTable({
         menus: v.array(v.id('menus')),
@@ -63,7 +67,8 @@ const schema = defineSchema({
         ),
         totalPrice: v.number(),
         userId: v.id('users'),
-    }).index('by_user', ['userId']),
+        orderDate: v.optional(v.number()),
+    }).index('by_user', ['userId']).index('by_orderDate', ['orderDate']),
 
     transactions: defineTable({
         orders: v.array(v.id('orders')),
@@ -76,8 +81,8 @@ const schema = defineSchema({
             v.literal('Cancelled'),
         ),
         userId: v.id('users'),
-        shippingId: v.id('shippingAddress')
-    }).index('by_shippingId',['shippingId']).index('by_userId', ['userId']),
+        shippingId: v.id('shippingAddress'),
+    }).index('by_shippingId', ['shippingId']).index('by_userId', ['userId']),
 
     ratings: defineTable({
         stars: v.optional(v.number()),
@@ -101,10 +106,10 @@ const schema = defineSchema({
     shippingAddress: defineTable({
         userId: v.id('users'),
         firstname: v.string(),
-        lastName: v.string(), 
+        lastName: v.string(),
         streetAddress: v.string(),
         apartmmentNumer: v.optional(v.string()),
-        address:v.string(),
+        address: v.string(),
         phoneNumber: v.string(),
 
     }).index('by_userId', ['userId'])
