@@ -3,18 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/lib/utils";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useArimaForecastData } from "../api/use-arima-forecast-data";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const ArimaSalesForecastCard = () => {
     const { data: forecastData, isLoading, error } = useArimaForecastData()
 
     if (isLoading) {
-        return (
-            <Card>
-                <CardContent>
-                    Loading...
-                </CardContent>
-            </Card>
-        )
+        return <Skeleton className="h-[400px] w-full" />
     }
 
     if (error) {

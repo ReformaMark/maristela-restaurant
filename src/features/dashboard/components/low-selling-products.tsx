@@ -6,11 +6,14 @@ import { formatPrice } from "@/lib/utils"
 import { useLowSellingProducts } from "../api/use-low-selling-products"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 export const LowSellingProducts = () => {
     const { data, isLoading } = useLowSellingProducts()
     const [viewType, setViewType] = useState<'revenue' | 'unitSold'>('unitSold')
 
-    if (isLoading) return null
+    if (isLoading) {
+        return <Skeleton className="h-[390px] w-full" />
+    }
 
     const renderByUnitSold = () => (
         <div className="space-y-4">

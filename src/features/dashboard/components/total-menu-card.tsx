@@ -5,8 +5,9 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Loader2Icon, Users2Icon } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAllMenus } from "@/features/menu/api/use-all-menus";
+import { Users2Icon } from "lucide-react";
 
 export const TotalMenuCard = () => {
     const { data, isLoading } = useAllMenus()
@@ -14,7 +15,7 @@ export const TotalMenuCard = () => {
     const count = data?.length
 
     if (isLoading) {
-        return <Loader2Icon className="size-4 animate-spin text-muted-foreground" />
+        return <Skeleton className="h-32 w-full" />
     }
 
     return (

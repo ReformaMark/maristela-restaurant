@@ -14,6 +14,7 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useOrderPopularity } from "@/features/dashboard/api/use-order-popularity"
 import { TrendingUp } from "lucide-react"
 import { useMemo } from "react"
@@ -25,7 +26,7 @@ export default function OrderStatusDistributionCard() {
         return data?.reduce((acc, curr) => acc + curr.value, 0) || 0
     }, [data])
 
-    if (isLoading) return <div>Loading...</div>
+    if (isLoading) return <Skeleton className="h-[200px] w-full" />
     if (!data || data.length === 0) return <div>No data available</div>
 
     const chartConfig = {

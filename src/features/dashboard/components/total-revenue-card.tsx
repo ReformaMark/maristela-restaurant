@@ -5,16 +5,17 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Loader2Icon, Users2Icon } from "lucide-react";
-import { useCountRevenue } from "../api/use-count-revenue";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatPrice } from "@/lib/utils";
+import { Users2Icon } from "lucide-react";
+import { useCountRevenue } from "../api/use-count-revenue";
 
 
 export const TotalRevenueCard = () => {
     const { data, isLoading } = useCountRevenue()
 
     if (isLoading) {
-        return <Loader2Icon className="size-4 animate-spin text-muted-foreground" />
+        return <Skeleton className="h-32 w-full" />
     }
 
     return (

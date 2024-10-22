@@ -28,6 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Skeleton } from '@/components/ui/skeleton'
 
 const COLORS = [
     "hsl(var(--chart-1))",
@@ -51,7 +52,7 @@ export default function ProductPopularityCard() {
         setCurrentPage(1)
     }, [searchTerm])
 
-    if (isLoading) return <div>Loading...</div>
+    if (isLoading) return <Skeleton className="h-[400px] w-full" />
     if (!data || data.length === 0) return <div>No data available</div>
 
     const filteredData = data

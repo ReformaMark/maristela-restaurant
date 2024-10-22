@@ -5,14 +5,15 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Loader2Icon, Users2Icon } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Users2Icon } from "lucide-react";
 import { useAllPendingTransactions } from "../api/use-all-pending-transactions";
 
 export const UnconfirmedOrdersCard = () => {
     const { data, isLoading } = useAllPendingTransactions()
 
     if (isLoading) {
-        return <Loader2Icon className="size-4 animate-spin text-muted-foreground" />
+        return <Skeleton className="h-32 w-full" />
     }
 
     const filteredData = data?.length
