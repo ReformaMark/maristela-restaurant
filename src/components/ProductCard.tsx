@@ -25,6 +25,7 @@ import Image from 'next/image'
 import ReactStars from 'react-stars'
 import { motion } from 'framer-motion'
 import { IoBagAddSharp } from 'react-icons/io5'
+import { GiHeartMinus } from 'react-icons/gi'
  
 export type RatingWithUser = Doc<'ratings'> & {
   user: Doc<'users'> | null;
@@ -47,7 +48,7 @@ function ProductCard({
     description?:string,
     image: string,
     price:number,
-   
+    
     menuId?: Id<"menus">,
 
     ratings: RatingWithUser[]
@@ -56,6 +57,7 @@ function ProductCard({
 
   const addToCartItem = useMutation(api.cartItems.addToCart);
   const addToFavorites = useMutation(api.favorites.addFavorites)
+  const removeFavorite = useMutation(api.favorites.removeFavorite)
   const getFavorites = useQuery(api.favorites.getAllfavorites)
   const isExisting = getFavorites?.find(f => f?.menuId === menuId) 
   // const cartItems = useQuery(api.cartItems.getCartItems);
@@ -115,6 +117,27 @@ function ProductCard({
     }
   }
 
+  const handleRemoveToFavorite = async (menuId?: Id<'menus'>) =>{
+    if (!menuId) {
+
+    } else {
+      if(isExisting) {
+        const favoriteId = isExisting._id
+        toast.promise(
+          removeFavorite({menuId, favoriteId}),
+          {
+            loading: 'Loading...',
+            success: (data) => {
+              return `${data?.name} has been removed to your favorites`;
+            },
+            error: 'Error removing item to your favorites',
+          }
+        );
+
+      }
+    }
+  }
+
   return (
     <Dialog >
         <Card className='relative overflow-hidden shadow-none rounded-3xl bg-gwhite p-0 h-fit transition-all duration-500 ease-in'>
@@ -122,35 +145,13 @@ function ProductCard({
               <CardContent className='p-0 relative shadow-none'>
                   {children}
               </CardContent>
-                {/* <div className='flex justify-between px-2 items-center text-lg md:text-xl font-semibold text-center  mb-0'>
-                  <h1 className='w-10/12 text-left text-sm md:text-lg font-semibold font-sans line-clamp-1'>{title}</h1>
-                  <div className="flex items-center">
-                    <h1 className=' text-text text-sm md:text-sm'>{average}/5</h1> 
-                    <Star className='size-5' fill='yellow' color='yellow'/>
-                  </div>
-                  
-                </div>
-                <p className='text-xs text-text line-clamp-2 text-left px-3 min-h-10'>{description}</p>
-                <div className="flex justify-between items-center px-2">
-                  
-                  <h1 className='font-thin text-sm'>for {formatPrice(price)}</h1>
-                  { user ? isAlreadyAdded() ? (
-                    <Button disabled onClick={handleAddToCart} variant={'outline'} className='rounded-full border border-text hover:border-primary text-text hover:text-primary font-semibold flex items-center '> 
-                      <FaCheck className=''/>
-                    </Button>
-                    ) : (
-                      <Button onClick={()=>{}} variant={'outline'} className='rounded-full  border border-text hover:border-primary text-text hover:text-primary font-semibold flex items-center '> 
-                     <FaPlus />
-                    </Button>
-                  ) : (
-                    <Button onClick={()=> router.push('/auth')} variant={'outline'} className='rounded-full  border border-text hover:border-primary text-text hover:text-primary font-semibold flex items-center '> 
-                     <FaPlus />
-                    </Button>
-                  )}
-                </div> */}
+          
                  <motion.div 
                   className={`flex ${pathname === "/favorites" ? "justify-end" : "justify-between"} md:hidden  px-5 gap-x-3 items-center inset-0 `}>
-                      <FaHeart onClick={()=> handleAddToFavorites(menuId)} className={`${pathname === '/favorites' ? "hidden": "block"} ${isExisting ? "hidden" : "block"} bg-white p-2 rounded-full size-10 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`}/>
+                      <div className="">
+                      <FaHeart onClick={()=> handleAddToFavorites(menuId)} className={`${isExisting ? "hidden": "block"} bg-white p-2 rounded-full size-10 hover:rotate-[360deg] cursor-pointer hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`}/>
+                        <GiHeartMinus onClick={()=> handleRemoveToFavorite(menuId)} className={`${isExisting ? "block": "hidden"} bg-white p-2 rounded-full cursor-pointer size-10 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`} />
+                      </div>
                       <DialogTrigger><IoBagAddSharp className='bg-white p-2 rounded-full size-10 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear'/></DialogTrigger>
                 </motion.div>
                 <div className="font-cairo space-y-3">
@@ -164,7 +165,10 @@ function ProductCard({
               initial={{opacity:0, y:30}}
               whileHover={{ opacity: 1, y:20 }}
               className="absolute hidden md:flex justify-between px-5 gap-x-3 items-center inset-0 w-full h-full ">
-                  <div className={`${pathname === "/favorites" ? "hidden" : "block"} ${isExisting ? "hidden" : "block"}`}><FaHeart onClick={()=> handleAddToFavorites(menuId)} className='bg-white p-2 rounded-full size-10 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear'/></div>
+                  <div className={` `}>
+                    <FaHeart onClick={()=> handleAddToFavorites(menuId)} className={`${isExisting ? "hidden": "block"} bg-white p-2 cursor-pointer rounded-full size-10 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`}/>
+                    <GiHeartMinus onClick={()=> handleRemoveToFavorite(menuId)} className={`${isExisting ? "block": "hidden"} bg-white cursor-pointer p-2 rounded-full size-10 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`} />
+                  </div>
                   <DialogTrigger><IoBagAddSharp className='bg-white p-2 rounded-full size-10 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear'/></DialogTrigger>
             </motion.div>
         </Card>

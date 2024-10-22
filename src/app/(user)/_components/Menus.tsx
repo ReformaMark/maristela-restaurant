@@ -3,7 +3,6 @@ import React from 'react'
 import { useQuery } from 'convex/react'
 import { api } from '../../../../convex/_generated/api'
 import {  Doc } from '../../../../convex/_generated/dataModel'
-import Recommendation from './Recommendation'
 import CategoryTemplate from './CategoryTemplate'
 import { RatingWithUser } from '@/components/ProductCard'
 
@@ -17,7 +16,6 @@ function Menus() {
     const menus = useQuery(api.menus.allMenus)
   return (
     <div>
-        <Recommendation/>
         <CategoryTemplate menus={menus} categoryName='Pork'/>
         <CategoryTemplate menus={menus} categoryName='Chicken'/>
         <CategoryTemplate menus={menus} categoryName='Pancit & Pasta'/>

@@ -93,3 +93,17 @@ export const addFavorites = mutation({
         } 
     }
 })
+
+export const removeFavorite = mutation({
+    args:{
+        menuId: v.id('menus'),
+        favoriteId: v.id('favorites')
+    },
+    handler: async (ctx, args )=>{
+        console.log(args.favoriteId)
+        const menu = await ctx.db.get(args.menuId)
+        await ctx.db.delete(args.favoriteId)
+
+        return menu
+    }
+})
