@@ -4,6 +4,7 @@ import "@/lib/globals.css";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import { DashboardHeader } from "./_components/dashboard-header";
 import { Sidebar } from "./_components/sidebar";
+import { AdminCheck } from "@/features/auth/components/admin-check";
 
 export const metadata = {
     title: 'Dashboard',
@@ -15,14 +16,16 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             <html lang="en">
                 <body>
                     <ConvexClientProvider>
-                        <div className="flex h-screen">
-                            <Sidebar className="hidden w-64 border-r bg-gray-100/60 lg:block border-red-200" />
-                            <div className="flex-1 overflow-y-auto">
-                                <DashboardHeader />
-                                <Toaster />
-                                {children}
+                        <AdminCheck>
+                            <div className="flex h-screen">
+                                <Sidebar className="hidden w-64 border-r bg-gray-100/60 lg:block border-red-200" />
+                                <div className="flex-1 overflow-y-auto">
+                                    <DashboardHeader />
+                                    <Toaster />
+                                    {children}
+                                </div>
                             </div>
-                        </div>
+                        </AdminCheck>
                     </ConvexClientProvider>
                 </body>
             </html>

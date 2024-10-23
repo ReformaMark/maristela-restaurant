@@ -10,10 +10,12 @@ import {
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { useAuthActions } from "@convex-dev/auth/react"
+import { useConvexAuth } from "convex/react"
 import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, TriangleAlertIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { AuthFlow } from "../types"
+import { useAdminCheck } from "./use-admin-check"
 
 
 interface SignUpCardProps {
@@ -25,6 +27,8 @@ export const SignUpCard = ({
 }: SignUpCardProps) => {
 
     const { signIn } = useAuthActions();
+    const isAdmin = useAdminCheck();
+    const { isAuthenticated } = useConvexAuth();
 
     const [name, setFName] = useState("");
     const [lname, setLName] = useState("");
@@ -39,8 +43,19 @@ export const SignUpCard = ({
 
     const router = useRouter()
 
+    useEffect(() => {
+        if (isAuthenticated) {
+            if (!isAdmin) {
+                router.push("/");
+            } else {
+                router.push("/dashboard");
+            }
+        }
+    }, [isAuthenticated, isAdmin, router]);
+
     const onSignUp = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+
 
         if (password !== confirmPassword) {
             setError("Passwords do not match")
@@ -48,6 +63,7 @@ export const SignUpCard = ({
         }
 
         setPending(true)
+        setError("")
 
         signIn("password", {
             email,

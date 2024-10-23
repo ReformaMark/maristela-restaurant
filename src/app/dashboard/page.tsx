@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArimaSalesForecastCard } from "@/features/dashboard/components/arima-sales-forecast-card"
 import { CancelledOrdersCard } from "@/features/dashboard/components/cancelled-orders-card"
@@ -12,9 +11,6 @@ import { TotalOrdersCard } from "@/features/dashboard/components/total-orders-ca
 import { TotalRevenueCard } from "@/features/dashboard/components/total-revenue-card"
 import { TotalUsersCard } from "@/features/dashboard/components/total-users-card"
 import { UnconfirmedOrdersCard } from "@/features/dashboard/components/unconfirmed-orders-card"
-import {
-    CalendarIcon
-} from 'lucide-react'
 import OrderStatusDistributionCard from "./_components/order-status-distribution-card"
 import ProductPopularityCard from "./_components/product-popularity-card"
 

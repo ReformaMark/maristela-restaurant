@@ -1,4 +1,4 @@
-import { AuthFlow } from "../types"
+import { Button } from "@/components/ui/button"
 import {
     Card,
     CardContent,
@@ -6,13 +6,16 @@ import {
     CardHeader,
     CardTitle
 } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
 import { Separator } from "@/components/ui/separator"
-import { TriangleAlertIcon } from "lucide-react"
-import { useAuthActions } from "@convex-dev/auth/react";
+import { useAuthActions } from "@convex-dev/auth/react"
+import { useConvexAuth } from "convex/react"
+import { Loader2, TriangleAlertIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { AuthFlow } from "../types"
+import { useAdminCheck } from "./use-admin-check"
+
 interface SignInCardProps {
     setState: (state: AuthFlow) => void
 }
@@ -22,7 +25,8 @@ export const SignInCard = ({
 }: SignInCardProps) => {
 
     const { signIn } = useAuthActions();
-
+    const isAdmin = useAdminCheck();
+    const { isAuthenticated } = useConvexAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [pending, setPending] = useState<boolean>(false);
@@ -30,22 +34,34 @@ export const SignInCard = ({
 
     const router = useRouter()
 
-    const onSignIn = (e: React.FormEvent<HTMLFormElement>) => {
+    useEffect(() => {
+        if (isAuthenticated) {
+            if (!isAdmin) {
+                router.push("/");
+            } else {
+                router.push("/dashboard");
+            }
+        }
+    }, [isAuthenticated, isAdmin, router]);
+
+    const onSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-
         setPending(true)
+        setError("")
 
-        signIn("password", {
-            email,
-            password,
-            flow: "signIn"
-        })
-            .catch(() => {
-                setError("Invalid email or password")
-            })
-            .finally(() => {
-                setPending(false)
-            })
+        try {
+            await signIn("password", {
+                email,
+                password,
+                flow: "signIn"
+            });
+
+        } catch (error) {
+            setError("Invalid email or password")
+            console.error(error)
+        } finally {
+            setPending(false)
+        }
     }
 
     return (
@@ -88,7 +104,14 @@ export const SignInCard = ({
                         size={"lg"}
                         disabled={pending}
                     >
-                        Continue
+                        {pending ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Signing In...
+                            </>
+                        ) : (
+                            "Continue"
+                        )}
                     </Button>
                 </form>
                 <Separator />
