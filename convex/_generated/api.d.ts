@@ -18,6 +18,7 @@ import type {
 import type * as auth from "../auth.js";
 import type * as cartItems from "../cartItems.js";
 import type * as dashboard from "../dashboard.js";
+import type * as favorites from "../favorites.js";
 import type * as http from "../http.js";
 import type * as menus from "../menus.js";
 import type * as orders from "../orders.js";
@@ -39,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   cartItems: typeof cartItems;
   dashboard: typeof dashboard;
+  favorites: typeof favorites;
   http: typeof http;
   menus: typeof menus;
   orders: typeof orders;

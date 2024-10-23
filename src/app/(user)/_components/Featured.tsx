@@ -6,25 +6,25 @@ import ProductCard from '@/components/ProductCard'
 import Image from 'next/image'
 import { SkeletonCard } from '@/components/SkeletonCard'
 import { motion } from 'framer-motion'
-function Recommendation() {
+function Featured() {
     const menus = useQuery(api.menus.allMenus)
-    const recommendedMenus = menus?.filter(menu=> menu.recommended === true && menu.special === false);
+    const recommendedMenus = menus?.filter(menu=> menu.recommended === true || menu.special === true);
   return (
-    <div className='p-5'>
+    <div className='p-2 md:p-5'>
         
             {recommendedMenus ?( 
-                <motion.div
-                initial={{
-                    opacity: 0,
-                    y: 20,
-                }}
-                whileInView={{opacity: 1, y: 0}}
-                transition={{
-                    duration: 0.5,
-                    ease: [0.4, 0.0, 0.2, 1],
-                }} 
-                viewport={{once: true}}
-                className="grid grid-cols-2 md:grid-cols-4 gap-5 justify-center">
+               <motion.div
+               initial={{
+                   opacity: 0,
+                   y: 20,
+               }}
+               whileInView={{opacity: 1, y: 0}}
+               transition={{
+                   duration: 0.5,
+                   ease: [0.4, 0.0, 0.2, 1],
+               }} 
+               viewport={{once: true}}
+               className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-5 justify-center">
                     {  recommendedMenus.map((menuItem)=>(
                         <ProductCard  
                             key={menuItem._id} 
@@ -53,4 +53,4 @@ function Recommendation() {
   )
 }
 
-export default Recommendation
+export default Featured

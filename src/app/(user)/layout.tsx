@@ -33,7 +33,7 @@ export default function RootLayout({
     <ConvexAuthNextjsServerProvider>
     <html lang="en">
       <body
-        className={''}
+        className={'font-cairo'}
       >
         <ConvexClientProvider>
           <Header/>

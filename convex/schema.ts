@@ -46,7 +46,13 @@ const schema = defineSchema({
         quantity: v.optional(v.number()),
         isArchived: v.optional(v.boolean()),
         totalUnitsSold: v.optional(v.number()),
-    }).index('by_name', ['name']).index('by_totalUnitsSold', ['totalUnitsSold']),
+        })
+        .index('by_name', ['name'])
+        .index('by_totalUnitsSold', ['totalUnitsSold'])
+        .searchIndex("search_name", {
+            searchField: "name",
+            filterFields: ["name"],
+        }),
 
     familyMeals: defineTable({
         menus: v.array(v.id('menus')),
@@ -97,8 +103,12 @@ const schema = defineSchema({
         familyMealId: v.optional(v.id('familyMeals')),
         quantity: v.number(),
         userId: v.id('users'),
-    }).index('by_menuId', ['menuId']).index('by_familyMealId', ['familyMealId']).index('by_userId', ['userId']),
-
+    }).index('by_menuId', ['menuId']).index('by_familyMealId', ['familyMealId']).index('by_userId',['userId']),
+    favorites: defineTable({
+        menuId: v.optional(v.id('menus')),
+        familyMealId: v.optional(v.id('familyMeals')),
+        userId: v.id('users'),
+    }).index('by_menuId', ['menuId']).index('by_familyMealId', ['familyMealId']).index('by_userId',['userId']),
     shippingAddress: defineTable({
         userId: v.id('users'),
         firstname: v.string(),

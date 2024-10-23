@@ -13,9 +13,9 @@ export const rateMenu = mutation({
     handler: async (ctx,args)=>{
         const userId = await getAuthUserId(ctx)
        
-        const isRated = await ctx.db.query('ratings')
-            .filter((q)=> q.eq(q.field('menuId'), args.menuId && q.eq(q.field('transactionid'), args.transactionId)))
-            .collect();
+        // const isRated = await ctx.db.query('ratings')
+        //     .filter((q)=> q.eq(q.field('menuId'), args.menuId && q.eq(q.field('transactionid'), args.transactionId)))
+        //     .collect();
       
             if(!userId){
                 return null
