@@ -365,6 +365,7 @@ function difference(data: number[], order: number): number[] {
     for (let i = 0; i < order; i++) {
         data = data.slice(1).map((v, i) => v - data[i]);
     }
+
     return data;
 }
 

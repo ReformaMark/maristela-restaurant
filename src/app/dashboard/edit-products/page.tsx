@@ -35,41 +35,37 @@ const EditProductsPage = () => {
     return (
         <div className="container mx-auto p-4">
             <div className="grid grid-cols-1 gap-6">
-                <div className="col-span-1">
-                    <div className="grid">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>
-                                    Products
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <Tabs defaultValue="edit" className="w-full" onValueChange={(value) => setActiveTab(value)}>
-                                    <TabsList className="grid w-full grid-cols-2">
-                                        <TabsTrigger value="edit">Products</TabsTrigger>
-                                        <TabsTrigger value="archived">Archived</TabsTrigger>
-                                    </TabsList>
-                                    <TabsContent value="edit">
-                                        <DataTable
-                                            columns={EditColumns}
-                                            // @ts-expect-error just a type error
-                                            data={filteredMenu}
-                                            filter="name"
-                                        />
-                                    </TabsContent>
-                                    <TabsContent value="archived">
-                                        <DataTable
-                                            columns={EditColumns}
-                                            // @ts-expect-error just a type error
-                                            data={filteredMenu}
-                                            filter="name"
-                                        />
-                                    </TabsContent>
-                                </Tabs>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </div>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>
+                            Products
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Tabs defaultValue="edit" className="w-full" onValueChange={(value) => setActiveTab(value)}>
+                            <TabsList className="grid w-full grid-cols-2">
+                                <TabsTrigger value="edit">Products</TabsTrigger>
+                                <TabsTrigger value="archived">Archived</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="edit">
+                                <DataTable
+                                    columns={EditColumns}
+                                    // @ts-expect-error just a type error
+                                    data={filteredMenu}
+                                    filter="name"
+                                />
+                            </TabsContent>
+                            <TabsContent value="archived">
+                                <DataTable
+                                    columns={EditColumns}
+                                    // @ts-expect-error just a type error
+                                    data={filteredMenu}
+                                    filter="name"
+                                />
+                            </TabsContent>
+                        </Tabs>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     )

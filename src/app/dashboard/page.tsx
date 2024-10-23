@@ -34,10 +34,10 @@ const DashboardPage = () => {
                         <h1 className="text-3xl font-bold">Dashboard</h1>
                         <div className="flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
                             {/* TODO: MAKE IT CALENDAR */}
-                            <Button variant="outline" size="sm">
+                            {/* <Button variant="outline" size="sm">
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 Jan 20, 2023 - Feb 09, 2023
-                            </Button>
+                            </Button> */}
                         </div>
                     </div>
 
