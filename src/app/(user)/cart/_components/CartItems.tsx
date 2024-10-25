@@ -4,14 +4,15 @@ import React from 'react'
 import { api } from '../../../../../convex/_generated/api'
 import Image from 'next/image'
 import { IoClose } from 'react-icons/io5'
-import { toast, Toaster } from 'sonner'
+import { toast } from 'sonner'
 import QtyBtn from './QtyBtn'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { formatPrice } from '@/lib/utils'
+import { FaBasketShopping } from 'react-icons/fa6'
 
 function CartItems() {
-    const cartartItems = useQuery(api.cartItems.getCartItems)
+    const cartItmes = useQuery(api.cartItems.getCartItems)
     const router = useRouter()
 
  
@@ -21,14 +22,14 @@ function CartItems() {
     }
 
     //calculate the total price of all the items in the cart
-    const subTotal = cartartItems && cartartItems.reduce((accumulator, item) => {
+    const subTotal = cartItmes && cartItmes.reduce((accumulator, item) => {
         return accumulator + ((item?.menu?.price||0) * (item?.quantity || 0)) ;
     }, 0);
 
   return (
     <div className='px- sm:px-20 md:px-32 lg:px-48 text-text'>
-        <h1 className='text-primary font-bold text-xl mb-5 text-center uppercase'>Shopping Cart</h1>
-        <h1 className='text-text text-[0.5rem] md:text-sm mb-2'>You have {cartartItems?.length} item(s) in your order.</h1>
+        <h1 className='text-primary font-bold text-xl mb-5 text-center uppercase'>Order Basket</h1>
+        <h1 className='text-text text-[0.5rem] md:text-sm mb-2'>You have {cartItmes?.length} item(s) in your order.</h1>
         <div className="border-gray-200 border-2 text-text shadow-sm font-thin text-xs md:text-lg py-1 grid grid-cols-12">
             <h1 className='c col-span-5 pl-3 md:pl-10 border-r-2 border-gray-100'>Name</h1>
             <h1 className='c col-span-2 pl-3 md:pl-10 border-r-2 border-gray-100'>Price</h1>
@@ -37,7 +38,7 @@ function CartItems() {
             <h1 className='c col-span-1'></h1>
         </div>
         <div className="min-h-[60vh] max-h-[60vh] overflow-y-scroll border-x-2 border-gray-200">
-        {cartartItems ? cartartItems.map((item)=>(
+        {cartItmes ? cartItmes.length >= 1 ? cartItmes.map((item)=>(
             <div key={item?._id} className="grid shadow-sm grid-cols-12 items-center w-full h-fit pl-1 md:pl-5 border-b-2 border-b-gray-200  py-2">
                 <div className="flex items-center gap-x-2 col-span-5">
                     <Image src={item?.url ? item.url : ""} width={100} height={100} alt={item?.menu?.name || ''} className='size-12 md:size-20 p-1 md:p-2 shadow-md'/>
@@ -49,17 +50,29 @@ function CartItems() {
                 <QtyBtn cartItemId={item?._id} quantity={item?.quantity}/>
                 <h1  className='col-span-2 text-xs md:text-lg pl-3 md:pl-5'>{formatPrice(calcTotal(item?.quantity,item?.menu?.price))}</h1>
                 <IoClose  className='col-span-1 hover:text-primary transition-colors duration-300 ease-in-out cursor-pointer ml-2 md:ml-5' onClick={() => toast.error(`${item?.menu?.name} was removed from your cart!`)}/>
-                <Toaster richColors/>
+      
             </div>
         )):(
-            <></>
+            <div className="flex flex-col items-center justify-center h-64 text-center space-y-4">
+            <FaBasketShopping className="text-gray-400 text-6xl" />
+            <h2 className="text-xl font-semibold text-gray-700">Your order basket is empty</h2>
+            <p className="text-gray-500">It seems you haven&apos;t added any delicious items to your basket yet!</p>
+            <Button
+                onClick={() => router.push('/menu')}
+                className="mt-4 bg-primary text-white py-2 px-4 rounded hover:bg-primary-dark transition-colors"
+            >
+               Order Now
+            </Button>
+            </div>
+        ) : (
+           <></>
         )}
         </div>
         <div className="w-full px-2 md:px-10 py-5 border-2 border-gray-200">
             <h1 className='text-right text-black font-medium uppercase'>Subtotal  -  {formatPrice(subTotal || 0)}</h1>
             <div className="flex justify-between items-center mt-5">
-                <Button variant={'outline'} onClick={()=> router.push('/')} className='uppercase font-medium bg-white text-black text-sm'>Continue shopping</Button>
-                <Button variant={'default'} onClick={()=> router.push('/cart/checkout')} className='uppercase font-medium text-sm'>Checkout</Button>
+                <Button variant={'outline'} onClick={()=> router.push('/')} className='uppercase font-medium bg-white text-black text-sm'>Return to Menu</Button>
+                <Button disabled={cartItmes && cartItmes?.length >= 1 ? false : true} variant={'default'} onClick={()=> router.push('/cart/checkout')} className='uppercase font-medium text-sm'>Checkout</Button>
             </div>
         </div>
     </div>

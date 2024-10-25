@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '../../../../../convex/_generated/api'
-import { toast, Toaster } from 'sonner'
+import { toast } from 'sonner'
 import { formatPrice } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -53,10 +53,6 @@ function CheckoutPage() {
     const subTotal = cartItems && cartItems.reduce((accumulator, item) => {
         return accumulator + ((item?.menu?.price || 0) * (item?.quantity || 0));
     }, 0);
-
-    if (cartItems && cartItems?.length < 1) {
-        router.back()
-    }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
@@ -153,7 +149,6 @@ function CheckoutPage() {
   return (
     <div className='px-3 sm:px-10 md:px-15 lg:px-24  text-text mb-24'>
         <h1 className='text-primary font-bold text-xl mb-5 text-center uppercase'>Checkout</h1> 
-        <Toaster richColors/>
         <div className="grid grid-cols-12 justify-between md:gap-x-10 space-y-10">
             <div className="col-span-12 md:col-span-7">
                 <h1 className='text-left text-lg font-medium text-primary tracking-wider'>Shipping Address <span className='text-primary'>*</span></h1>

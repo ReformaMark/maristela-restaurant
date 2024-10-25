@@ -79,21 +79,21 @@ function Orders() {
             <div>
                 <div className='text-text w-full my-5'>
                     <div className='grid grid-cols-12 justify-evenly w-full'>
-                        <div className='col-span-4'>Order ID</div>
-                        <div className='col-span-3'>Date</div>
-                        <div className='col-span-2'>Cost</div>
-                        <div className='col-span-2'>Status</div>
-                        <div className='col-span-1'></div>
+                        <div className='col-span-4 text-[0.4rem] md:text-sm'>Order ID</div>
+                        <div className='col-span-3 text-[0.5rem] md:text-sm'>Date</div>
+                        <div className='col-span-2 text-[0.5rem] md:text-sm'>Cost</div>
+                        <div className='col-span-2 text-[0.5rem] md:text-sm'>Status</div>
+                        <div className='col-span-1 text-[0.5rem] md:text-sm'></div>
                     </div>
                 </div>
                 <div className='space-y-5'>
                     {confirmedTransactions ? confirmedTransactions.length >= 1 ? confirmedTransactions.map((transaction)=>(
                         <div key={transaction?._id} className='grid grid-cols-12 justify-evenly w-full'>
-                          <div className='col-span-4'>{transaction?._id}</div>
-                          <div className='col-span-3'>{formatDate({convexDate: transaction? transaction._creationTime : 0})}</div>
-                          <div className='col-span-2'>{formatPrice(computeCost(transaction?.orders))}</div>
-                          <div className='col-span-2'>{transaction?.status}</div>
-                          <div className='col-span-1'>
+                          <div className='col-span-4 text-[0.4rem] md:text-sm'>{transaction?._id}</div>
+                          <div className='col-span-3 text-[0.5rem] md:text-sm'>{formatDate({convexDate: transaction? transaction._creationTime : 0})}</div>
+                          <div className='col-span-2 text-[0.5rem] md:text-sm'>{formatPrice(computeCost(transaction?.orders))}</div>
+                          <div className='col-span-2 text-[0.5rem] md:text-sm'>{transaction?.status}</div>
+                          <div className='col-span-1 text-[0.5rem] md:text-sm'>
                             <Link href={`/orders/${transaction?._id}`} className='text-yellow'>View</Link>
                           </div>
                       </div>
@@ -110,21 +110,21 @@ function Orders() {
             <div>
                 <div className='text-text w-full my-5'>
                     <div className='grid grid-cols-12 justify-evenly w-full'>
-                        <div className='col-span-4'>Order ID</div>
-                        <div className='col-span-3'>Date</div>
-                        <div className='col-span-2'>Cost</div>
-                        <div className='col-span-2'>Status</div>
-                        <div className='col-span-1'></div>
+                        <div className='col-span-4 text-[0.4rem] md:text-sm'>Order ID</div>
+                        <div className='col-span-3 text-[0.5rem] md:text-sm'>Date</div>
+                        <div className='col-span-2 text-[0.5rem] md:text-sm'>Cost</div>
+                        <div className='col-span-2 text-[0.5rem] md:text-sm'>Status</div>
+                        <div className='col-span-1 text-[0.5rem] md:text-sm'></div>
                     </div>
                 </div>
                 <div className='space-y-5'>
                     {OutfordeliveryTransactions ? OutfordeliveryTransactions.length >= 1 ? OutfordeliveryTransactions.map((transaction)=>(
                         <div key={transaction?._id} className='grid grid-cols-12 justify-evenly w-full'>
-                          <div className='col-span-4'>{transaction?._id}</div>
-                          <div className='col-span-3'>{formatDate({convexDate: transaction? transaction._creationTime : 0})}</div>
-                          <div className='col-span-2'>{formatPrice(computeCost(transaction?.orders))}</div>
-                          <div className='col-span-2'>{transaction?.status}</div>
-                          <div className='col-span-1'>
+                          <div className='col-span-4 text-[0.4rem] md:text-sm'>{transaction?._id}</div>
+                          <div className='col-span-4 text-[0.4rem] md:text-sm'>{formatDate({convexDate: transaction? transaction._creationTime : 0})}</div>
+                          <div className='col-span-2 text-[0.5rem] md:text-sm'>{formatPrice(computeCost(transaction?.orders))}</div>
+                          <div className='col-span-2 text-[0.5rem] md:text-sm'>{transaction?.status}</div>
+                          <div className='col-span-1 text-[0.5rem] md:text-sm'>
                             <Link href={`/orders/${transaction?._id}`} className='text-yellow'>View</Link>
                           </div>
                       </div>
@@ -141,21 +141,21 @@ function Orders() {
             <div >
                 <div className='text-text w-full my-5'>
                     <div className='grid grid-cols-12 justify-evenly w-full'>
-                        <div className='col-span-4'>Order ID</div>
-                        <div className='col-span-3'>Date</div>
-                        <div className='col-span-2'>Cost</div>
-                        <div className='col-span-2'>Status</div>
-                        <div className='col-span-1'></div>
+                        <div className='col-span-4 text-[0.4rem] md:text-sm'>Order ID</div>
+                        <div className='col-span-4 text-[0.4rem] md:text-sm'>Date</div>
+                        <div className='col-span-2 text-[0.5rem] md:text-sm'>Cost</div>
+                        <div className='col-span-2 text-[0.5rem] md:text-sm'>Status</div>
+                        <div className='col-span-1 text-[0.5rem] md:text-sm'></div>
                     </div>
                 </div>
                 <div className='space-y-5'>
                     {completedTransactions ? completedTransactions.length >= 1 ? completedTransactions.map((transaction)=>(
                         <div key={transaction?._id} className='grid grid-cols-12 justify-evenly w-full'>
-                          <div className='col-span-4'>{transaction?._id}</div>
-                          <div className='col-span-3'>{formatDate({convexDate: transaction? transaction._creationTime : 0})}</div>
-                          <div className='col-span-2'>{formatPrice(computeCost(transaction?.orders))}</div>
-                          <div className='col-span-2'>{transaction?.status}</div>
-                          <div className='col-span-1'>
+                          <div className='col-span-4 text-[0.4rem] md:text-sm'>{transaction?._id}</div>
+                          <div className='col-span-4 text-[0.4rem] md:text-sm'>{formatDate({convexDate: transaction? transaction._creationTime : 0})}</div>
+                          <div className='col-span-2 text-[0.5rem] md:text-sm'>{formatPrice(computeCost(transaction?.orders))}</div>
+                          <div className='col-span-2 text-[0.5rem] md:text-sm'>{transaction?.status}</div>
+                          <div className='col-span-1 text-[0.5rem] md:text-sm'>
                             <Link href={`/orders/${transaction?._id}`} className='text-yellow'>View</Link>
                           </div>
                       </div>
@@ -173,20 +173,20 @@ function Orders() {
                 <div className='text-text w-full my-5'>
                     <div className='grid grid-cols-12 justify-evenly w-full'>
                         <div className='col-span-4'>Order ID</div>
-                        <div className='col-span-3'>Date</div>
-                        <div className='col-span-2'>Cost</div>
-                        <div className='col-span-2'>Status</div>
-                        <div className='col-span-1'></div>
+                        <div className='col-span-4 text-[0.4rem] md:text-sm'>Date</div>
+                        <div className='col-span-2 text-[0.5rem] md:text-sm'>Cost</div>
+                        <div className='col-span-2 text-[0.5rem] md:text-sm'>Status</div>
+                        <div className='col-span-1 text-[0.5rem] md:text-sm'></div>
                     </div>
                 </div>
                 <div className='space-y-5'>
                     {cancelledTransactions ? cancelledTransactions.length >= 1 ? cancelledTransactions.map((transaction)=>(
                         <div key={transaction?._id} className='grid grid-cols-12 justify-evenly w-full'>
-                          <div className='col-span-4'>{transaction?._id}</div>
-                          <div className='col-span-3'>{formatDate({convexDate: transaction? transaction._creationTime : 0})}</div>
-                          <div className='col-span-2'>{formatPrice(computeCost(transaction?.orders))}</div>
-                          <div className='col-span-2'>{transaction?.status}</div>
-                          <div className='col-span-1'>
+                          <div className='col-span-4 text-[0.4rem] md:text-sm'>{transaction?._id}</div>
+                          <div className='col-span-4 text-[0.4rem] md:text-sm'>{formatDate({convexDate: transaction? transaction._creationTime : 0})}</div>
+                          <div className='col-span-2 text-[0.5rem] md:text-sm'>{formatPrice(computeCost(transaction?.orders))}</div>
+                          <div className='col-span-2 text-[0.5rem] md:text-sm'>{transaction?.status}</div>
+                          <div className='col-span-1 text-[0.5rem] md:text-sm'>
                             <Link href={`/orders/${transaction?._id}`} className='text-yellow'>View</Link>
                           </div>
                       </div>
