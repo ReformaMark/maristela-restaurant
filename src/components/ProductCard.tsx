@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import { Doc, Id } from '../../convex/_generated/dataModel'
-import { toast, Toaster } from 'sonner'
+import { toast } from 'sonner'
 import { usePathname, useRouter } from 'next/navigation'
 
 import { formatDate, formatPrice } from '@/lib/utils'
@@ -159,7 +159,7 @@ function ProductCard({
                   <h1 className='text-sm md:text-lg text-center font-bold'>{formatPrice(price)}</h1>
                 </div>
             </CardHeader>
-            <Toaster/>
+           
            
             <motion.div 
               initial={{opacity:0, y:30}}
