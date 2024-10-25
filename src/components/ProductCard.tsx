@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react'
+import Maristela from '@/../public/img/maristela.jpg';
 import {
     Card,
     CardContent,
@@ -178,7 +179,7 @@ function ProductCard({
           <div className='p-0 h-full overflow-auto'>
             <div className="h-1/2 ">
               <Image 
-                src={image} 
+                src={image === "" ? Maristela : image  } 
                 alt={title}
                 width={1000}
                 height={1000}
