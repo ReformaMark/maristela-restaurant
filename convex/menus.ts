@@ -12,10 +12,12 @@ export const allMenus = query({
         const menus = await ctx.db
             .query("menus")
             .order("desc")
+            .filter((q)=> q.eq(q.field('isArchived'), false))
             .collect();
 
         return Promise.all(menus.map(async (menu) => {
-            const ratings = await getManyFrom(ctx.db, 'ratings', 'by_menu', menu._id, "menuId");
+            const ratings = (await getManyFrom(ctx.db, 'ratings', 'by_menu', menu._id, "menuId"))
+           
             const ratingsWithUser = await Promise.all(
                 ratings.map(async (rating) => {
                     const user = await ctx.db.get(rating.userId); // Fetch the user document
@@ -42,6 +44,7 @@ export const searchMenus = query({
     },
     handler: async(ctx, args)=>{
         const search = await ctx.db.query('menus')
+        .filter(q => q.eq(q.field('isArchived'), false))
         .withSearchIndex('search_name', (q)=> 
         q.search('name', args.search))
         .take(5)

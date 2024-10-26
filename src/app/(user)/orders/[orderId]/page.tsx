@@ -21,16 +21,8 @@ import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import RatingStars from '@/components/Stars'
-import { CheckCircle, Clock, Truck, Check, XCircle } from 'lucide-react';
+import { statusIcons, StatusType } from '../_components/Orders'
 
-export type StatusType = 'Pending' | 'Confirmed' | 'Out for Delivery' | 'Completed' | 'Cancelled';
-export const statusIcons: Record<StatusType, JSX.Element> = {
-    Pending: <Clock className="w-5 h-5 md:size-16" />,
-    Confirmed: <CheckCircle className="w-5 h-5 md:size-16" />,
-    'Out for Delivery': <Truck className="w-5 h-5 md:size-16" />,
-    Completed: <Check className="w-5 h-5 md:size-16" />,
-    Cancelled: <XCircle className="w-5 h-5 md:size-16" />
-};
 function TransactionPage({
     params
 }:{
