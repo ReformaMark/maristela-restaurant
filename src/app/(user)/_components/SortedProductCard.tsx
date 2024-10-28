@@ -30,7 +30,8 @@ function SortedProductCard({
     topRated?:boolean,
     topReviews?:boolean
 }) {
-    const menus = useQuery(api.menus.allMenus);
+    const allmenus = useQuery(api.menus.allMenus);
+    const menus = allmenus?.filter(menu => menu.isArchived === false)
     const addToCartItem = useMutation(api.cartItems.addToCart);
     const addToFavorites = useMutation(api.favorites.addFavorites)
     const getFavorites = useQuery(api.favorites.getAllfavorites)

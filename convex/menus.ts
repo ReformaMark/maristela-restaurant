@@ -12,7 +12,7 @@ export const allMenus = query({
         const menus = await ctx.db
             .query("menus")
             .order("desc")
-            .filter((q)=> q.eq(q.field('isArchived'), false))
+           
             .collect();
 
         return Promise.all(menus.map(async (menu) => {
@@ -44,7 +44,7 @@ export const searchMenus = query({
     },
     handler: async(ctx, args)=>{
         const search = await ctx.db.query('menus')
-        .filter(q => q.eq(q.field('isArchived'), false))
+      
         .withSearchIndex('search_name', (q)=> 
         q.search('name', args.search))
         .take(5)

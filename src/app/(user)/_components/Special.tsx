@@ -9,7 +9,7 @@ import { motion } from 'framer-motion'
 
 function Special() {
     const menus = useQuery(api.menus.allMenus)
-    const specialMenus =  menus?.filter(menu=> menu.special === true);
+    const specialMenus =  menus?.filter(menu=> menu.special === true && menu.isArchived === false);
   return (
     <div className='shadow-md p-2 md:p-5 w-full'>
        

@@ -7,7 +7,8 @@ import Image from 'next/image'
 import { SkeletonCard } from '@/components/SkeletonCard'
 import { motion } from 'framer-motion'
 function Featured() {
-    const menus = useQuery(api.menus.allMenus)
+    const allmenus = useQuery(api.menus.allMenus)
+    const menus = allmenus?.filter(menu => menu.isArchived === false)
     const recommendedMenus = menus?.filter(menu=> menu.recommended === true || menu.special === true);
   return (
     <div className='p-2 md:p-5'>

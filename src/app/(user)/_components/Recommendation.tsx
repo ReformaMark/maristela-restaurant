@@ -8,7 +8,7 @@ import { SkeletonCard } from '@/components/SkeletonCard'
 import { motion } from 'framer-motion'
 function Recommendation() {
     const menus = useQuery(api.menus.allMenus)
-    const recommendedMenus = menus?.filter(menu=> menu.recommended === true && menu.special === false);
+    const recommendedMenus = menus?.filter(menu=> menu.recommended === true && menu.special === false && menu.isArchived === false);
   return (
     <div className='p-5'>
         

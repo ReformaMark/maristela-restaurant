@@ -23,8 +23,8 @@ import {
   } from "@/components/ui/carousel"
 import { Card, CardContent } from "@/components/ui/card"
 function Categories() {
-    const menus = useQuery(api.menus.allMenus);
-
+    const allmenus = useQuery(api.menus.allMenus);
+    const menus = allmenus?.filter(menu => menu.isArchived === false)
     const numberOfPork = ()=>{
         return menus?.filter((menu)=> menu.category === 'Pork').length
     }

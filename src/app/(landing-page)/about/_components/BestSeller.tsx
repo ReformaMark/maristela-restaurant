@@ -9,7 +9,7 @@ import { api } from '../../../../../convex/_generated/api'
 
 function BestSeller() {
   const menus = useQuery(api.menus.allMenus)
-  const signature = menus?.filter((menu)=> menu.special === true )
+  const signature = menus?.filter((menu)=> menu.special === true && menu.isArchived === false )
   return (
     <div className='px-24 py-10 h-screen '>
       <div className="flex justify-center items-center gap-x-10">

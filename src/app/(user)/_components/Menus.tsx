@@ -13,7 +13,8 @@ export type AugmentedMenu = Doc<'menus'> & {
   };
 
 function Menus() {
-    const menus = useQuery(api.menus.allMenus)
+    const allmenus = useQuery(api.menus.allMenus)
+    const menus = allmenus?.filter(menu => menu.isArchived === false)
   return (
     <div>
         <CategoryTemplate menus={menus} categoryName='Pork'/>

@@ -15,7 +15,8 @@ function CategoryPage({
         categoryName: MenuCategoryType
     }
 }) {
-    const menus = useQuery(api.menus.allMenus)
+    const allmenus = useQuery(api.menus.allMenus)
+    const menus = allmenus?.filter(menu => menu.isArchived === false)
     const formattedCategoryName = params.categoryName.replace(/%20/g, ' ') .replace(/%26/g, '&'); 
     console.log(formattedCategoryName)
   return (
