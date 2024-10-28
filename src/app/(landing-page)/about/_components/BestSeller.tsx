@@ -6,6 +6,7 @@ import React from 'react'
 import {motion} from 'framer-motion'
 import { useQuery } from 'convex/react'
 import { api } from '../../../../../convex/_generated/api'
+import Logo from '@/../public/img/maristela.jpg'
 
 function BestSeller() {
   const menus = useQuery(api.menus.allMenus)
@@ -29,8 +30,8 @@ function BestSeller() {
             key={menu._id}  
             className=""
           >
-            <ProductCard ratings={menu.ratings} image={menu.url ? menu.url : ""}  title={menu.name} price={menu.price} >
-              <Image src={menu.url ? menu.url : ""} alt={menu.name} className='object-cover h-44 w-full bg-yellow rounded-3xl hover:scale-105 transition-all duration-500 ease-in'/>
+            <ProductCard ratings={menu.ratings} image={menu.url ? menu.url : Logo}  title={menu.name} price={menu.price} >
+              <Image src={menu.url ? menu.url : Logo} alt={menu.name} className='object-cover h-44 w-full bg-yellow rounded-3xl hover:scale-105 transition-all duration-500 ease-in'/>
             </ProductCard>
           </motion.div>
          

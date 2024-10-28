@@ -22,7 +22,7 @@ import { toast } from 'sonner'
 import { usePathname, useRouter } from 'next/navigation'
 
 import { formatDate, formatPrice } from '@/lib/utils'
-import Image from 'next/image'
+import Image, { StaticImageData } from 'next/image'
 import ReactStars from 'react-stars'
 import { motion } from 'framer-motion'
 import { IoBagAddSharp } from 'react-icons/io5'
@@ -48,7 +48,7 @@ function ProductCard({
     title: string,
     // goodFor?: string;
     description?:string,
-    image: string,
+    image: string | StaticImageData,
     price:number,
     
     menuId?: Id<"menus">,
@@ -149,10 +149,18 @@ function ProductCard({
           
                  <motion.div 
                   className={`flex ${pathname === "/favorites" ? "justify-end" : "justify-between"} md:hidden  px-5 gap-x-3 items-center inset-0 `}>
-                      <div className="">
-                      <FaHeart onClick={()=> handleAddToFavorites(menuId)} className={`${isExisting ? "hidden": "block"} bg-white p-2 rounded-full size-10 hover:rotate-[360deg] cursor-pointer hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`}/>
-                        <GiHeartMinus onClick={()=> handleRemoveToFavorite(menuId)} className={`${isExisting ? "block": "hidden"} bg-white p-2 rounded-full cursor-pointer size-10 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`} />
-                      </div>
+                      {user ?(
+                        <div className="">
+                          <FaHeart onClick={()=> handleAddToFavorites(menuId)} className={`${isExisting ? "hidden": "block"} bg-white p-2 rounded-full size-10 hover:rotate-[360deg] cursor-pointer hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`}/>
+                          <GiHeartMinus onClick={()=> handleRemoveToFavorite(menuId)} className={`${isExisting ? "block": "hidden"} bg-white p-2 rounded-full cursor-pointer size-10 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`} />
+                        </div>
+                      ):(
+                        <div className="">
+                          <FaHeart onClick={()=> router.push('/auth')} className={`${isExisting ? "hidden": "block"} bg-white p-2 rounded-full size-10 hover:rotate-[360deg] cursor-pointer hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`}/>
+                         
+                        </div>
+                      )}
+                      
                      <IoBagAddSharp onClick={()=>setIsOpen(true)} className='bg-white p-2 rounded-full size-10 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear'/>
                 </motion.div>
                 <div className="font-cairo space-y-3">
@@ -166,10 +174,18 @@ function ProductCard({
               initial={{opacity:0, y:30}}
               whileHover={{ opacity: 1, y:20 }}
               className="absolute hidden md:flex justify-between px-5 gap-x-3 items-center inset-0 w-full h-full ">
+                  {user ? (
                   <div className={` `}>
                     <FaHeart onClick={()=> handleAddToFavorites(menuId)} className={`${isExisting ? "hidden": "block"} bg-white p-2 cursor-pointer rounded-full size-10 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`}/>
                     <GiHeartMinus onClick={()=> handleRemoveToFavorite(menuId)} className={`${isExisting ? "block": "hidden"} bg-white cursor-pointer p-2 rounded-full size-10 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`} />
                   </div>
+                  ):(
+                  <div className={` `}>
+                    <FaHeart onClick={()=> router.push('/auth')} className={`${isExisting ? "hidden": "block"} bg-white p-2 cursor-pointer rounded-full size-10 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`}/>
+                    
+                  </div>
+                  )}
+                  
                  <IoBagAddSharp onClick={()=>setIsOpen(true)} className='bg-white p-2 rounded-full size-10 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear'/>
             </motion.div>
         </Card>

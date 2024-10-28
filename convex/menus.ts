@@ -43,13 +43,30 @@ export const searchMenus = query({
         search: v.string()
     },
     handler: async(ctx, args)=>{
-        const search = await ctx.db.query('menus')
-      
+        const menus = await ctx.db.query('menus')
         .withSearchIndex('search_name', (q)=> 
-        q.search('name', args.search))
-        .take(5)
+        q.search('name', args.search)).collect()
 
-        return search
+        return Promise.all(menus.map(async (menu) => {
+            const ratings = (await getManyFrom(ctx.db, 'ratings', 'by_menu', menu._id, "menuId"))
+           
+            const ratingsWithUser = await Promise.all(
+                ratings.map(async (rating) => {
+                    const user = await ctx.db.get(rating.userId); // Fetch the user document
+                    return {
+                        ...rating,
+                        user: user ? user : null, // Include the user document, or null if not found
+                    };
+                })
+            );
+            return {
+                ...menu,
+                ...(menu.imageId === undefined)
+                    ? ""
+                    : { url: await ctx.storage.getUrl(menu.imageId) },
+                ratings: ratingsWithUser
+            };
+        }));
     },
 })
 export const getOneMenu = query({

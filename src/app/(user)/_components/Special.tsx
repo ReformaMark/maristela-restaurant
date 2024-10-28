@@ -6,7 +6,7 @@ import Image from 'next/image';
 import ProductCard from '@/components/ProductCard';
 import { SkeletonCard } from '@/components/SkeletonCard';
 import { motion } from 'framer-motion'
-
+import Logo from '@/../public/img/maristela.jpg'
 function Special() {
     const menus = useQuery(api.menus.allMenus)
     const specialMenus =  menus?.filter(menu=> menu.special === true && menu.isArchived === false);
@@ -38,10 +38,10 @@ function Special() {
                         price={menuItem.price} 
                         menuId={menuItem._id}
                         ratings={menuItem.ratings}
-                        image={menuItem.url ? menuItem.url : ""}
+                        image={menuItem.url ? menuItem.url : Logo}
                     >
                     
-                        <Image src={menuItem.url ? menuItem.url : ""} alt={menuItem.name} height={400} width={400} className='h-32 md:h-52 w-full object-cover rounded-lg hover:scale-105 transition-all duration-500 ease-linear'/>
+                        <Image src={menuItem.url ? menuItem.url : Logo} alt={menuItem.name} height={400} width={400} className='h-32 md:h-52 w-full object-cover rounded-lg hover:scale-105 transition-all duration-500 ease-linear'/>
                     </ProductCard>
                 ))}
             </motion.div>

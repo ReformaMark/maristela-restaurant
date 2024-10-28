@@ -1,16 +1,19 @@
 import React from 'react'
 import SearchAndMenu from '../../_components/SearchAndMenu'
-import Image from 'next/image'
-import Logo from '@/../public/img/maristela-removebg1.png'
+import SearchResultItems from '../../_components/SearchResultItems';
 
-function SearchPage() {
+function SearchPage({params}:{params:{menuName:string}}) {
+  const formattedParams = params.menuName.replace(/%20/g, ' ') .replace(/%26/g, '&'); 
+
   return (
     <div className='relative px-3 md:pt-16 sm:px-10 md:px-15 lg:px-24'>
         <SearchAndMenu/>
-        <div className="relative w-full bg-none md:bg-gray-50 ">
-            <h1 className='absolute w-full text-primary top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-bold text-2xl sm:text-xl md:text-2xl lg:text-4xl tracking-wider text-center mb-5'>Maristela&apos;s Restaurant Menu</h1>
-            <Image src={Logo} alt='' className='size-48 mx-auto opacity-40'/>
-        </div> 
+       
+       
+        <h1 className='text-xl md:text-xl font-bold text-primary text-center my-5 flex gap-x-3'>Search Result:</h1>
+        <div className="">
+          <SearchResultItems searchValue={formattedParams}/>
+        </div>
     </div>
   )
 }

@@ -66,8 +66,9 @@ function Header() {
               <SheetTitle className='border-b-2 border-b-gray-100 py-10'> <Link href={'/'} className='text-black font-cairo text-lg font-extrabold'>Maristela&apos;s Restaurant</Link></SheetTitle>
               <SheetDescription>
                 <div className="text-center  space-y-5">
+                {isLoggedIn ? (
                   <div className="flex gap-x-6 text-xs lg:text-3xl">
-                    <Link href={'/cart'} className='text-black relative'>
+                      <Link href={'/cart'} className='text-black relative'>
                       <FaHeart className='size-7 text-black'/>
                       {favorites && favorites.length > 0 && (
                         <motion.div
@@ -85,19 +86,25 @@ function Header() {
                       <FaShoppingBag className='size-7 text-black'/>
                       {cartItems && cartItems.length > 0 &&
                       <motion.div
-                        initial={{ y: 0 }}
-                        animate={{ y: 2}}
-                        transition={{ duration: 0.5 }}
-                        className='absolute size-4 p-2 top-[-5px] right-[-6px] flex items-center justify-center rounded-full bg-yellow text-white text-sm'>
+                      initial={{ y: 0 }}
+                      animate={{ y: 2}}
+                      transition={{ duration: 0.5 }}
+                      className='absolute size-4 p-2 top-[-5px] right-[-6px] flex items-center justify-center rounded-full bg-yellow text-white text-sm'>
                         {cartItems.length || 0}
                       </motion.div>
                       }
                     </Link>
 
+                  
                     <div className="flex items-center">
                       <h1 className="text-lg  font-cairo text-gray-500">item: <span className='font-bold text-black'>{formatPrice(subTotal || 0)}</span></h1>
                     </div>
                   </div>
+                  ):(
+                    <div className="">
+
+                    </div>
+                  )}
                   {isLoggedIn ? (
                     <div className="block">
                       <UserAvatar />
@@ -160,51 +167,58 @@ function Header() {
         </Link>
 
       </div>
-      <div className="flex gap-x-6 text-xs lg:text-3xl">
-        <Link href={'/favorites'} className='text-black relative'>
-          <FaHeart className='size-5 text-black'/>
-          {favorites && favorites.length > 0 && (
+      {isLoggedIn ? (
+        <div className="flex gap-x-6 text-xs lg:text-3xl">
+          
+          <Link href={'/favorites'} className='text-black relative'>
+            <FaHeart className='size-5 text-black'/>
+            {favorites && favorites.length > 0 && (
+              <motion.div
+              initial={{ y: 0 }}
+              animate={{ y: 2}}
+              transition={{ duration: 0.5 }}
+              className='absolute size-3 top-[-5px] right-[-4px] flex items-center justify-center rounded-full bg-yellow text-white text-sm'>
+              {favorites.length || 0}
+            </motion.div>
+            )}
+          
+          </Link>
+
+          <Link href={'/cart'} className='text-black relative'>
+            <FaShoppingBag className='size-5 text-black'/>
+            {cartItems && cartItems.length > 0 &&
             <motion.div
-            initial={{ y: 0 }}
-            animate={{ y: 2}}
-            transition={{ duration: 0.5 }}
-             className='absolute size-3 top-[-5px] right-[-4px] flex items-center justify-center rounded-full bg-yellow text-white text-sm'>
-            {favorites.length || 0}
-           </motion.div>
-          )}
-         
-        </Link>
+              initial={{ y: 0 }}
+              animate={{ y: 2}}
+              transition={{ duration: 0.5 }}
+              className='absolute size-3 p-2 top-[-5px] right-[-4px] flex items-center justify-center rounded-full bg-yellow text-white text-sm'>
+              {cartItems.length || 0}
+            </motion.div>
+            }
+          </Link>
 
-        <Link href={'/cart'} className='text-black relative'>
-          <FaShoppingBag className='size-5 text-black'/>
-          {cartItems && cartItems.length > 0 &&
-          <motion.div
-            initial={{ y: 0 }}
-            animate={{ y: 2}}
-            transition={{ duration: 0.5 }}
-            className='absolute size-3 p-2 top-[-5px] right-[-4px] flex items-center justify-center rounded-full bg-yellow text-white text-sm'>
-            {cartItems.length || 0}
-          </motion.div>
-          }
-        </Link>
-
-        <div className="flex items-center">
-          <h1 className="text-xs  font-cairo text-gray-500">item: <span className='font-bold text-black'>{formatPrice(subTotal || 0)}</span></h1>
-        </div>
-
-        {/* <Link href={''} className='text-primary'><FaUser /></Link> */}
-        {/* {isLoggedIn ? (
-          <div className="hidden md:block">
-            <UserAvatar />
+          <div className="flex items-center">
+            <h1 className="text-xs  font-cairo text-gray-500">item: <span className='font-bold text-black'>{formatPrice(subTotal || 0)}</span></h1>
           </div>
-        )
-          : isLoading ? (<Loader2Icon className='w-6 h-6 animate-spin' />)
-            : (
-              <Link href={'/auth'} className='text-primary'>
-                <FaUser />
-              </Link>
-            )} */}
-      </div>
+
+          {/* <Link href={''} className='text-primary'><FaUser /></Link> */}
+          {/* {isLoggedIn ? (
+            <div className="hidden md:block">
+              <UserAvatar />
+            </div>
+          )
+            : isLoading ? (<Loader2Icon className='w-6 h-6 animate-spin' />)
+              : (
+                <Link href={'/auth'} className='text-primary'>
+                  <FaUser />
+                </Link>
+              )} */}
+        </div>
+        ):(
+          <div className="">
+            
+          </div>
+        )}
     </motion.nav>
     </div>
   )

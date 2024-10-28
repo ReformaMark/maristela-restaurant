@@ -131,7 +131,11 @@ function SortedProductCard({
                     
                     className="flex md:hidden flex-col gap-2 "
                 >
-                  <FaHeart onClick={()=>handleAddToFavorites(product._id)} className={`${isExisting(product._id) ? "hidden": "block"} bg-white p-2 rounded-full size-7 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`}/>
+                    {user ? (
+                        <FaHeart onClick={()=>handleAddToFavorites(product._id)} className={`${isExisting(product._id) ? "hidden": "block"} bg-white p-2 rounded-full size-7 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`}/>
+                    ):(
+                        <FaHeart onClick={()=>router.push('/auth')} className={`${isExisting(product._id) ? "hidden": "block"} bg-white p-2 rounded-full size-7 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`}/>
+                    )}
                   <Dialog >
                   <DialogTrigger><IoBagAddSharp className='bg-white p-2 rounded-full size-7 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear'/></DialogTrigger>
                   <DialogContent className='p-0 max-w-3xl  ' >
@@ -211,7 +215,11 @@ function SortedProductCard({
                     whileHover={{ opacity: 1, x:-20 }}
                     className="hidden md:absolute md:flex flex-col gap-2 md:justify-end md:items-end md:top-0 md:right-0 size-full"
                 >
-                  <FaHeart onClick={()=>handleAddToFavorites(product._id)} className={`${isExisting(product._id) ? "hidden": "block"} bg-white p-2 rounded-full size-7 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`}/>
+                    {user ? (
+                        <FaHeart onClick={()=>handleAddToFavorites(product._id)} className={`${isExisting(product._id) ? "hidden": "block"} bg-white p-2 rounded-full size-7 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`}/>
+                    ):(
+                        <FaHeart onClick={()=>router.push('/auth')} className={`${isExisting(product._id) ? "hidden": "block"} bg-white p-2 rounded-full size-7 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear`}/>
+                    )}
                   <Dialog >
                   <DialogTrigger><IoBagAddSharp className='bg-white p-2 rounded-full size-7 hover:rotate-[360deg] hover:bg-yellow hover:text-white shadow-md transition-all duration-500 ease-linear'/></DialogTrigger>
                   <DialogContent className='p-0 max-w-3xl  ' >

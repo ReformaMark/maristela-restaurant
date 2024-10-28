@@ -3,7 +3,7 @@ import { AugmentedMenu } from './Menus'
 import { SkeletonCard } from '@/components/SkeletonCard'
 import Image from 'next/image'
 import ProductCard from '@/components/ProductCard'
-
+import Logo from '@/../public/img/maristela.jpg'
 
 function CategoryTemplate({
     menus,
@@ -32,13 +32,13 @@ function CategoryTemplate({
                         key={menuItem._id} 
                         title={menuItem.name} 
                         price={menuItem.price}
-                        image={menuItem.url ? menuItem.url : ""}
+                        image={menuItem.url ? menuItem.url : Logo}
                         description={menuItem.description}
                         menuId={menuItem._id}
                         ratings={menuItem.ratings}
                         >
                         
-                        <Image src={menuItem.url ? menuItem.url : ""} alt={menuItem.name} height={200} width={200} className='h-32 md:h-52 w-full object-cover rounded-lg hover:scale-105 transition-all duration-500 ease-linear'/>
+                        <Image src={menuItem.url ? menuItem.url : Logo} alt={menuItem.name} height={200} width={200} className='h-32 md:h-52 w-full object-cover rounded-lg hover:scale-105 transition-all duration-500 ease-linear'/>
                     </ProductCard>
                 ))}
             </div>
