@@ -10,7 +10,7 @@ import Logo from '@/../public/img/maristela.jpg'
 
 function BestSeller() {
   const menus = useQuery(api.menus.allMenus)
-  const signature = menus?.filter((menu)=> menu.special === true && menu.isArchived === false )
+  const sortedMenus = menus?.sort((a, b) => (a.totalUnitsSold || 0) - (b.totalUnitsSold || 0)).slice(0, 3);;
   return (
     <div className='px-24 py-10 h-screen '>
       <div className="flex justify-center items-center gap-x-10">
@@ -19,7 +19,7 @@ function BestSeller() {
         <Star className='size-16'/>
       </div>
       <div className="border-2 p-5 grid grid-cols-3 gap-5 rounded-xl border-primary mt-5 shadow-xl">
-        {signature && signature.map(menu=> (
+        {sortedMenus && sortedMenus.map(menu=> (
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             whileInView={{opacity: 1, x: 0}}
@@ -31,7 +31,7 @@ function BestSeller() {
             className=""
           >
             <ProductCard ratings={menu.ratings} image={menu.url ? menu.url : Logo}  title={menu.name} price={menu.price} >
-              <Image src={menu.url ? menu.url : Logo} alt={menu.name} className='object-cover h-44 w-full bg-yellow rounded-3xl hover:scale-105 transition-all duration-500 ease-in'/>
+              <Image src={menu.url ? menu.url : Logo} width={500} height={500} alt={menu.name} className='object-cover h-44 w-full bg-yellow rounded-3xl hover:scale-105 transition-all duration-500 ease-in'/>
             </ProductCard>
           </motion.div>
          
