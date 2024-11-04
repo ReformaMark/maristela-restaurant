@@ -103,6 +103,14 @@ export const deleteCartItems = mutation({
         cartItemsId: v.id('cartItems')
     },
     handler: async(ctx, args) =>{
-        await ctx.db.delete(args.cartItemsId)
+        const item = await ctx.db.get(args.cartItemsId)
+        if(item && item.menuId){
+            const menu = await ctx.db.get(item.menuId)
+            await ctx.db.delete(args.cartItemsId)
+            return menu
+        } else {
+            throw new Error("Invalid action")
+        }
+       
     }
 })

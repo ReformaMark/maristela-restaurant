@@ -3,7 +3,7 @@
 import { Id } from '../../../../../convex/_generated/dataModel'
 import {  useMutation, useQuery } from 'convex/react'
 import { api } from '../../../../../convex/_generated/api'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, CheckCircle, Clock, Package, Truck, XCircleIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import {
     Dialog,
@@ -18,7 +18,7 @@ import Logo from '@/../public/img/maristela.jpg'
 import Image from 'next/image'
 import { formatDate, formatPrice } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { toast } from 'sonner'
 import RatingStars from '@/components/Stars'
 
@@ -32,7 +32,7 @@ function TransactionPage({
     const transaction = useQuery(api.transactions.getTransaction, {transactionid: params.orderId})
     const cancel = useMutation(api.transactions.cancelTransaction)
     const [isOpen, setIsOpen] = useState<boolean>(false)
-    const Status = transaction?.status
+    const currentStatus = transaction?.status
     const router = useRouter()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const computeCost = (orders?: any[]) =>{
@@ -59,7 +59,7 @@ function TransactionPage({
     }
 
   return (
-    <div className='px-1 sm:px-10 md:px-15 lg:px-24 min-h-screen'>
+    <div className='px-3 sm:px-10 md:px-15 lg:px-24 min-h-screen'>
         <div className="flex gap-x-3 items-center">
             <ArrowLeft onClick={()=> router.back()} className='border-yellow border-2 text-yellow p-1 rounded-full cursor-pointer size-8'/>
             <h1 className=' text-text font-semibold'>Order Status</h1>
@@ -137,32 +137,68 @@ function TransactionPage({
                             <h1 className='text-lg'>{formatPrice(computeCost(transaction?.orders) + 80)}</h1>
                         </div>
                     </div>
-                    </DialogHeader>
+                    </DialogHeader> 
                 </DialogContent>
             </Dialog>
         </div>
-        <div className="bg-white p-3 md:p-10 rounded-lg shadow-md">
-            <div className="flex items-center gap-x-2 justify-center text-text font-semibold">
-                <div className={`${Status === "Pending" ? "text-primary" : "text-text"} text-[0.5rem] md:text-sm`}>
-                    Pending
+        <div className="flex justify-evenly px-5 mt-5 items-center w-full">
+            <div className="flex flex-row items-center justify-between mb-4 text-sm">
+                <div className="flex flex-col items-center mb-2 sm:mb-0">
+                    <div className={`size-8 md:size-12 rounded-full flex items-center justify-center ${currentStatus === 'Pending' ? 'bg-primary' : 'bg-gray-300'}`}>
+                        <Clock className="size-5 md:size-10 text-white" />
+                    </div>
+                    <span className="text-xs mt-1 text-center">
+                        Pending
+                    </span>
                 </div>
-                <div className="bg-text w-5 md:w-10 h-1 rounded-md"></div>
-                <div className={`${Status === "Confirmed" ? "text-primary" : "text-text"} text-[0.5rem] md:text-sm`}>
-                    Confirmed
+                <div className={`hidden sm:block flex-1 h-1 bg-gray-300`} />
+            </div>
+            <div className="flex flex-row items-center justify-between mb-4 text-sm">
+                <div className="flex flex-col items-center mb-2 sm:mb-0">
+                    <div className={`size-8 md:size-12 rounded-full flex items-center justify-center ${currentStatus === 'Confirmed' ? 'bg-primary' : 'bg-gray-300'}`}>
+                        <CheckCircle className="size-5 md:size-10 text-white" />
+                    </div>
+                    <span className="text-xs mt-1 text-center">
+                        Confirmed
+                    </span>
                 </div>
-                <div className="bg-text w-5 md:w-10 h-1 rounded-md"></div>
-                <div className={`${Status === "Out for Delivery" ? "text-primary" : "text-text"} text-[0.5rem] md:text-sm`}>
-                    Out for delivery
+                <div className={`hidden sm:block flex-1 h-1 bg-gray-300`} />
+                
+            </div>
+            <div className="flex flex-row items-center justify-between mb-4 text-sm">
+                <div className="flex flex-col items-center mb-2 sm:mb-0">
+                    <div className={`size-8 md:size-12 rounded-full flex items-center justify-center ${currentStatus === 'Out for Delivery' ? 'bg-primary' : 'bg-gray-300'}`}>
+                        <Truck className="size-5 md:size-10 text-white" />
+                    </div>
+                    <span className="text-xs mt-1 text-center">
+                        Out for Delivery
+                    </span>
                 </div>
-                <div className="bg-text w-5 md:w-10 h-1 rounded-md"></div>
-                <div className={`${Status === "Completed" ? "text-primary" : "text-text"} text-[0.5rem] md:text-sm`}>
-                    Completed
+                <div className={`hidden sm:block flex-1 h-1 ${currentStatus === 'Out for Delivery' ? 'bg-primary' : 'bg-gray-300'}`} />
+    
+            </div>
+            <div className="flex flex-row items-center justify-between mb-4 text-sm">
+                <div className="flex flex-col items-center mb-2 sm:mb-0">
+                    <div className={`size-8 md:size-12 rounded-full flex items-center justify-center ${currentStatus === 'Completed' ? 'bg-primary' : 'bg-gray-300'}`}>
+                        <Package className="size-5 md:size-10 text-white" />
+                    </div>
+                    <span className="text-xs mt-1 text-center">
+                        {currentStatus}
+                    </span>
                 </div>
-                <div className="bg-text w-5 md:w-10 h-1 rounded-md"></div>
-                <div className={`${Status === "Cancelled" ? "text-primary" : "text-text"} text-[0.5rem] md:text-sm`}>
-                    Cancelled
+                <div className={`hidden sm:block flex-1 h-1  bg-gray-300`} />
+            </div>
+            <div className="mb-4 text-sm ">
+                <div className="flex flex-col items-center mb-2 sm:mb-0">
+                    <div className={`size-8 md:size-12 rounded-full flex items-center justify-center ${currentStatus === 'Cancelled' ? 'bg-primary' : 'bg-gray-300'}`}>
+                        <XCircleIcon className="size-5 md:size-10 text-white" />
+                    </div>
+                    <span className="text-xs mt-1 text-center">
+                        Cancelled
+                    </span>
                 </div>
             </div>
+        </div>
             <div className="">
                 <div className="w-full space-y-2">
                     <div className="grid grid-cols-12 w-full py-2 md:text-lg text-xs border-b border-b-black">
@@ -184,11 +220,18 @@ function TransactionPage({
                                 <h1 className='col-span-2 text-right'>{formatPrice(order.totalPrice)}</h1>
                             </div>
                             {transaction.status === 'Completed' && (
-                                <div className="flex items-center gap-x-1">
-                                    <h1 className='text-text text-sm'>Rate this product: </h1>
-                                    <RatingStars edit={true} size={30} menuId={order.menuId} transactionId={transaction._id}/>
+                                <>
+                                    <div className="hidden md:flex mt-3 items-center gap-x-1">
+                                        <h1 className='text-text text-sm'>Rate this product: </h1>
+                                        <RatingStars edit={true} size={30} menuId={order.menuId} transactionId={transaction._id}/>
 
-                                </div>
+                                    </div>
+                                    <div className="flex md:hidden mt-3 items-center gap-x-1">
+                                        <h1 className='text-text text-xs'>Rate this product: </h1>
+                                        <RatingStars edit={true} size={15} menuId={order.menuId} transactionId={transaction._id}/>
+
+                                    </div>
+                                </>
                             )}
                         </div>
                     ))}
@@ -230,7 +273,7 @@ function TransactionPage({
             </div>
             
         </div>
-    </div>
+ 
   )
 }
 

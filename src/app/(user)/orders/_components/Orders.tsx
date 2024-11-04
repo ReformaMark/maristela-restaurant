@@ -5,7 +5,7 @@ import { api } from '../../../../../convex/_generated/api'
 import { formatDate, formatPrice } from '@/lib/utils'
 import Link from 'next/link'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Package, XCircleIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { CheckCircle, Clock, Truck, Check, XCircle } from 'lucide-react';
 
@@ -75,9 +75,23 @@ function Orders() {
                           </div>
                       </div>
                     )) : (
-                        <div className='text-center'>No Pending transactions.</div>
+                        <div className="flex flex-col items-center justify-center min-h-[200px] py-6">
+                            <Clock className="size-10 md:size-20 text-gray-500" />
+                            <p className="text-lg  text-gray-600">No Pending Orders</p>
+                            <p className="text-gray-500 text-center text-sm mt-1">
+                                <Link href="/menu" className="text-yellow hover:underline">Place a new order</Link> now!
+                            </p>
+                        </div>
                     ) : (
-                        <>Loading...</>
+                        <div className="flex items-center justify-center min-h-[200px]">
+                            <div className="flex items-center gap-2">
+                            <svg className="w-5 h-5 text-blue-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                            <span className="text-sm text-gray-700 font-medium">Loading...</span>
+                            </div>
+                        </div>
                     )}
                   
                 </div>
@@ -106,9 +120,23 @@ function Orders() {
                           </div>
                       </div>
                     )) : (
-                        <div className='text-center'>No Confirmed transactions.</div>
+                        <div className="flex flex-col items-center justify-center min-h-[200px] py-6">
+                            <CheckCircle className="size-10 md:size-20 text-gray-500" />
+                            <p className="text-lg  text-gray-600">No Confirmed Orders</p>
+                            <p className="text-gray-500 text-center text-sm mt-1">
+                                You can check back later for updates, or you can <Link href="/menu" className="text-yellow hover:underline">place a new order</Link> now!
+                            </p>
+                        </div>
                     ) : (
-                        <>Loading...</>
+                        <div className="flex items-center justify-center min-h-[200px]">
+                            <div className="flex items-center gap-2">
+                            <svg className="w-5 h-5 text-blue-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                            <span className="text-sm text-gray-700 font-medium">Loading...</span>
+                            </div>
+                        </div>
                     )}
                   
                 </div>
@@ -129,7 +157,7 @@ function Orders() {
                     {OutfordeliveryTransactions ? OutfordeliveryTransactions.length >= 1 ? OutfordeliveryTransactions.map((transaction)=>(
                         <div key={transaction?._id} className='grid grid-cols-12 justify-evenly w-full'>
                           <div className='col-span-4 text-[0.4rem] md:text-sm'>{transaction?._id}</div>
-                          <div className='col-span-4 text-[0.4rem] md:text-sm'>{formatDate({convexDate: transaction? transaction._creationTime : 0})}</div>
+                          <div className='col-span-3 text-[0.4rem] md:text-sm'>{formatDate({convexDate: transaction? transaction._creationTime : 0})}</div>
                           <div className='col-span-2 text-[0.5rem] md:text-sm'>{formatPrice(computeCost(transaction?.orders))}</div>
                           <div className='col-span-2 text-[0.5rem] md:text-sm'>{transaction?.status}</div>
                           <div className='col-span-1 text-[0.5rem] md:text-sm'>
@@ -137,9 +165,23 @@ function Orders() {
                           </div>
                       </div>
                     )): (
-                        <div className='text-center'>No out for delivery transactions.</div>
+                        <div className="flex flex-col items-center justify-center min-h-[200px] py-6">
+                            <Truck className="size-10 md:size-20 text-gray-500" />
+                            <p className="text-lg  text-gray-600">No Out for Delivery Orders</p>
+                            <p className="text-gray-500 text-center text-sm mt-1">
+                                You can check back later for updates, or you can <Link href="/menu" className="text-yellow hover:underline">place a new order</Link> now!
+                            </p>
+                        </div>
                     ) : (
-                        <>Loading...</>
+                        <div className="flex items-center justify-center min-h-[200px]">
+                            <div className="flex items-center gap-2">
+                            <svg className="w-5 h-5 text-blue-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                            <span className="text-sm text-gray-700 font-medium">Loading...</span>
+                            </div>
+                        </div>
                     )}
                   
                 </div>
@@ -150,7 +192,7 @@ function Orders() {
                 <div className='text-text w-full my-5'>
                     <div className='grid grid-cols-12 justify-evenly w-full'>
                         <div className='col-span-4 text-[0.4rem] md:text-sm'>Order ID</div>
-                        <div className='col-span-4 text-[0.4rem] md:text-sm'>Date</div>
+                        <div className='col-span-3 text-[0.4rem] md:text-sm'>Date</div>
                         <div className='col-span-2 text-[0.5rem] md:text-sm'>Cost</div>
                         <div className='col-span-2 text-[0.5rem] md:text-sm'>Status</div>
                         <div className='col-span-1 text-[0.5rem] md:text-sm'></div>
@@ -160,7 +202,7 @@ function Orders() {
                     {completedTransactions ? completedTransactions.length >= 1 ? completedTransactions.map((transaction)=>(
                         <div key={transaction?._id} className='grid grid-cols-12 justify-evenly w-full'>
                           <div className='col-span-4 text-[0.4rem] md:text-sm'>{transaction?._id}</div>
-                          <div className='col-span-4 text-[0.4rem] md:text-sm'>{formatDate({convexDate: transaction? transaction._creationTime : 0})}</div>
+                          <div className='col-span-3 text-[0.4rem] md:text-sm'>{formatDate({convexDate: transaction? transaction._creationTime : 0})}</div>
                           <div className='col-span-2 text-[0.5rem] md:text-sm'>{formatPrice(computeCost(transaction?.orders))}</div>
                           <div className='col-span-2 text-[0.5rem] md:text-sm'>{transaction?.status}</div>
                           <div className='col-span-1 text-[0.5rem] md:text-sm'>
@@ -168,9 +210,23 @@ function Orders() {
                           </div>
                       </div>
                     )): (
-                        <div className='text-center'>No Completed transactions.</div>
+                        <div className="flex flex-col items-center justify-center min-h-[200px] py-6">
+                            <Package  className="size-10 md:size-20 text-gray-500" />
+                            <p className="text-lg  text-gray-600">No Completed Orders</p>
+                            <p className="text-gray-500 text-center text-sm mt-1">
+                                You can check back later for updates, or you can <Link href="/menu" className="text-yellow hover:underline">place a new order</Link> now!
+                            </p>
+                        </div>
                     ) : (
-                        <>Loading...</>
+                        <div className="flex items-center justify-center min-h-[200px]">
+                            <div className="flex items-center gap-2">
+                            <svg className="w-5 h-5 text-blue-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                            <span className="text-sm text-gray-700 font-medium">Loading...</span>
+                            </div>
+                        </div>
                     )}
                   
                 </div>
@@ -181,7 +237,7 @@ function Orders() {
                 <div className='text-text w-full my-5'>
                     <div className='grid grid-cols-12 justify-evenly w-full'>
                         <div className='col-span-4'>Order ID</div>
-                        <div className='col-span-4 text-[0.4rem] md:text-sm'>Date</div>
+                        <div className='col-span-3 text-[0.4rem] md:text-sm'>Date</div>
                         <div className='col-span-2 text-[0.5rem] md:text-sm'>Cost</div>
                         <div className='col-span-2 text-[0.5rem] md:text-sm'>Status</div>
                         <div className='col-span-1 text-[0.5rem] md:text-sm'></div>
@@ -191,7 +247,7 @@ function Orders() {
                     {cancelledTransactions ? cancelledTransactions.length >= 1 ? cancelledTransactions.map((transaction)=>(
                         <div key={transaction?._id} className='grid grid-cols-12 justify-evenly w-full'>
                           <div className='col-span-4 text-[0.4rem] md:text-sm'>{transaction?._id}</div>
-                          <div className='col-span-4 text-[0.4rem] md:text-sm'>{formatDate({convexDate: transaction? transaction._creationTime : 0})}</div>
+                          <div className='col-span-3 text-[0.4rem] md:text-sm'>{formatDate({convexDate: transaction? transaction._creationTime : 0})}</div>
                           <div className='col-span-2 text-[0.5rem] md:text-sm'>{formatPrice(computeCost(transaction?.orders))}</div>
                           <div className='col-span-2 text-[0.5rem] md:text-sm'>{transaction?.status}</div>
                           <div className='col-span-1 text-[0.5rem] md:text-sm'>
@@ -199,53 +255,29 @@ function Orders() {
                           </div>
                       </div>
                     )): (
-                        <div className='text-center'>No Cancelled transactions.</div>
+                        <div className="flex flex-col items-center justify-center min-h-[200px] py-6">
+                            <XCircleIcon className="size-10 md:size-20 text-gray-500" />
+                            <p className="text-lg  text-gray-600">No Cancelled Orders</p>
+                            <p className="text-gray-500 text-center text-sm mt-1">
+                                You can check back later for updates, or you can <Link href="/menu" className="text-yellow hover:underline">place a new order</Link> now!
+                            </p>
+                        </div>
                     ) : (
-                        <>Loading...</>
+                        <div className="flex items-center justify-center min-h-[200px]">
+                            <div className="flex items-center gap-2">
+                            <svg className="w-5 h-5 text-blue-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                            <span className="text-sm text-gray-700 font-medium">Loading...</span>
+                            </div>
+                        </div>
                     )}
                   
                 </div>
             </div>
           </TabsContent>
         </Tabs>
-        {/* {transactions ? transactions.map((transaction)=>(
-            <Link href={`/orders/${transaction?._id}`} key={transaction?._id} className="">
-                {transaction?.orders.map((order)=>(
-                    <div key={order?._id} className="bg-white border-2 border-gray-300 p-5 shadow-md rounded-md space-y-3">
-                        <div className="flex justify-between">
-                            <h1 className='text-text text-xs md:text-sm'>Order Id : {transaction._id}</h1>
-                            <h1 className='text-text text-xs md:text-sm'>{transaction.status}</h1>
-                        </div>
-                        <div className="grid grid-cols-2">
-                            <div className="flex items-center gap-x-3">
-                                <Image  src={order?.url ? order.url : ''} alt='' width={400} height={400} className='object-contain size-10'/>
-                                <h1 className='text-text text-xs md:text-sm'>{order?.menuName}</h1>
-                                <h1 className='text-text text-xs md:text-sm'>x {order?.quantity}</h1>
-                            
-                            </div>
-                            <div className="">
-                                <div className="flex items-center gap-x-2">
-                                    <CiLocationOn />
-                                    <h1 className='text-text text-xs md:text-sm'>{transaction.shippingAddress?.address}</h1>
-                                </div>
-                                <div className="flex items-center gap-x-2">
-                                    <CiPhone />
-                                    <h1 className='text-text text-xs md:text-sm'>{transaction.shippingAddress?.phoneNumber}</h1>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex justify-end">
-                            <h1 className='text-text text-xs'>{formatDate({convexDate:transaction._creationTime})}</h1>
-                        </div>
-                    </div>
-                     
-                ))}
-            </Link>
-        )):(
-            <div className="">
-
-            </div>
-        )} */}
     </div>
   )
 }

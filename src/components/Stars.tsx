@@ -77,7 +77,7 @@ export default function RatingStars({ edit, average,size, menuId, transactionId}
   setEditable(false)
 } 
   return (
-    <div className="flex gap-x-5 items-center">
+    <div className="flex gap-x-2 md:gap-x-5 items-center">
       <ReactStars count={5} size={size} value={rating} onChange={handleOnChange} edit={editable} half={true} />
       {!average && !hidden &&  (
         <div className="flex gap-x-3 items-center ">
@@ -87,7 +87,7 @@ export default function RatingStars({ edit, average,size, menuId, transactionId}
                     name="feedback"
                     value={feedbackMessage}
                     onChange={handleInputChange}
-                    className="border-red-200 bg-red-50 px-2 focus:ring-red-500 w-full"
+                    className="border-red-200 py-0 text-xs md:text-sm bg-red-50 px-2 focus:ring-red-500 w-full"
                     placeholder="Feedback message ..."
                 
                 />

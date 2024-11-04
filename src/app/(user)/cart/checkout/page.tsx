@@ -251,6 +251,9 @@ function CheckoutPage() {
                             <Input
                                 id="phoneNumber"
                                 name="phoneNumber"
+                                type='number'
+                                maxLength={11}
+                                minLength={11}
                                 value={shippingInfo.phoneNumber}
                                 onChange={handleInputChange}
                                 required

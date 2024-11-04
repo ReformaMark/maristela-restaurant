@@ -13,7 +13,7 @@ import {
 
 } from "@/components/ui/dialog"
 import { Button } from './ui/button'
-import { FaHeart } from 'react-icons/fa'
+import { FaHeart, FaShoppingBasket } from 'react-icons/fa'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
@@ -28,6 +28,7 @@ import { motion } from 'framer-motion'
 import { IoBagAddSharp } from 'react-icons/io5'
 import { GiHeartMinus } from 'react-icons/gi'
 import QuantitySelector from './QuantitySelector';
+import Link from 'next/link';
  
 export type RatingWithUser = Doc<'ratings'> & {
   user: Doc<'users'> | null;
@@ -77,10 +78,19 @@ function ProductCard({
       addToCartItem({menuId, quantity}),
       {
         loading: 'Loading...',
-        success: (data) => {
+        success: (data) => { 
           setIsDisabled(false)
           setQuantity(1)
-          return `${data?.name} has been added to your basket`;
+          return (
+            <div className="flex items-center space-x-2">
+            <FaShoppingBasket  className="text-primary" />
+            <Link href="/cart">
+              <span className="text-blue-500 hover:underline">
+                <strong className="font-semibold">{data?.name}</strong> has been added to your basket.
+              </span>
+            </Link>
+          </div>
+          )   
         },
         error: 'Error adding item to basket',
       }

@@ -70,7 +70,7 @@ function SortedProductCard({
         success: (data) => {
           return (
             <div className="flex items-center space-x-2">
-            <FaShoppingBasket  className="text-green-500" />
+            <FaShoppingBasket  className="text-primary" />
             <Link href="/cart">
               <span className="text-blue-500 hover:underline">
                 <strong className="font-semibold">{data?.name}</strong> has been added to your basket.
