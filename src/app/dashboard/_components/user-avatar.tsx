@@ -41,7 +41,7 @@ export const UserAvatar = () => {
                     </AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" side="bottom" className="w-60">
+            <DropdownMenuContent align="center" side="bottom" className="w-60 hidden md:block">
                 <Link href={'/orders'} className="">
                     <DropdownMenuItem onClick={() => {}} className="h-10 cursor-pointer">
                         <TbChecklist  className="size-4 mr-2 " />

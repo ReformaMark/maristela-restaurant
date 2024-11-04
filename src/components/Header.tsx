@@ -1,7 +1,7 @@
 'use client'
 import { UserAvatar } from '@/app/dashboard/_components/user-avatar';
 import { useCurrentUser } from '@/features/auth/api/use-current-user';
-import {  Loader2Icon } from 'lucide-react';
+import {  Loader2Icon, LogOutIcon } from 'lucide-react';
 import Link from 'next/link'
 import { usePathname } from 'next/navigation';
 import {  FaHeart, FaShoppingBag, FaUser } from 'react-icons/fa'
@@ -13,6 +13,7 @@ import {
   Sheet,
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -20,6 +21,7 @@ import {
 import { MdEmail } from 'react-icons/md';
 import { formatPrice } from '@/lib/utils';
 import SocialMedias from './SocialMedias';
+import { useAuthActions } from '@convex-dev/auth/react';
 
 function Header() {
   const pathname = usePathname();
@@ -27,7 +29,7 @@ function Header() {
   const isLoggedIn = data?._id ? true : false
   const cartItems = useQuery(api.cartItems.getCartItems)
   const favorites = useQuery(api.favorites.getAllfavorites)
-
+  const { signOut } = useAuthActions()
   const subTotal = cartItems && cartItems.reduce((accumulator, item) => {
     return accumulator + ((item?.menu?.price||0) * (item?.quantity || 0)) ;
   }, 0);
@@ -61,7 +63,7 @@ function Header() {
         <Link href={'/'} className='text-black font-cairo text-xl font-extrabold'>Maristela&apos;s Restaurant</Link>
         <Sheet>
           <SheetTrigger><FiMenu className='size-8 md:hidden text-black'/></SheetTrigger>
-          <SheetContent side={'left'}>
+          <SheetContent className='flex flex-col justify-between' side={'left'}>
             <SheetHeader>
               <SheetTitle className='border-b-2 border-b-gray-100 py-10'> <Link href={'/'} className='text-black font-cairo text-lg font-extrabold'>Maristela&apos;s Restaurant</Link></SheetTitle>
               <SheetDescription>
@@ -128,6 +130,10 @@ function Header() {
                     <Link href={'/about'} className={`${pathname === "/about" ? "text-yellow" : "text-black"} hover:text-yellow tracking-wider text-lg uppercase font-cairo  md:text-lg lg:text-[1rem] transition-colors duration-300 ease-linear`}>
                       About Us
                     </Link>
+                    <Link href={'/orders'} className={`${pathname === "/about" ? "text-yellow" : "text-black"} hover:text-yellow tracking-wider text-lg uppercase font-cairo  md:text-lg lg:text-[1rem] transition-colors duration-300 ease-linear`}>
+                      Orders
+                    </Link>
+                    
                   </div>
 
                   <SocialMedias cn='ml-0 items-start' size='size-7'/>
@@ -144,7 +150,14 @@ function Header() {
                 </div>
               </SheetDescription>
             </SheetHeader>
+            <SheetFooter className='mt-20'>
+              <div onClick={() => signOut()} className="flex gap-x-5">
+                <LogOutIcon  className="size-4 mr-2 " />
+                Log out
+              </div>
+          </SheetFooter>
           </SheetContent>
+          
         </Sheet>
       </div>
     
