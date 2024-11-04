@@ -140,7 +140,7 @@ function ProductCard({
   }
 
   return (
-    <Dialog open={isOpen} >
+    <Dialog open={isOpen} onOpenChange={setIsOpen} >
         <Card className='relative overflow-hidden shadow-none rounded-3xl bg-gwhite p-0 h-fit transition-all duration-500 ease-in'>
             <CardHeader className='border-b-2 border-gray-100 p-0 pb-2 md:space-y-5 shadow-none'>
               <CardContent className='p-0 relative shadow-none'>
