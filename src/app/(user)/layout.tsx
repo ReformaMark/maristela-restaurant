@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import { Toaster } from "sonner";
+import { Redirector } from "@/components/redirector";
 
 
 // const geistSans = localFont({
@@ -31,18 +32,20 @@ export default function RootLayout({
 }>) {
   return (
     <ConvexAuthNextjsServerProvider>
-    <html lang="en">
-      <body
-        className={'font-cairo'}
-      >
-        <ConvexClientProvider>
-          <Header/>
-          {children}
-          <Footer/>
-          <Toaster richColors/>
-        </ConvexClientProvider>
-      </body>
-    </html>
-  </ConvexAuthNextjsServerProvider>
+      <html lang="en">
+        <body
+          className={'font-cairo'}
+        >
+          <ConvexClientProvider>
+            <Redirector>
+              <Header />
+              {children}
+              <Footer />
+              <Toaster richColors />
+            </Redirector>
+          </ConvexClientProvider>
+        </body>
+      </html>
+    </ConvexAuthNextjsServerProvider>
   );
 }

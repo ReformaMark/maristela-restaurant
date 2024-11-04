@@ -62,20 +62,45 @@ export const CreateMenuCard = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
     const { mutate: generateUploadUrl } = useGenerateUploadUrl()
+    const [isUploading, setIsUploading] = useState(false)
 
     const fileInputRef = useRef<HTMLInputElement>(null)
 
-    const { mutate, isPending } = useMutation({
+    const { mutate: uploadProduct, isPending: isCreating } = useMutation({
         mutationFn: useConvexMutation(api.menus.create),
         onSuccess: () => {
             setProductData(initialProductData)
             setPreviewUrl(null)
+            if (fileInputRef.current) fileInputRef.current.value = ''
             toast.success('Product created successfully')
         },
-        onError: () => {
-            toast.error('Failed to create product')
+        onError: (error) => {
+            toast.error('Failed to create product: ' + error)
         },
     })
+
+    const uploadImage = async (file: File): Promise<Id<"_storage"> | undefined> => {
+        try {
+            const url = await generateUploadUrl({}, { throwError: true })
+            if (!url) throw new Error('Failed to generate upload URL')
+
+            const result = await fetch(url, {
+                method: 'POST',
+                body: file,
+                headers: {
+                    'Content-Type': file.type
+                }
+            })
+
+            if (!result.ok) throw new Error('Failed to upload image')
+
+            const { storageId } = await result.json()
+            return storageId
+        } catch (error) {
+            console.error('Image upload error:', error)
+            throw error
+        }
+    }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
@@ -122,38 +147,32 @@ export const CreateMenuCard = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        let storageId: Id<"_storage"> | undefined;
+        if (isUploading || isCreating) return
+
+        // Validation
+        if (!productData.productName.trim() || productData.price <= 0) {
+            toast.error('Please fill in all required fields')
+            return
+        }
+
+        if (!productData.image) {
+            toast.error('Please upload a product image')
+            return
+        }
 
         try {
-            if (productData.image) {
-                const url = await generateUploadUrl({}, {
-                    throwError: true
-                })
+            setIsUploading(true)
+            // Start image upload first
+            const storageId = await uploadImage(productData.image)
+            setIsUploading(false)
 
-                if (!url) {
-                    toast.error('Failed to generate upload URL')
-                    return
-                }
-
-                const result = await fetch(url, {
-                    method: 'POST',
-                    body: productData.image,
-                    headers: {
-                        'Content-Type': productData.image.type
-                    }
-                })
-
-                if (!result.ok) {
-                    toast.error('Failed to upload image')
-                    return
-                }
-
-                const { storageId: uploadedStorageId } = await result.json()
-
-                storageId = uploadedStorageId
+            if (!storageId) {
+                toast.error('Failed to upload image')
+                return
             }
 
-            await mutate({
+            // Then create the product
+            await uploadProduct({
                 category: productData.category,
                 name: productData.productName,
                 price: Number(productData.price),
@@ -161,12 +180,13 @@ export const CreateMenuCard = () => {
                 special: productData.special,
                 prepTime: productData.prepTime.toString(),
                 description: productData.description,
-                image: storageId!,
+                image: storageId,
                 quantity: Number(productData.quantity)
             })
-        } catch (error: unknown) {
+        } catch (error) {
+            setIsUploading(false)
             console.error(error)
-            toast.error(error as string)
+            toast.error(error instanceof Error ? error.message : 'An error occurred')
         }
     }
 
@@ -196,7 +216,7 @@ export const CreateMenuCard = () => {
                                 <Select
                                     onValueChange={handleCategoryChange}
                                     value={productData.category}
-                                    disabled={isPending}
+                                    disabled={isCreating}
                                 >
                                     <SelectTrigger className="border-red-200 bg-red-50 focus:ring-red-500">
                                         <SelectValue placeholder="Select a category" />
@@ -225,7 +245,7 @@ export const CreateMenuCard = () => {
                                         required
                                         className="border-red-200 bg-red-50 pl-10 focus:ring-red-500"
                                         placeholder="Enter product name"
-                                        disabled={isPending}
+                                        disabled={isCreating}
                                     />
                                 </div>
                             </div>
@@ -248,7 +268,7 @@ export const CreateMenuCard = () => {
                                             className="border-red-200 bg-red-50 pl-10 focus:ring-red-500"
                                             placeholder="0.00"
                                             min={0}
-                                            disabled={isPending}
+                                            disabled={isCreating}
                                         />
                                     </div>
                                 </div>
@@ -269,7 +289,7 @@ export const CreateMenuCard = () => {
                                             className="border-red-200 bg-red-50 pl-10 focus:ring-red-500"
                                             placeholder="Enter quantity"
                                             min={0}
-                                            disabled={isPending}
+                                            disabled={isCreating}
                                         />
                                     </div>
                                 </div>
@@ -291,7 +311,7 @@ export const CreateMenuCard = () => {
                                         className="border-red-200 bg-red-50 pl-10 focus:ring-red-500"
                                         placeholder="Enter prep time"
                                         min={0}
-                                        disabled={isPending}
+                                        disabled={isCreating}
                                     />
                                 </div>
                             </div>
@@ -309,7 +329,7 @@ export const CreateMenuCard = () => {
                                     required
                                     className="border-red-200 bg-red-50 focus:ring-red-500"
                                     placeholder="Describe your product..."
-                                    disabled={isPending}
+                                    disabled={isCreating}
                                 />
                             </div>
 
@@ -325,7 +345,7 @@ export const CreateMenuCard = () => {
                                         checked={productData.recommended}
                                         onCheckedChange={handleSwitchChange('recommended')}
                                         className="data-[state=checked]:bg-yellow"
-                                        disabled={isPending}
+                                        disabled={isCreating}
                                     />
                                 </div>
                                 <div className="flex items-center justify-between">
@@ -337,7 +357,7 @@ export const CreateMenuCard = () => {
                                         checked={productData.special}
                                         onCheckedChange={handleSwitchChange('special')}
                                         className="data-[state=checked]:bg-yellow"
-                                        disabled={isPending}
+                                        disabled={isCreating}
                                     />
                                 </div>
                             </div>
@@ -415,7 +435,7 @@ export const CreateMenuCard = () => {
                                         accept="image/*"
                                         onChange={handleImageChange}
                                         className="hidden"
-                                        disabled={isPending}
+                                        disabled={isCreating}
                                     />
                                 </div>
                             </div>
@@ -427,11 +447,25 @@ export const CreateMenuCard = () => {
                 <Button
                     type="submit"
                     form="create-product-form"
-                    className="bg-primary text-white transition-all duration-300 ease-in hover:bg-primary/90"
-                    disabled={isPending}
+                    className="bg-primary text-white transition-all duration-300 ease-in hover:bg-primary/90 disabled:opacity-50"
+                    disabled={isUploading || isCreating}
                 >
-                    <PlusIcon className="mr-2 h-5 w-5" />
-                    Add Product
+                    {isUploading ? (
+                        <>
+                            <span className="animate-spin mr-2">⭮</span>
+                            Uploading Image...
+                        </>
+                    ) : isCreating ? (
+                        <>
+                            <span className="animate-spin mr-2">⭮</span>
+                            Creating Product...
+                        </>
+                    ) : (
+                        <>
+                            <PlusIcon className="mr-2 h-5 w-5" />
+                            Add Product
+                        </>
+                    )}
                 </Button>
             </CardFooter>
         </Card >

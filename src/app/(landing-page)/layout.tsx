@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
+import { Redirector } from "@/components/redirector";
 
 
 // const geistSans = localFont({
@@ -30,17 +31,19 @@ export default function RootLayout({
 }>) {
   return (
     <ConvexAuthNextjsServerProvider>
-    <html lang="en">
-      <body
-        className={''}
-      >
-        <ConvexClientProvider>
-          <Header/>
-          {children}
-          <Footer/>
-        </ConvexClientProvider>
-      </body>
-    </html>
-  </ConvexAuthNextjsServerProvider>
+      <html lang="en">
+        <body
+          className={''}
+        >
+          <ConvexClientProvider>
+            <Redirector>
+              <Header />
+              {children}
+              <Footer />
+            </Redirector>
+          </ConvexClientProvider>
+        </body>
+      </html>
+    </ConvexAuthNextjsServerProvider>
   );
 }
