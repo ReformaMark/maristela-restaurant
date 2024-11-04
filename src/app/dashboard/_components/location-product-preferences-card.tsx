@@ -73,7 +73,7 @@ export const LocationProductPreferencesCard = () => {
                                 </span>
                             </button>
                         )
-                    })}
+                    })} 
                 </div>
             </CardHeader>
             <CardContent className="px-2 sm:p-6">
