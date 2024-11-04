@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { formatPrice } from '@/lib/utils'
 import { FaBasketShopping } from 'react-icons/fa6'
+import Logo from '@/../public/img/maristela.jpg'
 
 function CartItems() {
     const cartItmes = useQuery(api.cartItems.getCartItems)
@@ -41,7 +42,7 @@ function CartItems() {
         {cartItmes ? cartItmes.length >= 1 ? cartItmes.map((item)=>(
             <div key={item?._id} className="grid shadow-sm grid-cols-12 items-center w-full h-fit pl-1 md:pl-5 border-b-2 border-b-gray-200  py-2">
                 <div className="flex items-center gap-x-2 col-span-5">
-                    <Image src={item?.url ? item.url : ""} width={100} height={100} alt={item?.menu?.name || ''} className='size-12 md:size-20 p-1 md:p-2 shadow-md'/>
+                    <Image priority src={item?.url ? item.url : Logo} width={100} height={100} alt={item?.menu?.name || ''} className='size-12 md:size-20 p-1 md:p-2 shadow-md'/>
                     <div className="text-[0.5rem] md:text-lg">
                         <h1 className=''>{item?.menu?.name}</h1>
                     </div>

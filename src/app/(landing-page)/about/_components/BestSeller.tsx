@@ -31,7 +31,7 @@ function BestSeller() {
             className=""
           >
             <ProductCard ratings={menu.ratings} image={menu.url ? menu.url : Logo}  title={menu.name} price={menu.price} >
-              <Image src={menu.url ? menu.url : Logo} width={500} height={500} alt={menu.name} className='object-cover h-44 w-full bg-yellow rounded-3xl hover:scale-105 transition-all duration-500 ease-in'/>
+              <Image priority src={menu.url ? menu.url : Logo} width={500} height={500} alt={menu.name} className='object-cover h-44 w-full bg-yellow rounded-3xl hover:scale-105 transition-all duration-500 ease-in'/>
             </ProductCard>
           </motion.div>
          

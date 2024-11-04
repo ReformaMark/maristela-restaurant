@@ -41,7 +41,7 @@ function Special() {
                         image={menuItem.url ? menuItem.url : Logo}
                     >
                     
-                        <Image src={menuItem.url ? menuItem.url : Logo} alt={menuItem.name} height={400} width={400} className='h-32 md:h-52 w-full object-cover rounded-lg hover:scale-105 transition-all duration-500 ease-linear'/>
+                        <Image priority src={menuItem.url ? menuItem.url : Logo} alt={menuItem.name} height={400} width={400} className='h-32 md:h-52 w-full object-cover rounded-lg hover:scale-105 transition-all duration-500 ease-linear'/>
                     </ProductCard>
                 ))}
             </motion.div>

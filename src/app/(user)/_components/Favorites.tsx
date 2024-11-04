@@ -17,7 +17,7 @@ function Favorites() {
             <h1 className='text-black font-semibold text-2xl tracking-widest'>Favorites</h1> 
         </div>
     
-      <div className='grid grid-cols-1 md:grid-cols-4 '>
+      <div className='grid grid-cols-2 md:grid-cols-4 '>
           
           {favorites ? favorites.length >= 1 ? favorites.map((menuItem)=>(
               <ProductCard  
@@ -31,7 +31,7 @@ function Favorites() {
               
                 >
                   
-                <Image src={menuItem?.url ? menuItem.url : Logo} alt={menuItem?.menu.name || ''} height={200} width={200} className='h-32 md:h-52 w-full object-cover rounded-lg hover:scale-105 transition-all duration-500 ease-linear'/>
+                <Image priority src={menuItem?.url ? menuItem.url : Logo} alt={menuItem?.menu.name || ''} height={200} width={200} className='h-32 md:h-52 w-full object-cover rounded-lg hover:scale-105 transition-all duration-500 ease-linear'/>
               </ProductCard>
           )) : (
               <div className="text-center text-gray-500 text-sm">No added favorites.</div>

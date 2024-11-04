@@ -5,7 +5,7 @@ import { api } from '../../../../convex/_generated/api';
 import Image from 'next/image';
 import { formatDate, formatPrice, getAverage } from '@/lib/utils';
 import {motion} from 'framer-motion';
-import { FaHeart, FaMinus, FaPlus } from 'react-icons/fa';
+import { FaHeart, FaMinus, FaPlus, FaShoppingBasket } from 'react-icons/fa';
 import {
     Dialog,
     DialogContent,
@@ -13,13 +13,15 @@ import {
   } from "@/components/ui/dialog"
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+import { toast, Toaster } from 'sonner';
 import { Id } from '../../../../convex/_generated/dataModel';
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { RatingWithUser } from '@/components/ProductCard';
 import ReactStars from 'react-stars';
 import { Star } from 'lucide-react';
 import { IoBagAddSharp } from 'react-icons/io5';
+import Link from 'next/link';
+import Logo from '@/../public/img/maristela.jpg'
 
 function SortedProductCard({
     latest,
@@ -66,9 +68,18 @@ function SortedProductCard({
       {
         loading: 'Loading...',
         success: (data) => {
-          return `${data?.name} has been added to the cart`;
+          return (
+            <div className="flex items-center space-x-2">
+            <FaShoppingBasket  className="text-green-500" />
+            <Link href="/cart">
+              <span className="text-blue-500 hover:underline">
+                <strong className="font-semibold">{data?.name}</strong> has been added to your basket.
+              </span>
+            </Link>
+          </div>
+          )   
         },
-        error: 'Error adding item to cart',
+        error: 'Error adding item to your basket.',
       }
     );
   };
@@ -127,6 +138,7 @@ function SortedProductCard({
                       )}
                   </div>
                 </div>
+                 <Toaster richColors/>
                 <motion.div 
                     
                     className="flex md:hidden flex-col gap-2 "
@@ -227,7 +239,8 @@ function SortedProductCard({
                         <div className='p-0 h-full overflow-auto'>
                             <div className="h-1/2 ">
                             <Image 
-                                src={product.url || ''} 
+                                src={product.url || Logo} 
+                                priority
                                 alt={product.name}
                                 width={1000}
                                 height={1000}
