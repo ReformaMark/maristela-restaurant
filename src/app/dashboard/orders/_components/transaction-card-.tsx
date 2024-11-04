@@ -21,7 +21,7 @@ import { calculateTotal, formatPrice } from "@/lib/utils"
 import { useConvexMutation } from "@convex-dev/react-query"
 import { useMutation } from "@tanstack/react-query"
 import { ConvexError } from "convex/values"
-import { CheckCircle, Clock, Package, RefreshCcw, Search, Truck } from "lucide-react"
+import { CheckCircle, Clock, Package, RefreshCcw, Search, Truck, XCircleIcon } from "lucide-react"
 import { Fragment, useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
 import { api } from "../../../../../convex/_generated/api"
@@ -92,9 +92,9 @@ export const TransactionCard = () => {
         setSearchInput("");
     }
 
-    useEffect(() => {
-        setSelectedTransaction(data?.[0])
-    }, [data])
+    // useEffect(() => {
+    //     setSelectedTransaction(data?.[0])
+    // }, [data])
 
     useEffect(() => {
         if (searchError) {
@@ -137,6 +137,7 @@ export const TransactionCard = () => {
                                 {index === 1 && <CheckCircle className="w-5 h-5 text-white" />}
                                 {index === 2 && <Truck className="w-5 h-5 text-white" />}
                                 {index === 3 && <Package className="w-5 h-5 text-white" />}
+                                {index === 4 && <XCircleIcon className="w-5 h-5 text-white" />}
                             </div>
                             <span className="text-xs mt-1 text-center">
                                 {status}

@@ -1,6 +1,4 @@
-import { Button } from "@/components/ui/button"
 import { MobileSheet } from "./mobile-sheet"
-import { BellIcon } from "lucide-react"
 import { UserAvatar } from "./user-avatar"
 
 export const DashboardHeader = () => {
@@ -9,9 +7,9 @@ export const DashboardHeader = () => {
             <MobileSheet />
 
             <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="icon" className="hover:bg-gray-200">
+                {/* <Button variant="ghost" size="icon" className="hover:bg-gray-200">
                     <BellIcon className="h-5 w-5" />
-                </Button>
+                </Button> */}
 
                 <UserAvatar />
             </div>
