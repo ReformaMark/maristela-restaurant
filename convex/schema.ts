@@ -6,7 +6,7 @@ const schema = defineSchema({
     ...authTables,
     users: defineTable({
         image: v.optional(v.string()),
-        email: v.optional(v.string()),
+        email: v.string(),
         emailVerificationTime: v.optional(v.number()),
         phone: v.optional(v.string()),
         phoneVerificationTime: v.optional(v.number()),
@@ -19,7 +19,12 @@ const schema = defineSchema({
         ratings: v.optional(v.array(v.id("ratings"))),
         orders: v.optional(v.array(v.id("orders"))),
         transactions: v.optional(v.array(v.id("transactions"))),
-    }),
+        verificationToken: v.optional(v.string()),
+        verificationTokenExpiry: v.optional(v.number()),
+        resetToken: v.optional(v.string()),
+        resetTokenExpiry: v.optional(v.number()),
+        isVerified: v.optional(v.boolean()),
+    }).index('email', ['email']),
     menus: defineTable({
         imageId: v.optional(v.id('_storage')),
         category: v.union(
@@ -46,7 +51,7 @@ const schema = defineSchema({
         quantity: v.optional(v.number()),
         isArchived: v.optional(v.boolean()),
         totalUnitsSold: v.optional(v.number()),
-        })
+    })
         .index('by_name', ['name'])
         .index('by_totalUnitsSold', ['totalUnitsSold'])
         .searchIndex("search_name", {
@@ -103,12 +108,12 @@ const schema = defineSchema({
         familyMealId: v.optional(v.id('familyMeals')),
         quantity: v.number(),
         userId: v.id('users'),
-    }).index('by_menuId', ['menuId']).index('by_familyMealId', ['familyMealId']).index('by_userId',['userId']),
+    }).index('by_menuId', ['menuId']).index('by_familyMealId', ['familyMealId']).index('by_userId', ['userId']),
     favorites: defineTable({
         menuId: v.optional(v.id('menus')),
         familyMealId: v.optional(v.id('familyMeals')),
         userId: v.id('users'),
-    }).index('by_menuId', ['menuId']).index('by_familyMealId', ['familyMealId']).index('by_userId',['userId']),
+    }).index('by_menuId', ['menuId']).index('by_familyMealId', ['familyMealId']).index('by_userId', ['userId']),
     shippingAddress: defineTable({
         userId: v.id('users'),
         firstname: v.string(),

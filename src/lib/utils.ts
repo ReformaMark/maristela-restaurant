@@ -63,3 +63,12 @@ export const statusColors = {
   Completed: 'bg-green-500 hover:bg-green-600 text-white',
   Cancelled: 'bg-primary hover:bg-primary/70 text-white',
 }
+
+export function generateToken(length = 32) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let token = '';
+  for (let i = 0; i < length; i++) {
+    token += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return token;
+}

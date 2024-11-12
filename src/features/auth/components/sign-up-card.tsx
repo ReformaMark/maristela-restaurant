@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { AuthFlow } from "../types"
 import { useAdminCheck } from "./use-admin-check"
+import { EmailVerification } from "./email-verification"
 
 
 interface SignUpCardProps {
@@ -41,6 +42,8 @@ export const SignUpCard = ({
     const [error, setError] = useState("");
     const [step, setStep] = useState(1);
 
+    const [verificationStep, setVerificationStep] = useState<boolean>(false);
+
     const router = useRouter()
 
     useEffect(() => {
@@ -53,34 +56,81 @@ export const SignUpCard = ({
         }
     }, [isAuthenticated, isAdmin, router]);
 
-    const onSignUp = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-
-
-        if (password !== confirmPassword) {
-            setError("Passwords do not match")
-            return
+    const onSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+    
+        if (!validateForm()) {
+            return;
         }
+    
+        setPending(true);
+        setError("");
+    
+        try {
+            const signUpData = {
+                email,
+                password,
+                name,
+                lastName: lname,
+                address,
+                role,
+                flow: "signUp"
+            };
+    
+            console.log("Sending sign-up data:", signUpData);
+    
+            await signIn("password", signUpData);
+            setVerificationStep(true);
+        } catch (error) {
+            console.error("Sign-up error:", error);
+            if (error instanceof Error) {
+                setError(error.message);
+            } else {
+                setError("Something went wrong!");
+            }
+        } finally {
+            setPending(false);
+        }
+    };
 
-        setPending(true)
-        setError("")
+    const validateForm = () => {
+        if (!email?.trim() || 
+            !password?.trim() || 
+            !name?.trim() || 
+            !lname?.trim() || 
+            !address?.trim() || 
+            !role?.trim()
+        ) {
+            setError("All fields are required");
+            return false;
+        }
+        
+        if (password !== confirmPassword) {
+            setError("Passwords do not match");
+            return false;
+        }
+    
+        if (password.length < 6) {
+            setError("Password must be at least 6 characters long");
+            return false;
+        }
+    
+        return true;
+    };
 
-        signIn("password", {
-            email,
-            lname,
-            name,
-            address,
-            role,
-            password,
-            flow: "signUp",
-        })
-            .catch(() => {
-                setError("Something went wrong!")
-            })
-            .finally(() => {
-                setPending(false)
-            })
-    }
+    if (verificationStep) {
+        return (
+          <EmailVerification 
+            email={email}
+            password={password}
+            name={name}
+            lastName={lname}
+            address={address}
+            role={role}
+            onCancel={() => setVerificationStep(false)} 
+          />
+        );
+      }
 
     const handleFirstStep = () => {
         // Make a ched firstname and lastname, it should not contain spaces, special characters and numbers.
@@ -221,16 +271,24 @@ export const SignUpCard = ({
                         type="button"
                         variant="outline"
                         onClick={handlePrevious}
-                        disabled={step === 1}
+                        disabled={step === 1 || pending}
                     >
                         <ArrowLeftIcon className="mr-2 h-4 w-4" /> Previous
                     </Button>
                     {step < 3 ? (
-                        <Button type="button" onClick={step === 1 ? handleFirstStep : handleSecondStep}>
+                        <Button 
+                            type="button" 
+                            onClick={step === 1 ? handleFirstStep : handleSecondStep}
+                            disabled={pending}
+                        >
                             Next <ArrowRightIcon className="ml-2 h-4 w-4" />
                         </Button>
                     ) : (
-                        <Button type="submit" form="sign-up-form">
+                        <Button 
+                            type="submit" 
+                            form="sign-up-form"
+                            disabled={pending}
+                        >
                             Submit <CheckIcon className="ml-2 h-4 w-4" />
                         </Button>
                     )}
