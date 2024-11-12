@@ -1,9 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useAuthActions } from "@convex-dev/auth/react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -11,6 +8,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { useState } from "react";
 
 interface EmailVerificationProps {
   email: string;
@@ -22,7 +22,7 @@ interface EmailVerificationProps {
   onCancel: () => void;
 }
 
-export function EmailVerification({ email, password, name, lastName, address, role, onCancel }: EmailVerificationProps) {
+export function EmailVerification({ email, onCancel }: EmailVerificationProps) {
   const { signIn } = useAuthActions();
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
@@ -36,11 +36,6 @@ export function EmailVerification({ email, password, name, lastName, address, ro
     try {
       await signIn("password", {
         email,
-        password,
-        name,
-        lastName,
-        address,
-        role,
         code,
         flow: "email-verification"
       });

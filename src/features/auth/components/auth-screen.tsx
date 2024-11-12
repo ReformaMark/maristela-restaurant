@@ -10,6 +10,7 @@ import { AuthFooter } from "./auth-footer"
 import { Button } from "@/components/ui/button"
 import { ArrowLeftIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { ForgotPasswordCard } from "./forgot-password-card"
 
 export const AuthScreen = () => {
     const [state, setState] = useState<AuthFlow>("signIn")
@@ -60,9 +61,15 @@ export const AuthScreen = () => {
 
             <div className="h-full w-full lg:w-[50%] flex flex-col flex-1 items-center justify-center">
 
-                <div className="h-full flex items-center justify-center ">
+                <div className="h-full flex items-center justify-center">
                     <div className="md:h-auto md:w-[420px]">
-                        {state === "signIn" ? <SignInCard setState={setState} /> : <SignUpCard setState={setState} />}
+                        {state === "signIn" ? (
+                            <SignInCard setState={setState} />
+                        ) : state === "signUp" ? (
+                            <SignUpCard setState={setState} />
+                        ) : (
+                            <ForgotPasswordCard setState={setState} />
+                        )}
                     </div>
                 </div>
 

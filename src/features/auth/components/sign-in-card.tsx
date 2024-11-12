@@ -124,6 +124,14 @@ export const SignInCard = ({
                         </span>
                     </p>
 
+                    <p className="text-sm text-muted-foreground">
+                        Forgot your password? <span
+                            className="text-primary hover:underline cursor-pointer"
+                            onClick={() => setState("forgotPassword")}>
+                            Reset it here
+                        </span>
+                    </p>
+
                     <p className="block lg:hidden text-sm text-muted-foreground">
                         Changed your mind? <span
                             className="text-primary hover:underline cursor-pointer"

@@ -15,35 +15,106 @@ const ParamsSchema = z.object({
 });
 
 export default Password<DataModel>({
+    // @ts-expect-error - profile is not defined in the type
     profile(params) {
-        const { error, data } = ParamsSchema.safeParse(params);
+        switch (params.flow) {
+            case "signIn":
+                // For sign in, we only need to validate email and password
+                if (!params.email || !params.password) {
+                    throw new ConvexError({
+                        message: "Invalid credentials",
+                        validationErrors: {
+                            email: !params.email ? { _errors: ["Required"] } : undefined,
+                            password: !params.password ? { _errors: ["Required"] } : undefined,
+                        }
+                    });
+                }
+                return {
+                    email: params.email,
+                    isVerified: true, // User is already verified if they can sign in
+                };
 
-        if (error) {
-            throw new ConvexError(error.format());
-        }
+            case "email-verification":
+                if (!params.email || !params.code) {
+                    throw new ConvexError({
+                        message: "Invalid verification data",
+                        validationErrors: {
+                            email: !params.email ? { _errors: ["Required"] } : undefined,
+                            code: !params.code ? { _errors: ["Required"] } : undefined,
+                        }
+                    });
+                }
+                return {
+                    email: params.email,
+                    isVerified: false,
+                };
 
-        return {
-            email: data.email,
-            name: data.name,
-            lastName: data.lastName,
-            role: data.role,
-            address: data.address,
-            isVerified: false,
+            case "reset":
+                // Only validate email for initial reset request
+                if (!params.email) {
+                    throw new ConvexError({
+                        message: "Email is required",
+                        validationErrors: { email: { _errors: ["Required"] } }
+                    });
+                }
+                return { email: params.email };
+
+            case "reset-verification":
+                // For verification step, only validate email and code
+                if (!params.email || !params.code) {
+                    throw new ConvexError({
+                        message: "Invalid verification data",
+                        validationErrors: {
+                            email: !params.email ? { _errors: ["Required"] } : undefined,
+                            code: !params.code ? { _errors: ["Required"] } : undefined,
+                        }
+                    });
+                }
+                return { email: params.email };
+
+            case "signUp":
+                // For sign up, validate all required fields
+                const result = ParamsSchema.safeParse({
+                    email: params.email,
+                    password: params.password,
+                    name: params.name,
+                    lastName: params.lastName,
+                    role: params.role,
+                    address: params.address,
+                });
+
+                if (!result.success) {
+                    throw new ConvexError({
+                        message: "Invalid profile data",
+                        validationErrors: result.error.format()
+                    });
+                }
+
+                return {
+                    email: result.data.email,
+                    name: result.data.name,
+                    lastName: result.data.lastName,
+                    role: result.data.role,
+                    address: result.data.address,
+                    isVerified: false,
+                };
+
+            default:
+                throw new ConvexError({
+                    message: "Invalid flow",
+                    validationErrors: {
+                        flow: { _errors: ["Invalid flow type"] }
+                    }
+                });
         }
     },
     validatePasswordRequirements: (password: string) => {
-        console.log("Validating password length:", password.length);
-
-        if (password.length < 6) {
-            console.error("Password validation failed: too short");
-            throw new ConvexError(
-                "Password must be at least 6 characters long"
-            );
+        if (password?.length < 6) {
+            throw new ConvexError("Password must be at least 6 characters long");
         }
-        console.log("Password validation passed");
     },
-    // @ts-expect-error - ResendOTP is not typed
+    // @ts-expect-error - ResendOTP is not defined in the type
     verify: ResendOTP,
-    // @ts-expect-error - ResendOTPPasswordReset is not typed
+    // @ts-expect-error - ResendOTPPasswordReset is not defined in the type
     reset: ResendOTPPasswordReset
 });
