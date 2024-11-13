@@ -60,17 +60,27 @@ export default Password<DataModel>({
                 return { email: params.email };
 
             case "reset-verification":
-                // For verification step, only validate email and code
-                if (!params.email || !params.code) {
+                // For password reset verification, we need email, code, and new password
+                if (!params.email || !params.code || !params.newPassword) {
                     throw new ConvexError({
-                        message: "Invalid verification data",
+                        message: "Invalid reset verification data",
                         validationErrors: {
                             email: !params.email ? { _errors: ["Required"] } : undefined,
                             code: !params.code ? { _errors: ["Required"] } : undefined,
+                            newPassword: !params.newPassword ? { _errors: ["Required"] } : undefined,
                         }
                     });
                 }
-                return { email: params.email };
+                // For reset verification, we need to return a profile
+                return {
+                    email: params.email,
+                    isVerified: true,
+                    // Add minimal required profile data
+                    name: "User",
+                    lastName: "Reset",
+                    role: "user",
+                    address: "Reset Address"
+                };
 
             case "signUp":
                 // For sign up, validate all required fields

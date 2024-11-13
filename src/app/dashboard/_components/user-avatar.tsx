@@ -37,6 +37,7 @@ export const UserAvatar = () => {
             await signOut()
             toast.success("Signed out successfully")
         } catch (error) {
+            console.error(error)
             toast.error("Failed to sign out")
         }
     }

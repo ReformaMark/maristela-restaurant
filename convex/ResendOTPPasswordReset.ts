@@ -11,7 +11,7 @@ export const ResendOTPPasswordReset = Resend({
     async sendVerificationRequest({ identifier: email, provider, token }) {
         const resend = new ResendAPI(provider.apiKey);
         const { error } = await resend.emails.send({
-            from: "Maristela Restaurant <onboarding@resend.dev>",
+            from: "Maristela Restaurant <maristela@resend.dev>",
             to: [email],
             subject: "Reset your password in Maristela Restaurant",
             text: "Your password reset code is " + token,

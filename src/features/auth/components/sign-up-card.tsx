@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { useAuthActions } from "@convex-dev/auth/react"
 import { useConvexAuth } from "convex/react"
-import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, TriangleAlertIcon } from "lucide-react"
+import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, Eye, EyeOff, TriangleAlertIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { AuthFlow } from "../types"
@@ -41,6 +41,8 @@ export const SignUpCard = ({
     const [pending, setPending] = useState<boolean>(false);
     const [error, setError] = useState("");
     const [step, setStep] = useState(1);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const [verificationStep, setVerificationStep] = useState<boolean>(false);
 
@@ -193,22 +195,52 @@ export const SignUpCard = ({
             case 2:
                 return (
                     <>
-                        <Input
-                            disabled={pending}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Password"
-                            type="password"
-                            required
-                        />
-                        <Input
-                            disabled={pending}
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            placeholder="Confirm Password"
-                            type="password"
-                            required
-                        />
+                        <div className="relative">
+                            <Input
+                                disabled={pending}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Password"
+                                type={showPassword ? "text" : "password"}
+                                required
+                            />
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="absolute right-0 top-0"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? (
+                                    <EyeOff className="h-4 w-4" />
+                                ) : (
+                                    <Eye className="h-4 w-4" />
+                                )}
+                            </Button>
+                        </div>
+                        <div className="relative">
+                            <Input
+                                disabled={pending}
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                placeholder="Confirm Password"
+                                type={showConfirmPassword ? "text" : "password"}
+                                required
+                            />
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="absolute right-0 top-0"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            >
+                                {showConfirmPassword ? (
+                                    <EyeOff className="h-4 w-4" />
+                                ) : (
+                                    <Eye className="h-4 w-4" />
+                                )}
+                            </Button>
+                        </div>
                     </>
                 )
             case 3:

@@ -13,8 +13,9 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { TriangleAlertIcon, ArrowLeftIcon } from "lucide-react";
+import { TriangleAlertIcon, ArrowLeftIcon, Eye, EyeOff } from "lucide-react";
 import { AuthFlow } from "../types";
+import { toast } from "sonner";
 
 interface PasswordResetCardProps {
   setState: (state: AuthFlow) => void;
@@ -27,6 +28,7 @@ export function ForgotPasswordCard({ setState }: PasswordResetCardProps) {
   const [code, setCode] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleForgotSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -42,8 +44,9 @@ export function ForgotPasswordCard({ setState }: PasswordResetCardProps) {
       });
       setEmail(emailValue);
       setStep("verify");
+      (e.target as HTMLFormElement).reset();
     } catch (error) {
-      setError("Failed to send reset code. Please try again.");
+      setError("Failed to send reset code. Please double check the email address.");
       console.error("Forgot password error:", error);
     } finally {
       setPending(false);
@@ -59,9 +62,11 @@ export function ForgotPasswordCard({ setState }: PasswordResetCardProps) {
         const formData = new FormData(e.currentTarget);
         const verificationCode = formData.get("code") as string;
         
-        // Store the code without making the verification call yet
+        // Store the code first
         setCode(verificationCode);
         setStep("reset");
+        toast.success("Code verified successfully!");
+        (e.target as HTMLFormElement).reset();
     } catch (error) {
         console.error("Verification error:", error);
         setError("Invalid verification code. Please try again.");
@@ -71,39 +76,46 @@ export function ForgotPasswordCard({ setState }: PasswordResetCardProps) {
 };
 
 const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  setPending(true);
-  setError("");
+    e.preventDefault();
+    setPending(true);
+    setError("");
 
-  try {
-      const formData = new FormData(e.currentTarget);
-      const newPassword = formData.get("newPassword") as string;
+    try {
+        const formData = new FormData(e.currentTarget);
+        const newPassword = formData.get("newPassword") as string;
 
-      if (newPassword.length < 6) {
-          setError("Password must be at least 6 characters long");
-          return;
-      }
+        if (newPassword.length < 6) {
+            setError("Password must be at least 6 characters long");
+            return;
+        }
 
-      // This is where we actually verify the code and set the new password
-      await signIn("password", {
-          email,
-          code,
-          newPassword,
-          flow: "reset-verification"
-      });
+        // Use reset-verification flow with all required data
+        await signIn("password", {
+            email,
+            code,
+            newPassword,
+            flow: "reset-verification",
+            // Add minimal required profile data
+            name: "User",
+            lastName: "Reset",
+            role: "user",
+            address: "Reset Address"
+        });
 
-      // If successful, redirect to sign in
-      setState("signIn");
-  } catch (error) {
-      console.error("Reset error:", error);
-      if (error instanceof Error) {
-          setError(error.message);
-      } else {
-          setError("Failed to reset password. Please try again.");
-      }
-  } finally {
-      setPending(false);
-  }
+        // If successful, redirect to sign in
+        setState("signIn");
+    } catch (error) {
+        console.error("Reset error:", error);
+        if (error instanceof Error) {
+            setError(error.message);
+        } else {
+            setError("Failed to reset password. Please try again.");
+        }
+        // If there's an error, go back to verification step
+        setStep("verify");
+    } finally {
+        setPending(false);
+    }
 };
 
   return (
@@ -175,13 +187,28 @@ const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
           </form>
         ) : (
           <form onSubmit={handleResetPassword} className="space-y-4">
-            <Input
-              name="newPassword"
-              placeholder="New Password"
-              type="password"
-              disabled={pending}
-              required
-            />
+            <div className="relative">
+              <Input
+                name="newPassword"
+                placeholder="New Password"
+                type={showPassword ? "text" : "password"}
+                disabled={pending}
+                required
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
             <div className="flex gap-x-2">
               <Button
                 type="submit"
