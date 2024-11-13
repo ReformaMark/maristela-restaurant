@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { useAuthActions } from "@convex-dev/auth/react"
 import { useConvexAuth } from "convex/react"
-import { Loader2, TriangleAlertIcon } from "lucide-react"
+import { Eye, EyeOff, Loader2, TriangleAlertIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { AuthFlow } from "../types"
@@ -29,6 +29,7 @@ export const SignInCard = ({
     const { isAuthenticated } = useConvexAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [pending, setPending] = useState<boolean>(false);
     const [error, setError] = useState("");
 
@@ -90,14 +91,29 @@ export const SignInCard = ({
                         type="email"
                         required
                     />
-                    <Input
-                        disabled={pending}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Password"
-                        type="password"
-                        required
-                    />
+                    <div className="relative">
+                        <Input
+                            disabled={pending}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Password"
+                            type={showPassword ? "text" : "password"}
+                            required
+                        />
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? (
+                                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                            ) : (
+                                <Eye className="h-4 w-4 text-muted-foreground" />
+                            )}
+                        </Button>
+                    </div>
                     <Button
                         type="submit"
                         className="w-full"

@@ -22,6 +22,7 @@ import { MdEmail } from 'react-icons/md';
 import { formatPrice } from '@/lib/utils';
 import SocialMedias from './SocialMedias';
 import { useAuthActions } from '@convex-dev/auth/react';
+import { toast } from 'sonner';
 
 function Header() {
   const pathname = usePathname();
@@ -30,6 +31,16 @@ function Header() {
   const cartItems = useQuery(api.cartItems.getCartItems)
   const favorites = useQuery(api.favorites.getAllfavorites)
   const { signOut } = useAuthActions()
+
+  const handleSignOut = async () => {
+    try {
+      await signOut()
+      toast.success("Signed out successfully")
+    } catch (error) {
+      toast.error("Failed to sign out")
+    }
+  }
+
   const subTotal = cartItems && cartItems.reduce((accumulator, item) => {
     return accumulator + ((item?.menu?.price||0) * (item?.quantity || 0)) ;
   }, 0);
@@ -151,7 +162,7 @@ function Header() {
               </SheetDescription>
             </SheetHeader>
             <SheetFooter className='mt-20'>
-              <div onClick={() => signOut()} className="flex gap-x-5">
+              <div onClick={handleSignOut} className="flex gap-x-5">
                 <LogOutIcon  className="size-4 mr-2 " />
                 Log out
               </div>
