@@ -1,5 +1,6 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { query } from "./_generated/server";
+import { v } from "convex/values";
 
 export const totalUsers = query({
     handler: async (ctx) => {
@@ -246,28 +247,41 @@ export const getSalesForecast = query({
 });
 
 export const getArimaSalesForecast = query({
-    handler: async (ctx) => {
+    args: {
+        startDate: v.optional(v.number()),  // Unix timestamp in ms
+        endDate: v.optional(v.number()),    // Unix timestamp in ms
+    },
+    handler: async (ctx, { startDate, endDate }) => {
         try {
             const userId = await getAuthUserId(ctx);
             if (!userId) {
-                console.log("Error: No authenticated user found");
                 return null;
             }
 
             const user = await ctx.db.get(userId);
             if (user?.role !== "admin") {
-                console.log("Error: User is not an admin");
                 return null;
             }
 
+            const now = Date.now();
+            const defaultStartDate = now - (30 * 24 * 60 * 60 * 1000); // eq to 30 days ago
+
+            const queryStartDate = startDate ?? defaultStartDate;
+            const queryEndDate = endDate ?? now;
+
             const orders = await ctx.db
                 .query("orders")
-                .filter((q) => q.eq(q.field("status"), "confirmed"))
+                .filter((q) =>
+                    q.and(
+                        q.eq(q.field("status"), "confirmed"),
+                        q.gte(q.field("orderDate"), queryStartDate),
+                        q.lte(q.field("orderDate"), queryEndDate)
+                    )
+                )
                 .order("asc")
                 .collect();
 
             if (orders.length === 0) {
-                console.log("Warning: No confirmed orders found");
                 return [];
             }
 

@@ -1,11 +1,12 @@
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 
-export const useArimaForecastData = () => {
-    const result = useQuery(api.dashboard.getArimaSalesForecast);
-    return {
-        data: result,
-        isLoading: result === undefined,
-        error: result === null
-    };
-};
+export function useArimaForecastData({ startDate, endDate }: {
+    startDate?: number,
+    endDate?: number
+}) {
+    return useQuery(api.dashboard.getArimaSalesForecast, {
+        startDate,
+        endDate
+    });
+}

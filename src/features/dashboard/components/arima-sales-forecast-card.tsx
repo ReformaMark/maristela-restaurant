@@ -4,17 +4,47 @@ import { formatPrice } from "@/lib/utils";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useArimaForecastData } from "../api/use-arima-forecast-data";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
 
 export const ArimaSalesForecastCard = () => {
-    const { data: forecastData, isLoading, error } = useArimaForecastData()
+    const [dateRange, setDateRange] = useState({
+        startDate: Date.now() - (30 * 24 * 60 * 60 * 1000), // 30 days ago
+        endDate: Date.now()
+    });
 
-    if (isLoading) {
+    const forecastData = useArimaForecastData({
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate
+    });
+
+    const handleDateRangeChange = ({ range }: { 
+        range: { from: Date; to: Date | undefined }; 
+        rangeCompare?: { from: Date; to: Date | undefined } 
+    }) => {
+        if (range.to) { // Only update if we have both dates
+            setDateRange({
+                startDate: range.from.getTime(),
+                endDate: range.to.getTime()
+            });
+        }
+    };
+
+    if (forecastData === undefined) {
         return <Skeleton className="h-[400px] w-full" />
     }
 
-    if (error) {
+    if (forecastData === null) {
         return (
             <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle>ARIMA Sales Forecast</CardTitle>
+                    <DateRangePicker
+                        initialDateFrom={new Date(dateRange.startDate)}
+                        initialDateTo={new Date(dateRange.endDate)}
+                        onUpdate={handleDateRangeChange}
+                    />
+                </CardHeader>
                 <CardContent>
                     Error loading forecast data. Please try again later.
                 </CardContent>
@@ -25,20 +55,33 @@ export const ArimaSalesForecastCard = () => {
     if (!forecastData || forecastData.length === 0) {
         return (
             <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle>ARIMA Sales Forecast</CardTitle>
+                    <DateRangePicker
+                        initialDateFrom={new Date(dateRange.startDate)}
+                        initialDateTo={new Date(dateRange.endDate)}
+                        onUpdate={handleDateRangeChange}
+                    />
+                </CardHeader>
                 <CardContent>
-                    No forecast data available for the last 30 days.
+                    No forecast data available.
                 </CardContent>
             </Card>
         )
     }
 
-    // Filter the data to show only the last 30 days of historical data plus the 7-day forecast
+    // Filter the data to show only the forecast period
     const filteredData = forecastData.slice(-37);
 
     return (
         <Card className="col-span-full">
-            <CardHeader>
-                <CardTitle>ARIMA Sales Forecast (Last 30 Days + 7 Days Prediction)</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>ARIMA Sales Forecast</CardTitle>
+                <DateRangePicker
+                    initialDateFrom={new Date(dateRange.startDate)}
+                    initialDateTo={new Date(dateRange.endDate)}
+                    onUpdate={handleDateRangeChange}
+                />
             </CardHeader>
             <CardContent>
                 <ResponsiveContainer width="100%" height={400}>
