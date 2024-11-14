@@ -63,8 +63,10 @@ export const ArimaSalesForecastCard = () => {
                         onUpdate={handleDateRangeChange}
                     />
                 </CardHeader>
-                <CardContent>
-                    No forecast data available.
+                <CardContent className="flex h-[400px] items-center justify-center">
+                    <p className="text-lg text-muted-foreground">
+                        No forecast data available at this time.
+                    </p>
                 </CardContent>
             </Card>
         )
