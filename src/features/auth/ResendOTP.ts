@@ -11,7 +11,7 @@ export const ResendOTP = Resend({
   async sendVerificationRequest({ identifier: email, provider, token }) {
     const resend = new ResendAPI(provider.apiKey);
     const { error } = await resend.emails.send({
-      from: "Maristela Restaurant <maristela@resend.dev>",
+      from: "Maristela Restaurant <noreply@maristelarestaurant.com>",
       to: [email],
       subject: "Sign in to Maristela Restaurant",
       html: `
