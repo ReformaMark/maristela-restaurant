@@ -107,7 +107,7 @@ const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     } catch (error) {
         console.error("Reset error:", error);
         if (error instanceof Error) {
-            setError(error.message);
+            setError("Invalid code. Please try again.");
         } else {
             setError("Failed to reset password. Please try again.");
         }

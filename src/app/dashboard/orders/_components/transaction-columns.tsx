@@ -40,7 +40,7 @@ export const transactionColumns: ColumnDef<TransactionWithDetails>[] = [
         header: "Customer",
         cell: ({ row }) => {
             return <div>
-                {row.original.user.name} {row.original.user.lastName}
+                {row.original.user?.name} {row.original.user?.lastName}
             </div>
         },
     },

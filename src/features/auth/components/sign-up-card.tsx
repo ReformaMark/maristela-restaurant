@@ -135,9 +135,9 @@ export const SignUpCard = ({
       }
 
     const handleFirstStep = () => {
-        // Make a ched firstname and lastname, it should not contain spaces, special characters and numbers.
-        const checkedFirstname = /^[a-zA-Z]+$/.test(name)
-        const checkedLastname = /^[a-zA-Z]+$/.test(lname)
+        // Allow letters and spaces in names, but require at least one letter
+        const checkedFirstname = /^[a-zA-Z][a-zA-Z\s]*$/.test(name.trim())
+        const checkedLastname = /^[a-zA-Z][a-zA-Z\s]*$/.test(lname.trim())
         const checkedEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
         if (step === 1 && checkedFirstname && checkedLastname && checkedEmail) {
