@@ -59,7 +59,7 @@ function Orders() {
                         <div className='col-span-2 text-[0.6rem] md:text-sm'>Cost</div>
                         <div className='col-span-2 text-[0.6rem] md:text-sm'>Status</div>
                         <div className='col-span-1 text-[0.6rem] md:text-sm'></div>
-                    </div>
+                    </div> 
                 </div>
                 <div className='space-y-5'>
                     {pendingTransactions ? 
