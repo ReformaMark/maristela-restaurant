@@ -48,6 +48,7 @@ function CheckoutPage() {
     const createTransaction = useMutation(api.transactions.createTransaction)
     const createShippingAddress = useMutation(api.shippingAddress.createShippinngAddress)
     const deleteCartitems = useMutation(api.cartItems.deleteCartItems)
+    const updateShippingAddress = useMutation(api.shippingAddress.updateShippingAddress)
     const router = useRouter()
 
     const form = useForm<ShippingFormValues>({
@@ -91,8 +92,12 @@ function CheckoutPage() {
                 lastName: data.lastName,
                 streetAddress: data.streetAddress,
                 apartmentNumber: data.apartmentNumber || "",
+                barangay: data.barangay,
+                municipality: data.municipality,
+                province: data.province,
                 address: data.address,
-                phoneNumber: data.phoneNumber
+                phoneNumber: data.phoneNumber,
+                isSaved: true
             })
 
             if (!id) {
@@ -106,6 +111,22 @@ function CheckoutPage() {
         } catch (error) {
             console.error("Failed to save shipping address:", error)
             toast.error("Failed to save shipping address. Please try again.")
+        }
+    }
+
+    const onRemoveAddress = async (addressId: Id<"shippingAddress">) => {
+        try {
+            await updateShippingAddress({
+                shippingId: addressId,
+                isSaved: false
+            })
+            toast.success("Address removed from saved addresses")
+            if (selectedAddressId === addressId) {
+                setSelectedAddressId(null)
+            }
+        } catch (error) {
+            console.error("Failed to remove address:", error)
+            toast.error("Failed to remove address. Please try again.")
         }
     }
 
@@ -181,7 +202,7 @@ function CheckoutPage() {
                         <h1 className='text-left text-lg font-medium text-primary tracking-wider'>
                             Shipping Address <span className='text-primary'>*</span>
                         </h1>
-                        {(!savedAddresses || savedAddresses.length < 2) && (
+                        {(!savedAddresses || savedAddresses.filter(addr => addr.isSaved).length < 2) && (
                             <Button 
                                 variant="outline" 
                                 onClick={() => setShowAddressForm(!showAddressForm)}
@@ -191,24 +212,46 @@ function CheckoutPage() {
                         )}
                     </div>
 
-                    {savedAddresses && savedAddresses.length > 0 && (
+                    {savedAddresses && savedAddresses.filter(addr => addr.isSaved).length > 0 && (
                         <RadioGroup 
                             className="gap-4 mb-5"
                             value={selectedAddressId as string} 
                             onValueChange={(value) => setSelectedAddressId(value as Id<"shippingAddress">)}
                         >
-                            {savedAddresses.map((address) => (
+                            {savedAddresses.filter(addr => addr.isSaved).map((address) => (
                                 <div key={address._id} className="flex items-center space-x-4">
                                     <RadioGroupItem value={address._id} id={address._id} />
                                     <Card className="flex-1 p-4 cursor-pointer hover:border-primary">
-                                        <div className="font-medium">
-                                            {address.firstname} {address.lastName}
-                                        </div>
-                                        <div className="text-sm text-gray-600">
-                                            {address.address}
-                                        </div>
-                                        <div className="text-sm text-gray-600">
-                                            {address.phoneNumber}
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <div className="font-medium">
+                                                    {address.firstname} {address.lastName}
+                                                </div>
+                                                <h1>{address.phoneNumber}</h1>
+                                                <>
+                                                    {address?.apartmmentNumer && (
+                                                        <span>{address.apartmmentNumer}</span>
+                                                    )}
+                                                    {address.streetAddress && (
+                                                        <span>{address?.streetAddress}</span>
+                                                    )}
+                                                </>
+                                                {address?.barangay && (
+                                                    <>
+                                                        <span>, {address?.barangay}, </span>
+                                                        <span>{address?.muncipality}, </span>
+                                                        <span>{address?.province}</span>
+                                                    </>
+                                                )}
+                                            </div>
+                                            <Button 
+                                                variant="ghost" 
+                                                size="sm"
+                                                className="text-red-500 hover:text-red-700"
+                                                onClick={() => onRemoveAddress(address._id)}
+                                            >
+                                                Remove
+                                            </Button>
                                         </div>
                                     </Card>
                                 </div>

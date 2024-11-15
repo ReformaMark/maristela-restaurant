@@ -87,11 +87,25 @@ function TransactionPage({
                     </div>
                     <DialogDescription>
                        <div className="flex justify-between p-5 bg-gray-100 rounded-lg">
-                        <div className="text-left text-xs md:text-lg">
+                        <div className="text-left text-xs md:text-sm">
                             <h1 className='font-semibold text-[0.5rem]'>Shipping information</h1>
                             <h1>{transaction?.shippingAddress?.firstname} {transaction?.shippingAddress?.lastName}</h1>
                             <h1>{transaction?.shippingAddress?.phoneNumber}</h1>
-                            <h1>{transaction?.shippingAddress?.address}</h1>
+                            <>
+                                {transaction?.shippingAddress?.apartmmentNumer && (
+                                    <span>{transaction?.shippingAddress?.apartmmentNumer}</span>
+                                )}
+                                {transaction?.shippingAddress?.streetAddress && (
+                                    <span>{transaction?.shippingAddress?.streetAddress}</span>
+                                )}
+                            </>
+                            {transaction?.shippingAddress?.barangay && (
+                                <>
+                                    <span>{transaction?.shippingAddress?.barangay},</span>
+                                    <span>{transaction?.shippingAddress?.muncipality},</span>
+                                    <span>{transaction?.shippingAddress?.province},</span>
+                                </>
+                            )}
                         </div>
                         <div className="text-right text-xs md:text-sm">
                             <h1 className='font-semibold'>Order Id: {transaction?._id}</h1>
