@@ -29,6 +29,7 @@ import { IoBagAddSharp } from 'react-icons/io5'
 import { GiHeartMinus } from 'react-icons/gi'
 import QuantitySelector from './QuantitySelector';
 import Link from 'next/link';
+import { Separator } from './ui/separator';
  
 export type RatingWithUser = Doc<'ratings'> & {
   user: Doc<'users'> | null;
@@ -217,33 +218,44 @@ function ProductCard({
               <h1>{formatPrice(price)}</h1>
               <p className='text-sm text-text'>{description}</p>
             </div>
-            <h1 className='px-5 text-sm mb-3 mt-10'>Other people&apos;s review(s) - {ratings.length}</h1>
-            <div className="grid grid-cols-2 px-5 gap-x-5 grid-rows-1 overflow-auto">
-          {sortedRatings.length >= 1 ? sortedRatings.slice(0, 5).map((rating)=>(
-            <div key={rating._id} className="border-b border-gray-100 py-2 px-5 bg-gray-100 shadow-md mb-1">
-              <div className="flex gap-x-3 items-center">
-                <div className="text-center">
-                  <Avatar className='o outline-1 outline-black'>
-                    <AvatarImage src="" />
-                    <AvatarFallback>{rating.user?.name.charAt(0).toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                  <h1 className='text-text text-xs'>{rating.user?.name}</h1>
-                </div>
-                <div className="">
-                  <ReactStars count={5} size={10} value={rating.stars} edit={false} half={true} />
-                  <p className='text-[0.6rem] md:text-xs text-text line-clamp-3'>{rating.feedbackMessage}</p>
-                </div>
-              </div>
-              <div className="ml-auto text-right mt-3">
-                <h1 className='text-text text-[0.4rem] md:text-xs'>{formatDate({convexDate:rating._creationTime})}</h1>
-              </div>
+            <div className="flex items-center justify-between">
+              <h1 className='px-5 text-sm'>Other people&apos;s ratings and review(s) - {ratings.length}</h1>
+              <Button 
+                onClick={() => router.push(`/menu/${menuId}/reviews`)} 
+                variant="link" 
+                className="text-sm text-yellow hover:text-primary"
+              >
+                See all
+              </Button>
+             
             </div>
-          )):(
-            <div className="my-5">
-              <h1 className='text-text text-xs text-center'>No reviews.</h1>
+            <Separator className='mb-3'/>
+            <div className="flex px-5 gap-x-5 flex-nowrap overflow-x-auto max-h-[300px py-3">
+              {sortedRatings.length >= 1 ? sortedRatings.slice(0, 5).map((rating)=>(
+                <div key={rating._id} className="border-b flex-shrink-0 max-w-[300px] border-gray-100 py-2 px-5 bg-gray-100 shadow-md mb-1">
+                  <div className="flex gap-x-3 items-center">
+                    <div className="text-center">
+                      <Avatar className='o outline-1 outline-black'>
+                        <AvatarImage src="" />
+                        <AvatarFallback>{rating.isAnonymous ? "AN" : rating.user?.name.charAt(0).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      <h1 className='text-text text-xs'>{rating.isAnonymous ? "Anonymous" : rating.user?.name}</h1>
+                    </div>
+                    <div className="">
+                      <ReactStars count={5} size={10} value={rating.stars} edit={false} half={true} />
+                      <p className='text-[0.6rem] md:text-xs text-text line-clamp-3'>{rating.feedbackMessage}</p>
+                    </div>
+                  </div>
+                  <div className="ml-auto text-right mt-3">
+                    <h1 className='text-text text-[0.4rem] md:text-xs'>{formatDate({convexDate:rating._creationTime})}</h1>
+                  </div>
+                </div>
+              )):(
+                <div className="my-5">
+                  <h1 className='text-text text-xs text-center'>No reviews.</h1>
+                </div>
+              )}
             </div>
-          )}
-          </div>
           </div>
           
           <div className='fixed flex justify-between px-5 md:px-20 items-center bottom-0 bg-white border-t-2  border-t-gray-400 py-5 w-full'>

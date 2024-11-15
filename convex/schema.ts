@@ -100,7 +100,8 @@ const schema = defineSchema({
         feedbackMessage: v.optional(v.string()),
         userId: v.id("users"),
         menuId: v.id('menus'),
-        transactionid: v.id('transactions')
+        transactionid: v.id('transactions'),
+        isAnonymous: v.optional(v.boolean()),
     }).index('by_menu', ['menuId']),
 
     cartItems: defineTable({

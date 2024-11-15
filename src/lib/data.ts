@@ -66,3 +66,21 @@ export const barangays = [
     { barangay: "Poblacion III", municipality: "Sta. Teresita", province: "Batangas" }
   ];
   
+
+  export const badWords = [
+    // English offensive words
+    "asshole", "bitch", "bastard", "shit", "fuck", "damn", "piss", "cunt", 
+    "slut", "whore", "dick", "cock", "motherfucker", "faggot", "bastards",
+    "ugly", "idiot", "stupid", "douchebag", "jackass", "prick", "bastards",
+    
+    // Filipino offensive words
+    "puta", "putang", "gago", "bobo", "engot", "tanga", "buwisit", "putangina", 
+    "uwak", "loko", "kalbo", "siraulo", "bagag", "bayot", "hamog", "kupal",
+    "yawa", "pangit", "saklap", "litson", "salbahe", "tarantado", 
+    "t@ng@", "tang@", "t@nga", "t@ng@a", "t4nga", "t@ng4", "t@ng", 
+    "ulol", "inutil", "pakyu", "lintik", "punyeta",
+    
+    // Derogatory phrases
+    "shut up", "shut your mouth", "suck my dick", "go to hell", "eat shit", 
+    "blow me", "kiss my ass", "suck it", "fuck you", "fucker", "bastard"
+];

@@ -128,13 +128,13 @@ function SortedProductCard({
                       <h1 className='text-lg'>{product.name}</h1>
                       <h1 className='text-lg font-bold'>{formatPrice(product.price)}</h1>
                       {latest && (
-                          <h1 className='text-xs text-gray-500'>{formatDate({convexDate: product._creationTime})}</h1>
+                        <h1 className='text-xs text-gray-500'>{formatDate({convexDate: product._creationTime})}</h1>
                       )}
                       {topRated && (
-                          <h1 className='text-xs text-gray-500 flex items-center'>Ratings : {getAverage({ratings:product.ratings})} <Star color='yellow' fill='yellow' size={14}/></h1>
+                        <h1 className='text-xs text-gray-500 flex items-center'>Ratings : {getAverage({ratings:product.ratings})} <Star color='yellow' fill='yellow' size={14}/></h1>
                       )}
                       {topReviews && (
-                          <h1 className='text-xs text-gray-500'>Reviews : {product.ratings.length}</h1>
+                        <h1 className='text-xs text-gray-500'>Reviews : {product.ratings.length}</h1>
                       )}
                   </div>
                 </div>

@@ -8,28 +8,24 @@ export const rateMenu = mutation({
         stars: v.number(),
         feedbackMessage: v.optional(v.string()),
         menuId: v.id('menus'),
-        transactionId: v.id('transactions')
+        transactionId: v.id('transactions'),
+        isAnonymous: v.boolean()
     },
     handler: async (ctx,args)=>{
         const userId = await getAuthUserId(ctx)
        
-        // const isRated = await ctx.db.query('ratings')
-        //     .filter((q)=> q.eq(q.field('menuId'), args.menuId && q.eq(q.field('transactionid'), args.transactionId)))
-        //     .collect();
-      
-            if(!userId){
-                return null
-            }
+        if(!userId){
+            return null
+        }
 
-            await ctx.db.insert('ratings', {
-                stars: args.stars, 
-                feedbackMessage: args.feedbackMessage, 
-                menuId: args.menuId,
-                userId: userId,
-                transactionid: args.transactionId
-            })
-
-       
+        await ctx.db.insert('ratings', { 
+            stars: args.stars, 
+            feedbackMessage: args.feedbackMessage, 
+            menuId: args.menuId,
+            userId: userId,
+            transactionid: args.transactionId,
+            isAnonymous: args.isAnonymous
+        })
     }
 })
 
@@ -50,3 +46,38 @@ export const getRating = query({
         return sortedRatings[0]
     }
 })
+
+export const getRatings = query({
+    args:{
+        menuId: v.id('menus'),
+    },
+    handler: async (ctx, args)=>{
+        const ratings = await ctx.db.query('ratings')
+            .filter((q)=> q.eq(q.field('menuId'), args.menuId))
+            .order('desc')
+            .collect();
+
+        const menu = await ctx.db.get(args.menuId);
+        const menuImageId = menu?.imageId
+        if(!menuImageId) return 
+
+        const imageUrl = menuImageId ? await ctx.storage.getUrl(menuImageId) : null;
+
+        const ratingsWithUser = await Promise.all(
+            ratings.map(async (rating) => {
+                const user = await ctx.db.get(rating.userId);
+                return {
+                    ...rating,
+                    user,
+                    menu: {
+                        ...menu,
+                        imageUrl
+                    }
+                };
+            })
+        );
+
+        return ratingsWithUser;
+    }
+})
+
