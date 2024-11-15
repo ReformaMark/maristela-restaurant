@@ -17,7 +17,14 @@ import { useEffect, useState } from "react"
 import { AuthFlow } from "../types"
 import { useAdminCheck } from "./use-admin-check"
 import { EmailVerification } from "./email-verification"
-
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { barangays } from "@/lib/data"
 
 interface SignUpCardProps {
     setState: (state: AuthFlow) => void
@@ -34,6 +41,8 @@ export const SignUpCard = ({
     const [name, setFName] = useState("");
     const [lname, setLName] = useState("");
     const [address, setAddress] = useState("");
+    const [municipality, setMunicipality] = useState("");
+    const [barangay, setBarangay] = useState("");
     const [role] = useState("user");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -75,6 +84,9 @@ export const SignUpCard = ({
                 name,
                 lastName: lname,
                 address,
+                municipality,
+                barangay,
+                province: "Batangas",
                 role,
                 flow: "signUp"
             };
@@ -101,6 +113,8 @@ export const SignUpCard = ({
             !name?.trim() || 
             !lname?.trim() || 
             !address?.trim() || 
+            !municipality?.trim() ||
+            !barangay?.trim() ||
             !role?.trim()
         ) {
             setError("All fields are required");
@@ -250,9 +264,51 @@ export const SignUpCard = ({
                             disabled={pending}
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
-                            placeholder="Address"
+                            placeholder="Street Address"
                             type="text"
                             required
+                        />
+                        
+                        <Select
+                            value={municipality}
+                            onValueChange={(value) => setMunicipality(value)}
+                            disabled={pending}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select Municipality" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {[...new Set(barangays.map(barangay => barangay.municipality))].map((municipality) => (
+                                    <SelectItem key={municipality} value={municipality}>
+                                        {municipality}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+
+                        <Select
+                            value={barangay}
+                            onValueChange={(value)=>setBarangay(value)}
+                            disabled={pending}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a barangay" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {barangays
+                                    .filter(b => b.municipality === municipality)
+                                    .map(barangay => (
+                                        <SelectItem key={barangay.barangay} value={barangay.barangay}>
+                                            {barangay.barangay}
+                                        </SelectItem>
+                                    ))}
+                            </SelectContent>
+                        </Select>
+                        <Input
+                            disabled
+                            value="Batangas"
+                            placeholder="Province"
+                            type="text"
                         />
                     </>
                 )
