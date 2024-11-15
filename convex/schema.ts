@@ -120,12 +120,13 @@ const schema = defineSchema({
         firstname: v.string(),
         lastName: v.string(),
         streetAddress: v.string(),
-        barangay: v.string(),
-        muncipality: v.string(),
-        province: v.string(),
+        barangay: v.optional(v.string()),
+        muncipality: v.optional(v.string()),
+        province: v.optional(v.string()),
         apartmmentNumer: v.optional(v.string()),
         address: v.string(),
         phoneNumber: v.string(),
+        isSaved: v.optional(v.boolean()),
 
     }).index('by_userId', ['userId'])
 })

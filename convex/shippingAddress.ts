@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 
 export const createShippinngAddress = mutation({
     args: {
@@ -7,7 +7,7 @@ export const createShippinngAddress = mutation({
         firstname: v.string(),
         lastName: v.string(),
         streetAddress: v.string(),
-        apartmmentNumer: v.string(),
+        apartmentNumber: v.string(),
         address:v.string(),
         phoneNumber: v.string(),
     },
@@ -17,7 +17,7 @@ export const createShippinngAddress = mutation({
             firstname: args.firstname,
             lastName: args.lastName,
             streetAddress: args.streetAddress,
-            apartmmentNumer: args.apartmmentNumer,
+            apartmmentNumer: args.apartmentNumber,
             address: args.address,
             phoneNumber: args.phoneNumber,
         })
@@ -26,3 +26,13 @@ export const createShippinngAddress = mutation({
 
     },
 });
+
+export const getShippingAddresses = query({
+    args: {
+        userId: v.id('users'),
+    },
+    handler: async (ctx, args) => {
+        const shippingAddresses = await ctx.db.query("shippingAddress").filter(q => q.eq(q.field("userId"), args.userId)).collect()
+        return shippingAddresses
+    }
+})

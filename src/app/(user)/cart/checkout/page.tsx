@@ -8,72 +8,116 @@ import { formatPrice } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { barangays } from '@/lib/data'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { Id } from '../../../../../convex/_generated/dataModel'
+import { Card } from '@/components/ui/card'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
-type ShippingAddress = {
-    firstname: string,
-    lastName: string,
-    streetAddress: string,
-    apartmmentNumer: string,
-    address: string,
-    phoneNumber: string,
-}
+const shippingFormSchema = z.object({
+    firstname: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"), 
+    streetAddress: z.string().min(1, "Street address is required"),
+    apartmentNumber: z.string().optional(),
+    barangay: z.string().min(1, "Barangay is required"),
+    municipality: z.string().min(1, "Municipality is required"),
+    province: z.string(),
+    address: z.string().min(1, "Complete address is required"),
+    phoneNumber: z.string().min(11, "Phone number must be 11 digits").max(11)
+})
 
-const initialShipppinginfo: ShippingAddress = {
-    firstname: "",
-    lastName: "",
-    streetAddress: "",
-    apartmmentNumer: "",
-    address: "",
-    phoneNumber: "",
-}
+type ShippingFormValues = z.infer<typeof shippingFormSchema>
 
 function CheckoutPage() {
     const user = useQuery(api.users.current)
     const [isLoading, setIsLoading] = useState<boolean>(false)
-    const [shippingInfo, setShippingInfo] = useState<ShippingAddress>(initialShipppinginfo)
+    const [showAddressForm, setShowAddressForm] = useState<boolean>(false)
+    const [selectedAddressId, setSelectedAddressId] = useState<Id<"shippingAddress"> | null>(null)
     const cartItems = useQuery(api.cartItems.getCartItems)
+    const savedAddresses = useQuery(api.shippingAddress.getShippingAddresses, user?._id ? { userId: user._id } : "skip")
     const createOrder = useMutation(api.orders.createOrders)
     const createTransaction = useMutation(api.transactions.createTransaction)
     const createShippingAddress = useMutation(api.shippingAddress.createShippinngAddress)
     const deleteCartitems = useMutation(api.cartItems.deleteCartItems)
-    // const user = useQuery(api.users.current)
     const router = useRouter()
+
+    const form = useForm<ShippingFormValues>({
+        resolver: zodResolver(shippingFormSchema),
+        defaultValues: {
+            firstname: "",
+            lastName: "",
+            streetAddress: "",
+            apartmentNumber: "",
+            barangay: "",
+            municipality: "",
+            province: "Batangas",
+            address: "",
+            phoneNumber: "",
+        }
+    })
 
     if (!user) {
         router.replace('/auth')
         return
     }
 
-    //calculate the total price of an item
     function calcTotal(quantity?: number, price?: number) {
         return quantity && price ? quantity * price : 0
     }
 
-    //calculate the total price of all the items in the cart
     const subTotal = cartItems && cartItems.reduce((accumulator, item) => {
         return accumulator + ((item?.menu?.price || 0) * (item?.quantity || 0));
     }, 0);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target
-
-        setShippingInfo((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }))
-    }
-
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setIsLoading(true)
-        // Ensure cart items are available
-        if (!cartItems || cartItems.length === 0) {
+    const onSaveAddress = async (data: ShippingFormValues) => {
+        if (savedAddresses && savedAddresses.length >= 2) {
+            toast.error("You can only save up to 2 addresses")
             return
         }
 
         try {
-            // Create orders for each item in the cart
+            const id = await createShippingAddress({
+                userId: user._id,
+                firstname: data.firstname,
+                lastName: data.lastName,
+                streetAddress: data.streetAddress,
+                apartmentNumber: data.apartmentNumber || "",
+                address: data.address,
+                phoneNumber: data.phoneNumber
+            })
+
+            if (!id) {
+                throw new Error("Failed to create shipping address.")
+            }
+
+            setSelectedAddressId(id)
+            setShowAddressForm(false)
+            form.reset()
+            toast.success("Shipping address saved successfully!")
+        } catch (error) {
+            console.error("Failed to save shipping address:", error)
+            toast.error("Failed to save shipping address. Please try again.")
+        }
+    }
+
+    const onPlaceOrder = async () => {
+        setIsLoading(true)
+        if (!cartItems || cartItems.length === 0 || !selectedAddressId) {
+            toast.error("Please select a shipping address first")
+            setIsLoading(false)
+            return
+        }
+
+        try {
             const orders = await Promise.all(
                 cartItems.map(async (item) => {
                     if (!item) {
@@ -95,41 +139,24 @@ function CheckoutPage() {
                 })
             )
 
-            // Filter out any null values from failed order creations
             const validOrders = orders.filter(order => order !== null)
 
             if (validOrders.length === 0) {
                 throw new Error("Failed to create orders.")
             }
 
-            // Create shipping info
-            const shippingId = await createShippingAddress({
-                userId: user._id,
-                firstname: shippingInfo.firstname,
-                lastName: shippingInfo.lastName,
-                streetAddress: shippingInfo.streetAddress,
-                apartmmentNumer: shippingInfo.apartmmentNumer,
-                address: shippingInfo.address,
-                phoneNumber: shippingInfo.phoneNumber
-            })
-
-            if (!shippingId) {
-                throw new Error("Failed to create shipping address.")
-            }
-
-            // Display success message
             toast.promise(createTransaction({
                 orders: validOrders,
                 status: 'Pending',
                 mop: 'COD',
-                shippingId: shippingId,
+                shippingId: selectedAddressId,
                 userId: user._id,
-
             }), {
                 loading: 'Placing your order...',
                 success: "Order placed successfully!",
                 error: 'Error occurred while placing the order.',
             })
+
             cartItems.forEach((item) => {
                 if (!item) {
                     throw new Error("Failed to delete your cart items.")
@@ -140,138 +167,206 @@ function CheckoutPage() {
             setIsLoading(false)
         } catch (error) {
             console.error("Order submission failed:", error)
-            // Handle the error, e.g., display an error notification
             toast.error("Failed to place the order. Please try again.")
+            setIsLoading(false)
         }
     }
 
+    return (
+        <div className='px-3 sm:px-10 md:px-15 lg:px-24 text-text mb-24'>
+            <h1 className='text-primary font-bold text-xl mb-5 text-center uppercase'>Checkout</h1> 
+            <div className="grid grid-cols-12 justify-between md:gap-x-10 space-y-10">
+                <div className="col-span-12 md:col-span-7">
+                    <div className="flex justify-between items-center mb-5">
+                        <h1 className='text-left text-lg font-medium text-primary tracking-wider'>
+                            Shipping Address <span className='text-primary'>*</span>
+                        </h1>
+                        {(!savedAddresses || savedAddresses.length < 2) && (
+                            <Button 
+                                variant="outline" 
+                                onClick={() => setShowAddressForm(!showAddressForm)}
+                            >
+                                {showAddressForm ? 'Cancel' : 'Add New Address'}
+                            </Button>
+                        )}
+                    </div>
 
-  return (
-    <div className='px-3 sm:px-10 md:px-15 lg:px-24  text-text mb-24'>
-        <h1 className='text-primary font-bold text-xl mb-5 text-center uppercase'>Checkout</h1> 
-        <div className="grid grid-cols-12 justify-between md:gap-x-10 space-y-10">
-            <div className="col-span-12 md:col-span-7">
-                <h1 className='text-left text-lg font-medium text-primary tracking-wider'>Shipping Address <span className='text-primary'>*</span></h1>
-                <form
-                    id="create-shipping-form"
-                    onSubmit={handleSubmit}
-                >
-                    <div className="grid grid-cols-2 gap-x-5">
-                        <div className="space-y-2">
-                            <Label htmlFor="productName" className="text-sm font-medium text-red-700">
-                                First Name <span className='text-primary'>*</span>
-                            </Label>
-                            <div className="relative">
-                                <Input
-                                    id="firstname"
-                                    name="firstname"
-                                    value={shippingInfo.firstname}
-                                    onChange={handleInputChange}
-                                    required
-                                    className="border-red-200 bg-red-50 pl-10 focus:ring-red-500"
-                                    placeholder="First Name"
-                                
-                                />
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="lastName" className="text-sm font-medium text-red-700">
-                                Last Name <span className='text-primary'>*</span>
-                            </Label>
-                            <div className="relative">
-                                <Input
-                                    id="lastName"
-                                    name="lastName"
-                                    value={shippingInfo.lastName}
-                                    onChange={handleInputChange}
-                                    required
-                                    className="border-red-200 bg-red-50 pl-10 focus:ring-red-500"
-                                    placeholder="Last Name"
-                                
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="streetAddress" className="text-sm font-medium text-red-700">
-                            Street <span className='text-primary'>*</span>
-                        </Label>
-                        <div className="relative">
-                            <Input
-                                id="streetAddress"
-                                name="streetAddress"
-                                value={shippingInfo.streetAddress}
-                                onChange={handleInputChange}
-                                required
-                                className="border-red-200 bg-red-50 pl-10 focus:ring-red-500"
-                                placeholder="Street"
-                            
-                            />
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="apartmmentNumer" className="text-sm font-medium text-red-700">
-                            Bldg/Apartment Number <span className='text-primary'>*</span>
-                        </Label>
-                        <div className="relative">
-                            <Input
-                                id="apartmmentNumer"
-                                name="apartmmentNumer"
-                                value={shippingInfo.apartmmentNumer}
-                                onChange={handleInputChange}
-                            
-                                className="border-red-200 bg-red-50 pl-10 focus:ring-red-500"
-                                placeholder="Bldg/Apartment Number"
-                            
-                            />
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="address" className="text-sm font-medium text-red-700">
-                            Commplete Address <span className='text-primary'>*</span>
-                        </Label>
-                        <div className="relative">
-                            <Input
-                                id="address"
-                                name="address"
-                                value={shippingInfo.address}
-                                onChange={handleInputChange}
-                                required
-                                className="border-red-200 bg-red-50 pl-10 focus:ring-red-500"
-                                placeholder="Complete Address"
-                            
-                            />
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="phoneNumber" className="text-sm font-medium text-red-700">
-                            Phone Number <span className='text-primary'>*</span>
-                        </Label>
-                        <div className="relative">
-                            <Input
-                                id="phoneNumber"
-                                name="phoneNumber"
-                                type='number'
-                                maxLength={11}
-                                minLength={11}
-                                value={shippingInfo.phoneNumber}
-                                onChange={handleInputChange}
-                                required
-                                className="border-red-200 bg-red-50 pl-10 focus:ring-red-500"
-                                placeholder="Phone Number"
-                            
-                            />
-                        </div>
-                    </div>
-                
-                </form>
-            </div>
-            <div className="col-span-12 md:col-span-5 border border-gray-200 p-3  rounded-lg md:p-5">
-                <h1 className='uppercase text-lg font-semibold mb-5 text-center'>Order Summary</h1>
-                {cartItems && cartItems.map((item)=>(
-                    <div key={item?._id} className="flex justify-between border-b-1 border-gray-800 ">
-                        <h1 className=''>{item?.quantity} x {item?.menu?.name}</h1>
+                    {savedAddresses && savedAddresses.length > 0 && (
+                        <RadioGroup 
+                            className="gap-4 mb-5"
+                            value={selectedAddressId as string} 
+                            onValueChange={(value) => setSelectedAddressId(value as Id<"shippingAddress">)}
+                        >
+                            {savedAddresses.map((address) => (
+                                <div key={address._id} className="flex items-center space-x-4">
+                                    <RadioGroupItem value={address._id} id={address._id} />
+                                    <Card className="flex-1 p-4 cursor-pointer hover:border-primary">
+                                        <div className="font-medium">
+                                            {address.firstname} {address.lastName}
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                            {address.address}
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                            {address.phoneNumber}
+                                        </div>
+                                    </Card>
+                                </div>
+                            ))}
+                        </RadioGroup>
+                    )}
 
+                    {showAddressForm && (
+                        <form
+                            id="create-shipping-form"
+                            onSubmit={form.handleSubmit(onSaveAddress)}
+                            className="space-y-5"
+                        >
+                            <div className="grid grid-cols-2 gap-x-5">
+                                <div className="space-y-2">
+                                    <Label htmlFor="firstname" className="text-sm font-medium text-red-700">
+                                        First Name <span className='text-primary'>*</span>
+                                    </Label>
+                                    <div className="relative">
+                                        <Input
+                                            {...form.register("firstname")}
+                                            className="border-red-200 bg-red-50 pl-10 focus:ring-red-500"
+                                            placeholder="First Name"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="lastName" className="text-sm font-medium text-red-700">
+                                        Last Name <span className='text-primary'>*</span>
+                                    </Label>
+                                    <div className="relative">
+                                        <Input
+                                            {...form.register("lastName")}
+                                            className="border-red-200 bg-red-50 pl-10 focus:ring-red-500"
+                                            placeholder="Last Name"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5">
+                                <div className="space-y-2">
+                                    <Label htmlFor="province" className="text-sm font-medium text-red-700">
+                                        Province <span className='text-primary'>*</span>
+                                    </Label>
+                                    <Input
+                                        {...form.register("province")}
+                                        value="Batangas"
+                                        disabled
+                                        className="border-red-200 bg-red-50 pl-10 focus:ring-red-500"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="municipality" className="text-sm font-medium text-red-700">
+                                        Municipality <span className='text-primary'>*</span>
+                                    </Label>
+                                    <Select
+                                        onValueChange={(value) => form.setValue('municipality', value)}
+                                    >
+                                        <SelectTrigger className="col-span-3 border-red-200 bg-red-50 focus:ring-red-500">
+                                            <SelectValue placeholder="Select a municipality" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {[...new Set(barangays.map(barangay => barangay.municipality))].map((municipality) => (
+                                                <SelectItem key={municipality} value={municipality}>
+                                                    {municipality}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="barangay" className="text-sm font-medium text-red-700">
+                                        Barangay <span className='text-primary'>*</span>
+                                    </Label>
+                                    <Select
+                                        disabled={!form.watch('municipality')}
+                                        onValueChange={(value) => form.setValue('barangay', value)}
+                                    >
+                                        <SelectTrigger className="col-span-3 border-red-200 bg-red-50 focus:ring-red-500">
+                                            <SelectValue placeholder="Select a barangay" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {barangays
+                                                .filter(b => b.municipality === form.watch('municipality'))
+                                                .map((barangay) => (
+                                                    <SelectItem key={barangay.barangay} value={barangay.barangay}>
+                                                        {barangay.barangay}
+                                                    </SelectItem>
+                                                ))
+                                            }
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="streetAddress" className="text-sm font-medium text-red-700">
+                                        Street <span className='text-primary'>*</span>
+                                    </Label>
+                                    <div className="relative">
+                                        <Input
+                                            {...form.register("streetAddress")}
+                                            className="border-red-200 bg-red-50 pl-10 focus:ring-red-500"
+                                            placeholder="Street"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="apartmentNumber" className="text-sm font-medium text-red-700">
+                                        Bldg/Apartment Number
+                                    </Label>
+                                    <div className="relative">
+                                        <Input
+                                            {...form.register("apartmentNumber")}
+                                            className="border-red-200 bg-red-50 pl-10 focus:ring-red-500"
+                                            placeholder="Bldg/Apartment Number"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="phoneNumber" className="text-sm font-medium text-red-700">
+                                        Phone Number <span className='text-primary'>*</span>
+                                    </Label>
+                                    <div className="relative">
+                                        <Input
+                                            {...form.register("phoneNumber")}
+                                            type="tel"
+                                            className="border-red-200 bg-red-50 pl-10 focus:ring-red-500"
+                                            placeholder="Phone Number"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="address" className="text-sm font-medium text-red-700">
+                                    Complete Address <span className='text-primary'>*</span>
+                                </Label>
+                                <div className="relative">
+                                    <Input
+                                        {...form.register("address")}
+                                        className="border-red-200 bg-red-50 pl-10 focus:ring-red-500"
+                                        placeholder="Complete Address"
+                                    />
+                                </div>
+                            </div>
+                            <Button
+                                type="submit"
+                                className="w-full mt-5 bg-primary text-white hover:bg-primary/90 transition-all duration-300"
+                                disabled={isLoading}
+                            >
+                                Save Shipping Details
+                            </Button>
+                        </form>
+                    )}
+                </div>
+                <div className="h-fit col-span-12 md:col-span-5 border border-gray-200 p-3 rounded-lg md:p-5">
+                    <h1 className='uppercase text-lg font-semibold mb-5 text-center'>Order Summary</h1>
+                    {cartItems && cartItems.map((item)=>(
+                        <div key={item?._id} className="flex justify-between border-b-1 border-gray-800 ">
+                            <h1 className=''>{item?.quantity} x {item?.menu?.name}</h1>
                             <h1>{formatPrice(calcTotal(item?.quantity, item?.menu?.price))}</h1>
                         </div>
                     ))}
@@ -288,18 +383,15 @@ function CheckoutPage() {
                         <h1>{formatPrice(subTotal ? subTotal + 80 : 0)}</h1>
                     </div>
                     <Button
-                        type="submit"
-                        form="create-shipping-form"
+                        onClick={onPlaceOrder}
                         className="bg-primary uppercase text-bold w-full mt-5 tracking-widest text-white transition-all duration-300 ease-in hover:bg-primary/90"
-                        disabled={isLoading}
+                        disabled={isLoading || !selectedAddressId}
                     >
                         Place Order
                     </Button>
-                    <h1 className='text-xs text-text font-thin '>* We are only accepting Cash On Delivery(COD) payment method.</h1>
+                    <h1 className='text-xs text-text font-thin'>* We are only accepting Cash On Delivery(COD) payment method.</h1>
                 </div>
             </div>
-
-
         </div>
     )
 }
