@@ -65,7 +65,7 @@ function TransactionPage({
             <h1 className=' text-text font-semibold'>Order Status</h1>
         </div>
         <div className="flex w-full justify-between mt-5">
-            <h1 className='text-[0.5rem] md:text-xs text-text'>Order Id: {transaction?._id}</h1>
+            <h1 className='text-[0.5rem] md:text-xs text-text'>Order Id: {transaction?.orderId}</h1>
             <Dialog>
                 <DialogTrigger className='text-[0.5rem] md:text-sm text-yellow font-semibold'>View Reciept</DialogTrigger>
                 <DialogContent className='max-w-3xl pt-10 max-h-screen overflow-auto text-xs md:text-lg'>
@@ -88,12 +88,12 @@ function TransactionPage({
                     <DialogDescription>
                        <div className="flex justify-between p-5 bg-gray-100 rounded-lg">
                         <div className="text-left text-xs md:text-sm">
-                            <h1 className='font-semibold text-[0.5rem]'>Shipping information</h1>
+                            <h1 className='font-semibold text-xs'>Shipping information</h1>
                             <h1>{transaction?.shippingAddress?.firstname} {transaction?.shippingAddress?.lastName}</h1>
                             <h1>{transaction?.shippingAddress?.phoneNumber}</h1>
                             <>
                                 {transaction?.shippingAddress?.apartmmentNumer && (
-                                    <span>{transaction?.shippingAddress?.apartmmentNumer}</span>
+                                    <span>{transaction?.shippingAddress?.apartmmentNumer} </span>
                                 )}
                                 {transaction?.shippingAddress?.streetAddress && (
                                     <span>{transaction?.shippingAddress?.streetAddress}</span>
@@ -101,14 +101,14 @@ function TransactionPage({
                             </>
                             {transaction?.shippingAddress?.barangay && (
                                 <>
-                                    <span>{transaction?.shippingAddress?.barangay},</span>
-                                    <span>{transaction?.shippingAddress?.muncipality},</span>
-                                    <span>{transaction?.shippingAddress?.province},</span>
+                                    <span> {transaction?.shippingAddress?.barangay}, </span>
+                                    <span>{transaction?.shippingAddress?.muncipality}, </span>
+                                    <span>{transaction?.shippingAddress?.province}</span>
                                 </>
                             )}
                         </div>
                         <div className="text-right text-xs md:text-sm">
-                            <h1 className='font-semibold'>Order Id: {transaction?._id}</h1>
+                            <h1 className='font-semibold'>{transaction?.orderId}</h1>
                             <h1>{formatDate({convexDate: transaction? transaction._creationTime : 0})}</h1>
                             <h1>{transaction?.mop}</h1>
                         </div>

@@ -1,7 +1,7 @@
 'use client'
 import { UserAvatar } from '@/app/dashboard/_components/user-avatar';
 import { useCurrentUser } from '@/features/auth/api/use-current-user';
-import {  Bell, Loader2Icon, LogOutIcon } from 'lucide-react';
+import {  Loader2Icon, LogOutIcon } from 'lucide-react';
 import Link from 'next/link'
 import { usePathname } from 'next/navigation';
 import {  FaHeart, FaShoppingBag, FaUser } from 'react-icons/fa'
@@ -23,7 +23,6 @@ import { formatPrice } from '@/lib/utils';
 import SocialMedias from './SocialMedias';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { toast } from 'sonner';
-import { useRef } from 'react';
 import Notification from './notification';
 
 function Header() {
