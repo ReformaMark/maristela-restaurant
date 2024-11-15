@@ -5,7 +5,6 @@ const nextConfig = {
             {
               protocol: 'https',
               hostname: 'precise-peccary-273.convex.cloud',
-            
             },
             {
               protocol: 'https',

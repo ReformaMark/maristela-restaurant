@@ -114,11 +114,15 @@ const schema = defineSchema({
         familyMealId: v.optional(v.id('familyMeals')),
         userId: v.id('users'),
     }).index('by_menuId', ['menuId']).index('by_familyMealId', ['familyMealId']).index('by_userId', ['userId']),
+
     shippingAddress: defineTable({
         userId: v.id('users'),
         firstname: v.string(),
         lastName: v.string(),
         streetAddress: v.string(),
+        barangay: v.string(),
+        muncipality: v.string(),
+        province: v.string(),
         apartmmentNumer: v.optional(v.string()),
         address: v.string(),
         phoneNumber: v.string(),
