@@ -22,6 +22,7 @@ import type * as dashboard from "../dashboard.js";
 import type * as favorites from "../favorites.js";
 import type * as http from "../http.js";
 import type * as menus from "../menus.js";
+import type * as notifications from "../notifications.js";
 import type * as orders from "../orders.js";
 import type * as ratings from "../ratings.js";
 import type * as ResendOTPPasswordReset from "../ResendOTPPasswordReset.js";
@@ -46,6 +47,7 @@ declare const fullApi: ApiFromModules<{
   favorites: typeof favorites;
   http: typeof http;
   menus: typeof menus;
+  notifications: typeof notifications;
   orders: typeof orders;
   ratings: typeof ratings;
   ResendOTPPasswordReset: typeof ResendOTPPasswordReset;

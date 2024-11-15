@@ -1,7 +1,7 @@
 'use client'
 import { UserAvatar } from '@/app/dashboard/_components/user-avatar';
 import { useCurrentUser } from '@/features/auth/api/use-current-user';
-import {  Loader2Icon, LogOutIcon } from 'lucide-react';
+import {  Bell, Loader2Icon, LogOutIcon } from 'lucide-react';
 import Link from 'next/link'
 import { usePathname } from 'next/navigation';
 import {  FaHeart, FaShoppingBag, FaUser } from 'react-icons/fa'
@@ -23,6 +23,8 @@ import { formatPrice } from '@/lib/utils';
 import SocialMedias from './SocialMedias';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { toast } from 'sonner';
+import { useRef } from 'react';
+import Notification from './notification';
 
 function Header() {
   const pathname = usePathname();
@@ -30,7 +32,10 @@ function Header() {
   const isLoggedIn = data?._id ? true : false
   const cartItems = useQuery(api.cartItems.getCartItems)
   const favorites = useQuery(api.favorites.getAllfavorites)
+  
   const { signOut } = useAuthActions()
+ ;
+
 
   const handleSignOut = async () => {
     try {
@@ -45,8 +50,10 @@ function Header() {
   const subTotal = cartItems && cartItems.reduce((accumulator, item) => {
     return accumulator + ((item?.menu?.price||0) * (item?.quantity || 0)) ;
   }, 0);
+
   return (
     <div className="">
+     
       <div className="md:flex hidden  bg-[#f5f5f5] sm:px-10 md:px-15 lg:px-24 py-4 text-sm">
         <div className="flex gap-x-3 items-center border-r pr-6 border-r-gray-300">
           <MdEmail />
@@ -82,7 +89,8 @@ function Header() {
                 <div className="text-center  space-y-5">
                 {isLoggedIn ? (
                   <div className="flex gap-x-6 text-xs lg:text-3xl">
-                      <Link href={'/cart'} className='text-black relative'>
+                    <Notification/>
+                    <Link href={'/cart'} className='text-black relative'>
                       <FaHeart className='size-7 text-black'/>
                       {favorites && favorites.length > 0 && (
                         <motion.div
@@ -194,7 +202,7 @@ function Header() {
       </div>
       {isLoggedIn ? (
         <div className="flex gap-x-6 text-xs lg:text-3xl">
-          
+          <Notification/>
           <Link href={'/favorites'} className='text-black relative'>
             <FaHeart className='size-5 text-black'/>
             {favorites && favorites.length > 0 && (

@@ -91,6 +91,7 @@ const schema = defineSchema({
             v.literal('Completed'),
             v.literal('Cancelled'),
         ),
+        orderId: v.optional(v.string()),
         userId: v.id('users'),
         shippingId: v.id('shippingAddress'),
     }).index('by_shippingId', ['shippingId']).index('by_userId', ['userId']),
@@ -129,7 +130,14 @@ const schema = defineSchema({
         phoneNumber: v.string(),
         isSaved: v.optional(v.boolean()),
 
-    }).index('by_userId', ['userId'])
+    }).index('by_userId', ['userId']),
+
+    notifications: defineTable({
+        userId: v.id('users'),
+        message: v.string(),
+        isRead: v.boolean(),
+        orderId: v.id('transactions'),
+    }).index('by_userId', ['userId']),
 })
 
 export default schema;

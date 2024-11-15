@@ -141,16 +141,45 @@ export const createTransaction = mutation({
     shippingId: v.id('shippingAddress')
   },
   handler: async (ctx, args) => {
+    // Generate a unique order ID
+    const generateOrderId = () => {
+      const chars = '123456789';
+      const chars2 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const chars3 = 'abcdefghijklmnopqrstuvwxyz';
+      let result = '';
+      for (let i = 0; i < 6; i++) {
+        const charSet = i % 3 === 0 ? chars : i % 3 === 1 ? chars2 : chars3;
+        result += charSet.charAt(Math.floor(Math.random() * charSet.length));
+      }
+      return `Order#:${result}`;
+    };
+
+    // Check if orderId already exists
+    let orderId = generateOrderId();
+    let isUnique = false;
+    
+    while (!isUnique) {
+      orderId = generateOrderId();
+      const existing = await ctx.db
+        .query("transactions")
+        .filter(q => q.eq(q.field("orderId"), orderId))
+        .first();
+      
+      if (!existing) {
+        isUnique = true;
+      }
+    }
+
     const transactionId = await ctx.db.insert("transactions", {
       orders: args.orders,
       mop: args.mop,
       status: args.status,
       userId: args.userId,
-      shippingId: args.shippingId
-    })
+      shippingId: args.shippingId,
+      orderId: orderId
+    });
 
-    return transactionId
-
+    return transactionId;
   },
 });
 
@@ -427,6 +456,14 @@ export const handleTransactionStatus = mutation({
     const updatedTransactionId = await ctx.db.patch(args.transactionId, {
       status: args.status,
     });
+
+    await ctx.db.insert('notifications', {
+      userId: currentTransaction.userId,
+      message: `Your order with an id of ${currentTransaction.orderId} has been ${args.status}`,
+      isRead: false,
+      orderId: args.transactionId,
+   
+    })
 
     if (args.status === "Completed") {
       for (const orderId of currentTransaction.orders) {
