@@ -262,11 +262,11 @@ function ProductCard({
             <QuantitySelector quantity={quantity} handleQuantity={handleQuantity}/>
             { user ?  (
                 <Button disabled={isDisabled} onClick={handleAddToCart} variant={'outline'} className=' w-2/3  hover:text-primary text-white bg-primary hover:scale-105 font-semibold flex items-center gap-x-3'> 
-                Add to cart
+                Add to basket
               </Button>
             ) : (
               <Button onClick={()=> router.push('/auth')} variant={'outline'} className=' border-2 border-yellow hover:border-primary text-yellow hover:text-primary font-semibold flex items-center gap-x-3'> 
-                Add to cart
+                Add to basket
               </Button>
             )}
           </div>
