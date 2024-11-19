@@ -24,6 +24,7 @@ import SocialMedias from './SocialMedias';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { toast } from 'sonner';
 import Notification from './notification';
+import { AccountSettingsModal } from '@/features/user/components/account-settings';
 
 function Header() {
   const pathname = usePathname();
@@ -152,7 +153,10 @@ function Header() {
                     <Link href={'/orders'} className={`${pathname === "/about" ? "text-yellow" : "text-black"} hover:text-yellow tracking-wider text-lg uppercase font-cairo  md:text-lg lg:text-[1rem] transition-colors duration-300 ease-linear`}>
                       Orders
                     </Link>
-                    
+                    <div className="hover:text-yellow tracking-wider text-lg uppercase font-cairo  md:text-lg lg:text-[1rem] transition-colors duration-300 ease-linear">
+
+                      <AccountSettingsModal/>
+                    </div>
                   </div>
 
                   <SocialMedias cn='ml-0 items-start' size='size-7'/>

@@ -12,6 +12,9 @@ const ParamsSchema = z.object({
     lastName: z.string().min(1),
     role: z.enum(["user", "admin"]),
     address: z.string().min(1),
+    barangay: z.string().min(1),
+    municipality: z.string().min(1),
+    province: z.string().min(1),
 });
 
 export default Password<DataModel>({
@@ -79,7 +82,10 @@ export default Password<DataModel>({
                     name: "User",
                     lastName: "Reset",
                     role: "user",
-                    address: "Reset Address"
+                    address: "Reset Address",
+                    barangay: "Reset Barangay",
+                    municipality: "Reset Municipality",
+                    province: "Reset Province",
                 };
 
             case "signUp":
@@ -91,6 +97,9 @@ export default Password<DataModel>({
                     lastName: params.lastName,
                     role: params.role,
                     address: params.address,
+                    barangay: params.barangay,
+                    municipality: params.municipality,
+                    province: params.province,  
                 });
 
                 if (!result.success) {
@@ -106,6 +115,9 @@ export default Password<DataModel>({
                     lastName: result.data.lastName,
                     role: result.data.role,
                     address: result.data.address,
+                    barangay: result.data.barangay,
+                    municipality: result.data.municipality,
+                    province: result.data.province,
                     isVerified: false,
                 };
 

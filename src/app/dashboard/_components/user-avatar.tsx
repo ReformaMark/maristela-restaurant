@@ -7,17 +7,19 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Loader2Icon, LogOutIcon } from "lucide-react"
+import { Loader2Icon, LogOutIcon, Settings } from "lucide-react"
 
 import { useCurrentUser } from "@/features/auth/api/use-current-user"
 import { useAuthActions } from "@convex-dev/auth/react"
 import { TbChecklist } from "react-icons/tb"
 import Link from "next/link"
 import { toast } from "sonner"
+import { AccountSettingsModal } from "@/features/user/components/account-settings"
 
 export const UserAvatar = () => {
     const { signOut } = useAuthActions()
     const { data, isLoading, } = useCurrentUser()
+    
 
     if (isLoading) {
         return <Loader2Icon className="size-4 animate-spin text-muted-foreground" />
@@ -59,6 +61,10 @@ export const UserAvatar = () => {
                         Orders
                     </DropdownMenuItem>
                 </Link>
+                <div className="flex items-center cursor-default select-none rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
+                    <Settings className="size-4 mr-2" />
+                    <AccountSettingsModal/>
+                </div>
                 <DropdownMenuItem onClick={handleSignOut} className="h-10 cursor-pointer">
                     <LogOutIcon className="size-4 mr-2 " />
                     Log out
