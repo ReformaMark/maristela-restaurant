@@ -16,11 +16,7 @@ export default function LandingPage() {
       <BestSeller/>
       <Services/>
       <Testimony/>
-      {/* <Button
-        onClick={signOut}
-      >
-        logout
-      </Button> */}
+      {/* <ContactUs/> */}
     </div>
   );
 }
