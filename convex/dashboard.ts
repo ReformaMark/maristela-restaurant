@@ -248,29 +248,26 @@ export const getSalesForecast = query({
 
 export const getArimaSalesForecast = query({
     args: {
-        startDate: v.optional(v.number()),  // Unix timestamp in ms
-        endDate: v.optional(v.number()),    // Unix timestamp in ms
+        startDate: v.optional(v.number()),
+        endDate: v.optional(v.number()),
     },
     handler: async (ctx, { startDate, endDate }) => {
         try {
             const userId = await getAuthUserId(ctx);
-            if (!userId) {
-                return null;
-            }
+            if (!userId) return null;
 
             const user = await ctx.db.get(userId);
-            if (user?.role !== "admin") {
-                return null;
-            }
+            if (user?.role !== "admin") return null;
 
             const now = Date.now();
-            const defaultStartDate = now - (30 * 24 * 60 * 60 * 1000); // eq to 30 days ago
-
+            const defaultStartDate = now - (30 * 24 * 60 * 60 * 1000);
             const queryStartDate = startDate ?? defaultStartDate;
             const queryEndDate = endDate ?? now;
 
+            // Get historical data
             const orders = await ctx.db
                 .query("orders")
+                .withIndex("by_orderDate")
                 .filter((q) =>
                     q.and(
                         q.eq(q.field("status"), "confirmed"),
@@ -278,76 +275,68 @@ export const getArimaSalesForecast = query({
                         q.lte(q.field("orderDate"), queryEndDate)
                     )
                 )
-                .order("asc")
                 .collect();
 
-            if (orders.length === 0) {
-                return [];
+            // Process daily sales data
+            const dailySales = new Map<string, number>();
+            let currentDate = new Date(queryStartDate);
+            const endDateTime = new Date(queryEndDate);
+
+            while (currentDate <= endDateTime) {
+                const dateStr = currentDate.toISOString().split('T')[0];
+                dailySales.set(dateStr, 0);
+                currentDate.setDate(currentDate.getDate() + 1);
             }
 
-            const salesByDate = new Map<string, number>();
-            for (const order of orders) {
-                const date = new Date(order.orderDate!).toISOString().split('T')[0];
-                salesByDate.set(date, (salesByDate.get(date) || 0) + order.totalPrice);
-            }
+            // Fill in actual sales
+            orders.forEach(order => {
+                const dateStr = new Date(order.orderDate!).toISOString().split('T')[0];
+                const currentTotal = dailySales.get(dateStr) || 0;
+                dailySales.set(dateStr, currentTotal + order.totalPrice);
+            });
 
-            let salesData = Array.from(salesByDate.entries())
-                .map(([date, sales]) => ({ date, sales }))
+            // Convert to array and sort
+            const salesData = Array.from(dailySales.entries())
+                .map(([date, sales]) => ({
+                    date,
+                    sales
+                }))
                 .sort((a, b) => a.date.localeCompare(b.date));
 
-            // Fill in missing dates with 0 sales
-            const filledSalesData = fillMissingDates(salesData);
+            // Calculate recent average (last 30 days)
+            const recentSales = salesData.slice(-30);
+            const recentAvg = recentSales.reduce((sum, day) => sum + day.sales, 0) / recentSales.length;
 
-            // Extract sales values for ARIMA model
-            const salesValues = filledSalesData.map(d => d.sales);
+            const result = [];
 
-            // ARIMA model parameters
-            const p = 1; // AR order
-            const d = 1; // Differencing order
-            const q = 1; // MA order
-
-            // Perform differencing
-            const diffedSales = difference(salesValues, d);
-
-            // Estimate AR and MA coefficients
-            const arCoeff = estimateARCoefficients(diffedSales, p);
-            const maCoeff = estimateMACoefficients(diffedSales, q);
-
-            // Generate forecasts
-            const forecastSteps = 7;
-            const forecast = generateForecast(diffedSales, arCoeff, maCoeff, forecastSteps);
-
-            // Reverse differencing to get final forecast
-            const finalForecast = inverseDifference(forecast, salesValues.slice(-d), d);
-
-            const forecasts = filledSalesData.map(({ date, sales }) => ({
-                date,
-                sales,
-                forecast: sales
-            }));
-
-            const lastDate = new Date(filledSalesData[filledSalesData.length - 1].date);
-            const lastKnownSales = salesValues[salesValues.length - 1];
-
-            for (let i = 0; i < forecastSteps; i++) {
-                const nextDate = new Date(lastDate);
-                nextDate.setDate(lastDate.getDate() + i + 1);
-                let baseForecast = Math.max(0, Math.round(finalForecast[i]));
-
-                // Incorporate last known sales into the forecast
-                const weightLastKnown = Math.max(0, 1 - i / forecastSteps); // Weight decreases as we forecast further
-                baseForecast = Math.round(baseForecast * (1 - weightLastKnown) + lastKnownSales * weightLastKnown);
-
-                // Add some random variation (±10%)
-                const randomFactor = 0.9 + Math.random() * 0.2;
-                forecasts.push({
-                    date: nextDate.toISOString().split('T')[0],
-                    sales: 0,
-                    forecast: Math.round(baseForecast * randomFactor)
+            // Include historical data
+            for (const data of salesData) {
+                result.push({
+                    date: data.date,
+                    sales: data.sales,
+                    forecast: data.sales
                 });
             }
 
-            return forecasts;
+            // Generate forecasts for next 7 days
+            const lastDate = new Date(salesData[salesData.length - 1].date);
+
+            for (let i = 1; i <= 7; i++) {
+                const nextDate = new Date(lastDate);
+                nextDate.setDate(lastDate.getDate() + i);
+
+                // Use the exact same variation logic as in arimaValidation.ts
+                const variation = 0.9 + Math.random() * 0.2; // ±10% variation
+                const forecast = Math.round(recentAvg * variation);
+
+                result.push({
+                    date: nextDate.toISOString().split('T')[0],
+                    sales: 0,
+                    forecast
+                });
+            }
+
+            return result;
         } catch (error) {
             console.error("Error in getArimaSalesForecast:", error);
             return null;
@@ -445,4 +434,19 @@ function generateForecast(data: number[], arCoeff: number[], maCoeff: number[], 
     return forecast;
 }
 
+function calculateMovingAverage(data: number[], windowSize: number): number[] {
+    const result = [];
+    for (let i = 0; i < data.length; i++) {
+        const window = data.slice(Math.max(0, i - windowSize + 1), i + 1);
+        const avg = window.reduce((sum, val) => sum + val, 0) / window.length;
+        result.push(avg);
+    }
+    return result;
+}
 
+function calculateStandardDeviation(data: number[]): number {
+    const mean = data.reduce((sum, val) => sum + val, 0) / data.length;
+    const squaredDiffs = data.map(val => Math.pow(val - mean, 2));
+    const variance = squaredDiffs.reduce((sum, val) => sum + val, 0) / data.length;
+    return Math.sqrt(variance);
+}
