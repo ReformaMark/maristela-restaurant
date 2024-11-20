@@ -15,6 +15,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as arimaValidation from "../arimaValidation.js";
 import type * as auth from "../auth.js";
 import type * as cartItems from "../cartItems.js";
 import type * as CustomPassword from "../CustomPassword.js";
@@ -40,6 +41,7 @@ import type * as users from "../users.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  arimaValidation: typeof arimaValidation;
   auth: typeof auth;
   cartItems: typeof cartItems;
   CustomPassword: typeof CustomPassword;
