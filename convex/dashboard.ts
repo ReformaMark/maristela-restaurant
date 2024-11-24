@@ -359,7 +359,6 @@ export const getArimaSalesForecast = query({
         }
     }
 });
-
 // Helper functions
 
 function fillMissingDates(salesData: { date: string; sales: number }[]) {
@@ -450,4 +449,19 @@ function generateForecast(data: number[], arCoeff: number[], maCoeff: number[], 
     return forecast;
 }
 
+function calculateMovingAverage(data: number[], windowSize: number): number[] {
+    const result = [];
+    for (let i = 0; i < data.length; i++) {
+        const window = data.slice(Math.max(0, i - windowSize + 1), i + 1);
+        const avg = window.reduce((sum, val) => sum + val, 0) / window.length;
+        result.push(avg);
+    }
+    return result;
+}
 
+function calculateStandardDeviation(data: number[]): number {
+    const mean = data.reduce((sum, val) => sum + val, 0) / data.length;
+    const squaredDiffs = data.map(val => Math.pow(val - mean, 2));
+    const variance = squaredDiffs.reduce((sum, val) => sum + val, 0) / data.length;
+    return Math.sqrt(variance);
+}
