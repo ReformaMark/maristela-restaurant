@@ -1,6 +1,11 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { query } from "./_generated/server";
 import { v } from "convex/values";
+import {
+    generateForecastData,
+    calculateMetrics,
+    MetricResults
+} from "./arimaValidation";
 
 export const totalUsers = query({
     handler: async (ctx) => {
@@ -245,8 +250,8 @@ export const getSalesForecast = query({
 
 export const getArimaSalesForecast = query({
     args: {
-        startDate: v.optional(v.number()),  // Unix timestamp in ms
-        endDate: v.optional(v.number()),    // Unix timestamp in ms
+        startDate: v.optional(v.number()),
+        endDate: v.optional(v.number()),
     },
     handler: async (ctx, { startDate, endDate }) => {
         try {
@@ -256,17 +261,13 @@ export const getArimaSalesForecast = query({
             const user = await ctx.db.get(userId);
             if (user?.role !== "admin") return null;
 
-            // Get all orders if no date range is provided (for "all" view)
+            // Get orders with date filtering
             const orders = await ctx.db
                 .query("orders")
                 .withIndex("by_orderDate")
                 .filter((q) => {
                     const baseFilter = q.eq(q.field("status"), "confirmed");
-                    
-                    // If no dates provided, return all confirmed orders
                     if (!startDate || !endDate) return baseFilter;
-                    
-                    // Otherwise, filter by date range
                     return q.and(
                         baseFilter,
                         q.gte(q.field("orderDate"), startDate),
@@ -278,7 +279,7 @@ export const getArimaSalesForecast = query({
 
             if (orders.length === 0) return [];
 
-            // Group sales by date
+            // Process orders to daily data
             const salesByDate = new Map<string, number>();
             for (const order of orders) {
                 const date = new Date(order.orderDate!).toISOString().split('T')[0];
@@ -286,72 +287,38 @@ export const getArimaSalesForecast = query({
             }
 
             // Convert to array and sort by date
-            let salesData = Array.from(salesByDate.entries())
+            const salesData = Array.from(salesByDate.entries())
                 .map(([date, sales]) => ({ date, sales }))
                 .sort((a, b) => a.date.localeCompare(b.date));
 
-            // Fill in missing dates with 0 sales
+            // Fill missing dates
             const filledSalesData = fillMissingDates(salesData);
-
-            // Extract sales values for ARIMA model
-            const salesValues = filledSalesData.map(d => d.sales);
-
-            // ARIMA model parameters
-            const p = 1; // AR order
-            const d = 1; // Differencing order
-            const q = 1; // MA order
-
-            // Perform differencing
-            const diffedSales = difference(salesValues, d);
-
-            // Estimate AR and MA coefficients
-            const arCoeff = estimateARCoefficients(diffedSales, p);
-            const maCoeff = estimateMACoefficients(diffedSales, q);
-
-            // Generate forecasts
-            const forecastSteps = 7; // 7 days forecast
-            const forecast = generateForecast(diffedSales, arCoeff, maCoeff, forecastSteps);
-
-            // Reverse differencing to get final forecast
-            const finalForecast = inverseDifference(forecast, salesValues.slice(-d), d);
-
-            // Combine historical data with forecasts
-            const forecasts = filledSalesData.map(({ date, sales }) => ({
-                date,
-                sales,
-                forecast: sales // Use actual sales for historical data
+            const actualData = filledSalesData.map(d => ({
+                date: d.date,
+                sales: d.sales,
+                forecast: d.sales
             }));
 
-            // Add future forecasts
-            const lastDate = new Date(filledSalesData[filledSalesData.length - 1].date);
-            const lastKnownSales = salesValues[salesValues.length - 1];
+            // Generate forecasts using the improved ARIMA implementation
+            const startDateObj = new Date(filledSalesData[filledSalesData.length - 1].date);
+            const endDateObj = new Date(startDateObj);
+            endDateObj.setDate(startDateObj.getDate() + 7); // 7 days forecast
 
-            // Generate future forecasts
-            for (let i = 0; i < forecastSteps; i++) {
-                const nextDate = new Date(lastDate);
-                nextDate.setDate(lastDate.getDate() + i + 1);
-                
-                // Calculate base forecast
-                let baseForecast = Math.max(0, Math.round(finalForecast[i]));
+            const forecastData = generateForecastData(
+                actualData,
+                startDateObj.getTime(),
+                endDateObj.getTime()
+            );
 
-                // Weight the forecast with last known sales
-                const weightLastKnown = Math.max(0, 1 - i / forecastSteps);
-                baseForecast = Math.round(
-                    baseForecast * (1 - weightLastKnown) + 
-                    lastKnownSales * weightLastKnown
-                );
+            // Combine historical and forecast data
+            const result = [
+                ...actualData,
+                ...forecastData.filter(d =>
+                    new Date(d.date) > new Date(actualData[actualData.length - 1].date)
+                )
+            ];
 
-                // Add some random variation (±10%)
-                const randomFactor = 0.9 + Math.random() * 0.2;
-                
-                forecasts.push({
-                    date: nextDate.toISOString().split('T')[0],
-                    sales: 0, // No actual sales for future dates
-                    forecast: Math.round(baseForecast * randomFactor)
-                });
-            }
-
-            return forecasts;
+            return result;
 
         } catch (error) {
             console.error("Error in getArimaSalesForecast:", error);
@@ -379,89 +346,89 @@ function fillMissingDates(salesData: { date: string; sales: number }[]) {
     return filledData;
 }
 
-function difference(data: number[], order: number): number[] {
-    for (let i = 0; i < order; i++) {
-        data = data.slice(1).map((v, i) => v - data[i]);
-    }
+// function difference(data: number[], order: number): number[] {
+//     for (let i = 0; i < order; i++) {
+//         data = data.slice(1).map((v, i) => v - data[i]);
+//     }
 
-    return data;
-}
+//     return data;
+// }
 
-function inverseDifference(forecast: number[], lastValues: number[], order: number): number[] {
-    for (let i = order - 1; i >= 0; i--) {
-        forecast = forecast.map((v, j) => v + (lastValues[i] || forecast[j - 1] || 0));
-    }
-    return forecast;
-}
+// function inverseDifference(forecast: number[], lastValues: number[], order: number): number[] {
+//     for (let i = order - 1; i >= 0; i--) {
+//         forecast = forecast.map((v, j) => v + (lastValues[i] || forecast[j - 1] || 0));
+//     }
+//     return forecast;
+// }
 
-function estimateARCoefficients(data: number[], order: number): number[] {
-    // Simple estimation using correlation
-    const coeff = [];
-    for (let i = 1; i <= order; i++) {
-        const correlation = calculateCorrelation(data.slice(0, -i), data.slice(i));
-        coeff.push(correlation);
-    }
-    return coeff;
-}
+// function estimateARCoefficients(data: number[], order: number): number[] {
+//     // Simple estimation using correlation
+//     const coeff = [];
+//     for (let i = 1; i <= order; i++) {
+//         const correlation = calculateCorrelation(data.slice(0, -i), data.slice(i));
+//         coeff.push(correlation);
+//     }
+//     return coeff;
+// }
 
-function estimateMACoefficients(data: number[], order: number): number[] {
-    // Simple estimation using autocorrelation of residuals
-    const residuals = calculateResiduals(data);
-    const coeff = [];
-    for (let i = 1; i <= order; i++) {
-        const correlation = calculateCorrelation(residuals.slice(0, -i), residuals.slice(i));
-        coeff.push(correlation);
-    }
-    return coeff;
-}
+// function estimateMACoefficients(data: number[], order: number): number[] {
+//     // Simple estimation using autocorrelation of residuals
+//     const residuals = calculateResiduals(data);
+//     const coeff = [];
+//     for (let i = 1; i <= order; i++) {
+//         const correlation = calculateCorrelation(residuals.slice(0, -i), residuals.slice(i));
+//         coeff.push(correlation);
+//     }
+//     return coeff;
+// }
 
-function calculateCorrelation(x: number[], y: number[]): number {
-    const n = Math.min(x.length, y.length);
-    let sum_x = 0, sum_y = 0, sum_xy = 0, sum_x2 = 0, sum_y2 = 0;
-    for (let i = 0; i < n; i++) {
-        sum_x += x[i];
-        sum_y += y[i];
-        sum_xy += x[i] * y[i];
-        sum_x2 += x[i] * x[i];
-        sum_y2 += y[i] * y[i];
-    }
-    return (n * sum_xy - sum_x * sum_y) / Math.sqrt((n * sum_x2 - sum_x * sum_x) * (n * sum_y2 - sum_y * sum_y));
-}
+// function calculateCorrelation(x: number[], y: number[]): number {
+//     const n = Math.min(x.length, y.length);
+//     let sum_x = 0, sum_y = 0, sum_xy = 0, sum_x2 = 0, sum_y2 = 0;
+//     for (let i = 0; i < n; i++) {
+//         sum_x += x[i];
+//         sum_y += y[i];
+//         sum_xy += x[i] * y[i];
+//         sum_x2 += x[i] * x[i];
+//         sum_y2 += y[i] * y[i];
+//     }
+//     return (n * sum_xy - sum_x * sum_y) / Math.sqrt((n * sum_x2 - sum_x * sum_x) * (n * sum_y2 - sum_y * sum_y));
+// }
 
 function calculateResiduals(data: number[]): number[] {
     const mean = data.reduce((a, b) => a + b) / data.length;
     return data.map(v => v - mean);
 }
 
-function generateForecast(data: number[], arCoeff: number[], maCoeff: number[], steps: number): number[] {
-    const forecast = [];
-    const errors = calculateResiduals(data);
-    for (let i = 0; i < steps; i++) {
-        let forecastValue = 0;
-        for (let j = 0; j < arCoeff.length; j++) {
-            forecastValue += arCoeff[j] * (data[data.length - 1 - j] || forecast[i - 1 - j] || 0);
-        }
-        for (let j = 0; j < maCoeff.length; j++) {
-            forecastValue += maCoeff[j] * (errors[errors.length - 1 - j] || 0);
-        }
-        forecast.push(forecastValue);
-    }
-    return forecast;
-}
+// function generateForecast(data: number[], arCoeff: number[], maCoeff: number[], steps: number): number[] {
+//     const forecast = [];
+//     const errors = calculateResiduals(data);
+//     for (let i = 0; i < steps; i++) {
+//         let forecastValue = 0;
+//         for (let j = 0; j < arCoeff.length; j++) {
+//             forecastValue += arCoeff[j] * (data[data.length - 1 - j] || forecast[i - 1 - j] || 0);
+//         }
+//         for (let j = 0; j < maCoeff.length; j++) {
+//             forecastValue += maCoeff[j] * (errors[errors.length - 1 - j] || 0);
+//         }
+//         forecast.push(forecastValue);
+//     }
+//     return forecast;
+// }
 
-function calculateMovingAverage(data: number[], windowSize: number): number[] {
-    const result = [];
-    for (let i = 0; i < data.length; i++) {
-        const window = data.slice(Math.max(0, i - windowSize + 1), i + 1);
-        const avg = window.reduce((sum, val) => sum + val, 0) / window.length;
-        result.push(avg);
-    }
-    return result;
-}
+// function calculateMovingAverage(data: number[], windowSize: number): number[] {
+//     const result = [];
+//     for (let i = 0; i < data.length; i++) {
+//         const window = data.slice(Math.max(0, i - windowSize + 1), i + 1);
+//         const avg = window.reduce((sum, val) => sum + val, 0) / window.length;
+//         result.push(avg);
+//     }
+//     return result;
+// }
 
-function calculateStandardDeviation(data: number[]): number {
-    const mean = data.reduce((sum, val) => sum + val, 0) / data.length;
-    const squaredDiffs = data.map(val => Math.pow(val - mean, 2));
-    const variance = squaredDiffs.reduce((sum, val) => sum + val, 0) / data.length;
-    return Math.sqrt(variance);
-}
+// function calculateStandardDeviation(data: number[]): number {
+//     const mean = data.reduce((sum, val) => sum + val, 0) / data.length;
+//     const squaredDiffs = data.map(val => Math.pow(val - mean, 2));
+//     const variance = squaredDiffs.reduce((sum, val) => sum + val, 0) / data.length;
+//     return Math.sqrt(variance);
+// }

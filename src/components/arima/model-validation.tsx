@@ -5,57 +5,7 @@ import { useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { AccuracyChart } from "./accuracy-chart"
-
-// interface SalesData {
-//     date: string;
-//     sales: number;
-//     forecast: number;
-// }
-
-// Updated calculation helper functions
-// function calculateMAPE(actualData: SalesData[], forecastData: SalesData[]) {
-//     // Ensure we have data to compare
-//     if (!actualData.length || !forecastData.length) return 0;
-
-//     // Calculate percentage errors for each day
-//     let totalPercentageError = 0;
-//     let validDays = 0;
-
-//     actualData.forEach((actual, index) => {
-//       if (actual.sales > 0) { // Only include days with actual sales
-//         const percentError = Math.abs((actual.sales - actual.forecast) / actual.sales) * 100;
-//         if (!isNaN(percentError)) {
-//           totalPercentageError += percentError;
-//           validDays++;
-//         }
-//       }
-//     });
-
-//     // Return average percentage error
-//     return validDays > 0 ? totalPercentageError / validDays : 0;
-//   }
-
-//   function calculateRMSE(actualData: SalesData[], forecastData: SalesData[]) {
-//     // Ensure we have data to compare
-//     if (!actualData.length || !forecastData.length) return 0;
-
-//     // Calculate squared errors for each day
-//     let sumSquaredErrors = 0;
-//     let validDays = 0;
-
-//     actualData.forEach((actual, index) => {
-//       if (actual.sales > 0) { // Only include days with actual sales
-//         const squaredError = Math.pow(actual.sales - actual.forecast, 2);
-//         if (!isNaN(squaredError)) {
-//           sumSquaredErrors += squaredError;
-//           validDays++;
-//         }
-//       }
-//     });
-
-//     // Return root mean squared error
-//     return validDays > 0 ? Math.sqrt(sumSquaredErrors / validDays) : 0;
-//   }
+import { MetricResults } from "../../../convex/arimaValidation"
 
 interface MonthlyData {
     month: string;
@@ -118,6 +68,33 @@ function findMostAccurateForecast(data: MonthlyData[] | undefined): string {
     return `${monthYear} (${accuracy}% accurate)`;
 }
 
+function MetricsCard({ metrics }: { metrics: MetricResults }) {
+    return (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="p-4 bg-muted rounded-lg">
+                <h4 className="font-medium text-sm text-muted-foreground">MAPE</h4>
+                <p className="text-2xl font-semibold">{metrics.mape.toFixed(2)}%</p>
+                <p className="text-xs text-muted-foreground">Mean Absolute Percentage Error</p>
+            </div>
+            <div className="p-4 bg-muted rounded-lg">
+                <h4 className="font-medium text-sm text-muted-foreground">RMSE</h4>
+                <p className="text-2xl font-semibold">₱{metrics.rmse.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground">Root Mean Square Error</p>
+            </div>
+            <div className="p-4 bg-muted rounded-lg">
+                <h4 className="font-medium text-sm text-muted-foreground">MAE</h4>
+                <p className="text-2xl font-semibold">₱{metrics.mae.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground">Mean Absolute Error</p>
+            </div>
+            <div className="p-4 bg-muted rounded-lg">
+                <h4 className="font-medium text-sm text-muted-foreground">R²</h4>
+                <p className="text-2xl font-semibold">{(metrics.r2 * 100).toFixed(2)}%</p>
+                <p className="text-xs text-muted-foreground">Coefficient of Determination</p>
+            </div>
+        </div>
+    );
+}
+
 
 export function ModelValidation() {
     // December 2023 for actual data - start at midnight UTC
@@ -155,10 +132,6 @@ export function ModelValidation() {
         </div>
     }
 
-    // Calculate metrics using both actual and forecast data
-    //  const mape = calculateMAPE(validationData.actual, validationData.forecast)
-    //  const rmse = calculateRMSE(validationData.actual, validationData.forecast)
-
     return (
         <div className="space-y-6">
             <Card className="p-6">
@@ -166,6 +139,14 @@ export function ModelValidation() {
                 <p className="text-muted-foreground mb-6">
                     Comparing December 2023 actual sales with January 2024 forecasted values
                 </p>
+
+                {validationData.metrics && (
+                    <div className="mb-6">
+                        <h3 className="font-medium mb-4">Model Performance Metrics</h3>
+                        <MetricsCard metrics={validationData.metrics} />
+                    </div>
+                )}
+
                 <div className="grid md:grid-cols-2 gap-4">
                     <div>
                         <h3 className="font-medium mb-2">December 2023 - Actual Sales</h3>
@@ -338,38 +319,6 @@ export function ModelValidation() {
                         </div>
                     </Card>
                 </TabsContent>
-
-                {/* <TabsContent value="limitations">
-                    <Card className="p-6">
-                        <h2 className="text-2xl font-semibold mb-4">Model Limitations & Considerations</h2>
-                        <div className="space-y-6">
-                            <div>
-                                <h3 className="font-medium">Current Limitations</h3>
-                                <ul className="list-disc list-inside text-sm text-muted-foreground mt-2 space-y-2">
-                                    <li>Does not account for special events or holidays</li>
-                                    <li>Limited historical data may affect accuracy</li>
-                                    <li>Assumes consistent business operations</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h3 className="font-medium">Future Improvements</h3>
-                                <ul className="list-disc list-inside text-sm text-muted-foreground mt-2 space-y-2">
-                                    <li>Integration of seasonal factors</li>
-                                    <li>Dynamic parameter optimization</li>
-                                    <li>Incorporation of external factors (weather, events)</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h3 className="font-medium">Model Performance</h3>
-                                <p className="text-sm text-muted-foreground mt-2">
-                                    The current implementation shows promising results for short-term forecasting (1-7 days),
-                                    with decreasing accuracy for longer forecast horizons. The model performs best during
-                                    periods of stable business operations and regular customer patterns.
-                                </p>
-                            </div>
-                        </div>
-                    </Card>
-                </TabsContent> */}
             </Tabs>
         </div>
     )
