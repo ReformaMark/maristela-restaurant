@@ -187,13 +187,11 @@ export const getSalesForecast = query({
         try {
             const userId = await getAuthUserId(ctx);
             if (!userId) {
-                console.log("Error: No authenticated user found");
                 return null;
             }
 
             const user = await ctx.db.get(userId);
             if (user?.role !== "admin") {
-                console.log("Error: User is not an admin");
                 return null;
             }
 
@@ -204,7 +202,6 @@ export const getSalesForecast = query({
                 .take(30);
 
             if (orders.length === 0) {
-                console.log("Warning: No confirmed orders found");
                 return [];
             }
 
@@ -254,43 +251,41 @@ export const getArimaSalesForecast = query({
     handler: async (ctx, { startDate, endDate }) => {
         try {
             const userId = await getAuthUserId(ctx);
-            if (!userId) {
-                return null;
-            }
+            if (!userId) return null;
 
             const user = await ctx.db.get(userId);
-            if (user?.role !== "admin") {
-                return null;
-            }
+            if (user?.role !== "admin") return null;
 
-            const now = Date.now();
-            const defaultStartDate = now - (30 * 24 * 60 * 60 * 1000); // eq to 30 days ago
-
-            const queryStartDate = startDate ?? defaultStartDate;
-            const queryEndDate = endDate ?? now;
-
+            // Get all orders if no date range is provided (for "all" view)
             const orders = await ctx.db
                 .query("orders")
-                .filter((q) =>
-                    q.and(
-                        q.eq(q.field("status"), "confirmed"),
-                        q.gte(q.field("orderDate"), queryStartDate),
-                        q.lte(q.field("orderDate"), queryEndDate)
-                    )
-                )
+                .withIndex("by_orderDate")
+                .filter((q) => {
+                    const baseFilter = q.eq(q.field("status"), "confirmed");
+                    
+                    // If no dates provided, return all confirmed orders
+                    if (!startDate || !endDate) return baseFilter;
+                    
+                    // Otherwise, filter by date range
+                    return q.and(
+                        baseFilter,
+                        q.gte(q.field("orderDate"), startDate),
+                        q.lte(q.field("orderDate"), endDate)
+                    );
+                })
                 .order("asc")
                 .collect();
 
-            if (orders.length === 0) {
-                return [];
-            }
+            if (orders.length === 0) return [];
 
+            // Group sales by date
             const salesByDate = new Map<string, number>();
             for (const order of orders) {
                 const date = new Date(order.orderDate!).toISOString().split('T')[0];
                 salesByDate.set(date, (salesByDate.get(date) || 0) + order.totalPrice);
             }
 
+            // Convert to array and sort by date
             let salesData = Array.from(salesByDate.entries())
                 .map(([date, sales]) => ({ date, sales }))
                 .sort((a, b) => a.date.localeCompare(b.date));
@@ -314,40 +309,50 @@ export const getArimaSalesForecast = query({
             const maCoeff = estimateMACoefficients(diffedSales, q);
 
             // Generate forecasts
-            const forecastSteps = 7;
+            const forecastSteps = 7; // 7 days forecast
             const forecast = generateForecast(diffedSales, arCoeff, maCoeff, forecastSteps);
 
             // Reverse differencing to get final forecast
             const finalForecast = inverseDifference(forecast, salesValues.slice(-d), d);
 
+            // Combine historical data with forecasts
             const forecasts = filledSalesData.map(({ date, sales }) => ({
                 date,
                 sales,
-                forecast: sales
+                forecast: sales // Use actual sales for historical data
             }));
 
+            // Add future forecasts
             const lastDate = new Date(filledSalesData[filledSalesData.length - 1].date);
             const lastKnownSales = salesValues[salesValues.length - 1];
 
+            // Generate future forecasts
             for (let i = 0; i < forecastSteps; i++) {
                 const nextDate = new Date(lastDate);
                 nextDate.setDate(lastDate.getDate() + i + 1);
+                
+                // Calculate base forecast
                 let baseForecast = Math.max(0, Math.round(finalForecast[i]));
 
-                // Incorporate last known sales into the forecast
-                const weightLastKnown = Math.max(0, 1 - i / forecastSteps); // Weight decreases as we forecast further
-                baseForecast = Math.round(baseForecast * (1 - weightLastKnown) + lastKnownSales * weightLastKnown);
+                // Weight the forecast with last known sales
+                const weightLastKnown = Math.max(0, 1 - i / forecastSteps);
+                baseForecast = Math.round(
+                    baseForecast * (1 - weightLastKnown) + 
+                    lastKnownSales * weightLastKnown
+                );
 
                 // Add some random variation (±10%)
                 const randomFactor = 0.9 + Math.random() * 0.2;
+                
                 forecasts.push({
                     date: nextDate.toISOString().split('T')[0],
-                    sales: 0,
+                    sales: 0, // No actual sales for future dates
                     forecast: Math.round(baseForecast * randomFactor)
                 });
             }
 
             return forecasts;
+
         } catch (error) {
             console.error("Error in getArimaSalesForecast:", error);
             return null;

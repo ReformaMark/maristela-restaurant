@@ -5,8 +5,10 @@ export function useArimaForecastData({ startDate, endDate }: {
     startDate?: number,
     endDate?: number
 }) {
-    return useQuery(api.dashboard.getArimaSalesForecast, {
-        startDate,
-        endDate
+    const data = useQuery(api.dashboard.getArimaSalesForecast, {
+        startDate: startDate ?? undefined,
+        endDate: endDate ?? undefined
     });
+
+    return data;
 }
