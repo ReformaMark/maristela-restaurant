@@ -169,9 +169,9 @@ export function generateForecastData(actualData: any[], startDate: number, endDa
 
   // Enhanced parameters
   const arimaParams = {
-    p: 3,    // AR terms
+    p: 9,    // AR terms
     d: 1,    // Differencing
-    q: 2,    // MA terms
+    q: 4,    // MA terms
     s: 7     // Weekly seasonality
   };
 
