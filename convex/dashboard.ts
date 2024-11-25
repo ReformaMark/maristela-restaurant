@@ -1,10 +1,8 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { query } from "./_generated/server";
 import { v } from "convex/values";
+import { query } from "./_generated/server";
 import {
-    generateForecastData,
-    calculateMetrics,
-    MetricResults
+    generateForecastData
 } from "./arimaValidation";
 
 export const totalUsers = query({
@@ -395,10 +393,10 @@ function fillMissingDates(salesData: { date: string; sales: number }[]) {
 //     return (n * sum_xy - sum_x * sum_y) / Math.sqrt((n * sum_x2 - sum_x * sum_x) * (n * sum_y2 - sum_y * sum_y));
 // }
 
-function calculateResiduals(data: number[]): number[] {
-    const mean = data.reduce((a, b) => a + b) / data.length;
-    return data.map(v => v - mean);
-}
+// function calculateResiduals(data: number[]): number[] {
+//     const mean = data.reduce((a, b) => a + b) / data.length;
+//     return data.map(v => v - mean);
+// }
 
 // function generateForecast(data: number[], arCoeff: number[], maCoeff: number[], steps: number): number[] {
 //     const forecast = [];
