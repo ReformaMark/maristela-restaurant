@@ -164,70 +164,62 @@ export function ModelValidation() {
                     <TabsTrigger value="parameters">Model Parameters</TabsTrigger>
                     <TabsTrigger value="methodology">Methodology</TabsTrigger>
                     <TabsTrigger value="historical">Historical Performance</TabsTrigger>
-                    {/* <TabsTrigger value="limitations">Limitations & Considerations</TabsTrigger> */}
                 </TabsList>
 
                 <TabsContent value="parameters">
                     <Card className="p-6">
-                        <h2 className="text-2xl font-semibold mb-4">ARIMA Model Parameters (1,1,1)</h2>
+                        <h2 className="text-2xl font-semibold mb-4">Enhanced ARIMA Model Parameters</h2>
                         <div className="space-y-6">
                             <div>
                                 <h3 className="font-medium">Parameter Selection Rationale</h3>
                                 <ul className="list-disc list-inside text-sm text-muted-foreground mt-2 space-y-4">
                                     <li className="space-y-2">
-                                        <strong>p = 1 (Autoregressive Order)</strong>
+                                        <strong>p = 9 (Autoregressive Order)</strong>
                                         <p className="ml-6">
-                                            We chose p=1 because restaurant sales typically show strong dependency on the previous day&apos;s performance.
-                                            This captures important patterns like day-to-day customer behavior and inventory cycles, while avoiding
-                                            overfitting that might occur with higher orders.
+                                            Higher order AR terms capture complex patterns in historical data, including:
+                                            <ul className="list-disc list-inside ml-4 mt-2">
+                                                <li>Weekly cycles and patterns</li>
+                                                <li>Extended customer behavior trends</li>
+                                                <li>Long-term business cycles</li>
+                                            </ul>
                                         </p>
                                     </li>
                                     <li className="space-y-2">
                                         <strong>d = 1 (Differencing Order)</strong>
                                         <p className="ml-6">
-                                            First-order differencing was selected after analyzing the sales time series data, which showed
-                                            non-stationarity in mean but relatively stable variance. This transformation helps in:
+                                            First-order differencing removes trends and achieves stationarity while preserving
+                                            important patterns in the data.
+                                        </p>
+                                    </li>
+                                    <li className="space-y-2">
+                                        <strong>q = 4 (Moving Average Order)</strong>
+                                        <p className="ml-6">
+                                            Extended MA terms help capture:
                                             <ul className="list-disc list-inside ml-4 mt-2">
-                                                <li>Removing linear trends in the data</li>
-                                                <li>Handling daily seasonality patterns</li>
-                                                <li>Stabilizing the mean of the time series</li>
+                                                <li>Short-term fluctuations</li>
+                                                <li>Recent market shocks</li>
+                                                <li>Seasonal adjustments</li>
                                             </ul>
                                         </p>
                                     </li>
                                     <li className="space-y-2">
-                                        <strong>q = 1 (Moving Average Order)</strong>
+                                        <strong>s = 7 (Seasonal Period)</strong>
                                         <p className="ml-6">
-                                            The first-order moving average component helps capture short-term random fluctuations and
-                                            local patterns in sales. This is particularly important for restaurant data where recent
-                                            shocks (like weather events or local activities) can influence immediate future sales.
+                                            Weekly seasonality component accounts for regular patterns in restaurant traffic
+                                            and sales throughout the week.
                                         </p>
                                     </li>
                                 </ul>
                             </div>
 
                             <div className="mt-6">
-                                <h3 className="font-medium">Model Validation Process</h3>
-                                <p className="text-sm text-muted-foreground mt-2">
-                                    These parameters were selected through a rigorous process involving:
-                                </p>
+                                <h3 className="font-medium">Advanced Features</h3>
                                 <ul className="list-disc list-inside text-sm text-muted-foreground mt-2 space-y-2">
-                                    <li>Analysis of historical sales patterns and seasonality</li>
-                                    <li>Testing multiple parameter combinations (Grid Search)</li>
-                                    <li>Cross-validation using different time periods</li>
-                                    <li>Evaluation of forecast accuracy metrics</li>
-                                </ul>
-                            </div>
-
-                            <div className="mt-6">
-                                <h3 className="font-medium">Business Context</h3>
-                                <p className="text-sm text-muted-foreground mt-2">
-                                    The ARIMA(1,1,1) model balances complexity with practical utility for restaurant sales forecasting:
-                                </p>
-                                <ul className="list-disc list-inside text-sm text-muted-foreground mt-2 space-y-2">
-                                    <li>Simple enough for quick updates as new data arrives</li>
-                                    <li>Robust enough to capture key business patterns</li>
-                                    <li>Flexible enough to adapt to changing conditions</li>
-                                    <li>Practical for both short-term and medium-term forecasting</li>
+                                    <li>Adaptive weights based on volatility analysis</li>
+                                    <li>Exponential decay weights for AR/MA components</li>
+                                    <li>Weekly seasonal pattern recognition</li>
+                                    <li>Trend and intercept calculation</li>
+                                    <li>Outlier detection and handling</li>
                                 </ul>
                             </div>
                         </div>
@@ -239,22 +231,23 @@ export function ModelValidation() {
                         <h2 className="text-2xl font-semibold mb-4">Forecasting Methodology</h2>
                         <div className="space-y-6">
                             <div>
-                                <h3 className="font-medium">Random Variation (±10%)</h3>
-                                <p className="text-sm text-muted-foreground mt-2">
-                                    The ±10% random variation is incorporated to account for:
-                                </p>
-                                <ul className="list-disc list-inside text-sm text-muted-foreground mt-2 space-y-2">
-                                    <li>Natural daily fluctuations in customer behavior</li>
-                                    <li>Unexpected external factors (weather, local events)</li>
-                                    <li>Variations in menu item availability</li>
-                                </ul>
-                            </div>
-                            <div>
                                 <h3 className="font-medium">Data Processing</h3>
                                 <ul className="list-disc list-inside text-sm text-muted-foreground mt-2 space-y-2">
                                     <li>Missing dates filled with zero sales</li>
-                                    <li>Data sorted chronologically</li>
-                                    <li>First-order differencing applied (d=1)</li>
+                                    <li>Outlier detection using IQR method</li>
+                                    <li>Data normalization and smoothing</li>
+                                    <li>Adaptive volatility-based weighting</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 className="font-medium">Weight Distribution</h3>
+                                <p className="text-sm text-muted-foreground mt-2">
+                                    Weights are dynamically adjusted based on volatility:
+                                </p>
+                                <ul className="list-disc list-inside text-sm text-muted-foreground mt-2 space-y-2">
+                                    <li>High volatility: Favors recent data (AR: 0.4, MA: 0.4)</li>
+                                    <li>Medium volatility: Balanced approach (AR: 0.3, MA: 0.25)</li>
+                                    <li>Low volatility: Emphasizes trends (AR: 0.2, MA: 0.2)</li>
                                 </ul>
                             </div>
                         </div>
