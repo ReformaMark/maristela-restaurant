@@ -60,7 +60,7 @@ function Header() {
           <h1 className='text-sm'>sombrereriadesandoval@gmail.com</h1>
         </div>
         <div className="flex items-center pl-6">
-          <h1>Free Shipping for all Order of {formatPrice(500)}</h1>
+         
         </div>
        <SocialMedias size='size-7'/>
         <div className="flex items-center pl-6 gap-x-1">
