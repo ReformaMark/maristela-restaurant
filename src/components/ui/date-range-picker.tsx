@@ -348,7 +348,7 @@ export const DateRangePicker: FC<DateRangePickerProps> & {
           </div>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align={align} className="w-screen md:w-auto max-w-screen-lg p-0 md:p-4">
+      <PopoverContent align={align} className="w-[calc(100vw-2rem)] md:w-auto max-w-screen-lg p-0 md:p-4 max-h-[90vh] overflow-y-auto">
         <div className="flex flex-col md:flex-row p-2 md:p-4">
           <div className="flex flex-col w-full md:w-auto">
             <div className="flex flex-col gap-2 px-2 md:px-3 pb-4">
@@ -475,13 +475,14 @@ export const DateRangePicker: FC<DateRangePickerProps> & {
             </div>
           )}
         </div>
-        <div className="flex justify-end gap-2 p-4 border-t">
+        <div className="flex justify-end gap-2 p-4 border-t sticky bottom-0 bg-white">
           <Button
             onClick={() => {
               setIsOpen(false)
               resetValues()
             }}
             variant="ghost"
+            className="text-sm"
           >
             Cancel
           </Button>
@@ -495,6 +496,7 @@ export const DateRangePicker: FC<DateRangePickerProps> & {
                 onUpdate?.({ range, rangeCompare })
               }
             }}
+            className="text-sm"
           >
             Update
           </Button>

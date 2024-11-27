@@ -88,6 +88,7 @@ const DashboardPage = () => {
                         </TabsContent>
                     </Tabs>
                 </div>
+                <div className="h-[200px]" />
             </main>
         </div>
     )
