@@ -364,7 +364,7 @@ export const TransactionCard = () => {
                                     <dt className="text-muted-foreground">
                                         Phone
                                     </dt>
-                                    <dd>{selectedTransaction?.user?.phone}</dd>
+                                    <dd>{selectedTransaction?.shippingAddress?.phoneNumber}</dd>
                                 </div>
                             </dl>
                         </div>
