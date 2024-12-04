@@ -296,15 +296,17 @@ export const personalizedRecommendation = query({
             }
             return { category, orderId }; // Extract category and orderId
         });
+
+        const orders = await ctx.db.query('orders').order('desc').take(1000)
         const topMenusByCategory = await asyncMap(categories, async (category) => {
             const menus = await ctx.db.query('menus').filter(q => q.eq(q.field('category'), category)).collect();
 
             const orderCounts = await asyncMap(menus, async (menu) => {
                 const menuId = menu._id;
-                const orders = await ctx.db.query('orders').filter(q => q.eq(q.field('menuId'), menuId)).order('desc').take(50);
+                const orderLength = orders.filter(order => order.menuId === menuId).length;
                 return {
                     menuId,
-                    numberOfOrders: orders.length,
+                    numberOfOrders: orderLength,
                 };
             });
 
