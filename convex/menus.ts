@@ -275,8 +275,8 @@ export const archiveMenu = mutation({
 export const personalizedRecommendation = query({
     handler: async (ctx) => {
         const userId = await getAuthUserId(ctx);
-        if (userId == null) return null;
-
+        if (userId === null) return null;
+        console.log(userId)
         const latestTransaction = await ctx.db.query('transactions').order('desc').first();
 
         if (!latestTransaction?.orders) return null;
