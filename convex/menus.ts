@@ -321,14 +321,14 @@ export const personalizedRecommendation = query({
 
             const orderCounts = await asyncMap(menus, async (menu) => {
                 const menuId = menu._id;
-                const orders = await ctx.db.query('orders')
-                    .filter(q => q.eq(q.field('menuId'), menuId))
-                    .collect();
-                console.log(orders)
+                // const orders = await ctx.db.query('orders')
+                //     .filter(q => q.eq(q.field('menuId'), menuId))
+                //     .collect();
+                // console.log(orders)
                 // if(!orders) return null
 
                 // const numberOfOrders = orders.length === 0 ? 0 : orders.length
-
+                console.log(menuId)
                 return {
                     menuId,
                     // numberOfOrders: numberOfOrders
