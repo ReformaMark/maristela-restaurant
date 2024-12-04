@@ -278,16 +278,17 @@ export const personalizedRecommendation = query({
         if (userId === null) {
             throw new Error("User not authenticated");
         }
+        console.log(userId)
 
         const latestTransaction = await ctx.db.query('transactions').order('desc').first();
         if (!latestTransaction) {
             throw new Error("No transactions found");
         }
-
+       
         if (!latestTransaction.orders || latestTransaction.orders.length === 0) {
             throw new Error("No orders found in the latest transaction");
         }
-
+        console.log(latestTransaction)
         const categories: string[] = [];
         await asyncMap(latestTransaction.orders, async (orderId) => {
             const order = await ctx.db.get(orderId);
@@ -299,12 +300,12 @@ export const personalizedRecommendation = query({
             if (!orderMenuId) {
                 throw new Error(`Menu ID not found for order ${orderId}`);
             }
-
+            console.log(orderMenuId)
             const menu = await ctx.db.get(orderMenuId);
             if (!menu) {
                 throw new Error(`Menu with ID ${orderMenuId} not found`);
             }
-
+            console.log(menu)
             const category = menu.category;
             if (category && !categories.includes(category)) {
                 categories.push(category);
@@ -317,7 +318,7 @@ export const personalizedRecommendation = query({
             if (!menus || menus.length === 0) {
                 throw new Error(`No menus found for category ${category}`);
             }
-
+            console.log(menus)
             const orderCounts = await asyncMap(menus, async (menu) => {
                 const menuId = menu._id;
                 const orders = await ctx.db.query('orders').filter(q => q.eq(q.field('menuId'), menuId)).collect();
@@ -329,22 +330,31 @@ export const personalizedRecommendation = query({
 
             const sortedOrderCounts = orderCounts.sort((a, b) => b.numberOfOrders - a.numberOfOrders);
             const topThreeMenus = sortedOrderCounts.slice(0, 3);
-            const topThree = await asyncMap(topThreeMenus, async ({ menuId }) => {
-                const menu = await ctx.db.get(menuId);
-                if (!menu) {
-                    throw new Error(`Menu with ID ${menuId} not found`);
-                }
+            // const topThree = await asyncMap(topThreeMenus, async ({ menuId }) => {
+            //     const menu = await ctx.db.get(menuId);
+            //     if (!menu) {
+            //         throw new Error(`Menu with ID ${menuId} not found`);
+            //     }
 
-       
+            //     const ratings = await getManyFrom(ctx.db, 'ratings', 'by_menu', menuId, "menuId");
+            //     const ratingsWithUser = await Promise.all(
+            //         ratings.map(async (rating) => {
+            //             const user = await ctx.db.get(rating.userId);
+            //             return {
+            //                 ...rating,
+            //                 user: user ? user : null,
+            // //             };
+            // //         })
+            // //     );
 
-                return {
-                    ...menu,
-                    ...(menu.imageId === undefined ? {} : { url: await ctx.storage.getUrl(menu.imageId) }),
-                   
-                };
-            });
+            // //     return {
+            // //         ...menu,
+            // //         ...(menu.imageId === undefined ? {} : { url: await ctx.storage.getUrl(menu.imageId) }),
+            // //         ratings: ratingsWithUser,
+            // //     };
+            // });
 
-            return topThree;
+            // return topThree;
         });
 
         return ;
