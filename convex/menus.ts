@@ -289,8 +289,9 @@ export const personalizedRecommendation = query({
             throw new Error("No orders found in the latest transaction");
         }
         console.log(latestTransaction)
+
         let categories: string[] = [];
-        await asyncMap(latestTransaction.orders, async (orderId) => {
+        const s = await asyncMap(latestTransaction.orders, async (orderId) => {
             const order = await ctx.db.get(orderId);
             if (!order) {
                 throw new Error(`Order with ID ${orderId} not found`);
@@ -310,7 +311,7 @@ export const personalizedRecommendation = query({
             if (category && !categories.includes(category)) {
                 categories.push(category);
             }
-            return { category, orderId }; // Extract category and orderId
+            return { orderMenuId, orderId, menu }; // Extract category and orderId
         });
 
         console.log("categories: ",categories)
@@ -359,6 +360,6 @@ export const personalizedRecommendation = query({
         // //     // return topThree;
         // });
 
-        return userId ;
+        return {userid: userId, latestTransaction: latestTransaction, categories:categories, s: s  } ;
     }
 });
