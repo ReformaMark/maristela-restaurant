@@ -85,3 +85,4 @@ export const getAllOrders = query({
         return ordersWithDetails
     }
 })
+
