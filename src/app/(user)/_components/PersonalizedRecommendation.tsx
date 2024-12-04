@@ -11,6 +11,7 @@ export default function PersonalizedRecommendation() {
 
     // if (!personalizedRecommendation || personalizedRecommendation.length < 1) return <></>
     
+    console.log(personalizedRecommendation)
   return (
     <div>
         <h1 className="font-cairo font-extrabold text-2xl text-gray-800">Popular Picks for You</h1>
