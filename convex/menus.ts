@@ -327,11 +327,9 @@ export const personalizedRecommendation = query({
             
                 if(!orders) return null
 
-                const numberOfOrders = orders.length === 0 ? 0 : orders.length
-                console.log(menuId)
                 return {
                     menuId: menuId,
-                    numberOfOrders: numberOfOrders
+                    orders: orders
                 };
             });
 
