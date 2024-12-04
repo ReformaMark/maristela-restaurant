@@ -324,17 +324,18 @@ export const personalizedRecommendation = query({
                 // const orders = await ctx.db.query('orders')
                 //     .filter(q => q.eq(q.field('menuId'), menuId))
                 //     .collect();
-                // console.log(orders)
+            
                 // if(!orders) return null
 
-                // const numberOfOrders = orders.length === 0 ? 0 : orders.length
-                console.log(menuId)
+                // // const numberOfOrders = orders.length === 0 ? 0 : orders.length
+                // console.log(menuId)
                 return {
-                    menuId,
+                    menuId: menuId,
                     // numberOfOrders: numberOfOrders
                 };
             });
 
+            console.log(orderCounts)
             // const sortedOrderCounts = orderCounts.sort((a, b) => b.numberOfOrders - a.numberOfOrders);
             // const topThreeMenus = sortedOrderCounts.slice(0, 3);
             // const topThree = await asyncMap(topThreeMenus, async ({ menuId }) => {
@@ -362,7 +363,7 @@ export const personalizedRecommendation = query({
             // });
 
             // return topThree;
-            return category?.category
+            return {category: category?.category, ordersCounts: orderCounts}
         });
 
         return topMenusByCategory;
