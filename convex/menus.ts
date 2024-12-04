@@ -5,6 +5,8 @@ import {
     getManyFrom,
 } from "convex-helpers/server/relationships";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { asyncMap } from "convex-helpers";
+import { Id } from "./_generated/dataModel";
 
 
 export const allMenus = query({
@@ -269,3 +271,67 @@ export const archiveMenu = mutation({
         return args.isArchived;
     }
 })
+
+export const personalizedRecommendation = query({
+    handler: async (ctx) => {
+        const userId = await getAuthUserId(ctx);
+        if (userId == null) return null;
+
+        const latestTransaction = await ctx.db.query('transactions').order('desc').first();
+
+        if (!latestTransaction?.orders) return null;
+        const categories: string[] = [];
+
+        await asyncMap(latestTransaction.orders, async (orderId) => {
+            const order = await ctx.db.get(orderId);
+            const orderMenuId = order?.menuId;
+            if (!orderMenuId) return null;
+            const menu = await ctx.db.get(orderMenuId);
+            const category = menu?.category;
+            if (category && !categories.includes(category)) {
+                categories.push(category);
+            }
+            return { category, orderId }; // Extract category and orderId
+        });
+        const topMenusByCategory = await asyncMap(categories, async (category) => {
+            const menus = await ctx.db.query('menus').filter(q => q.eq(q.field('category'), category)).collect();
+
+            const orderCounts = await asyncMap(menus, async (menu) => {
+                const menuId = menu._id;
+                const orders = await ctx.db.query('orders').filter(q => q.eq(q.field('menuId'), menuId)).collect();
+                return {
+                    menuId,
+                    numberOfOrders: orders.length,
+                };
+            });
+
+            const sortedOrderCounts = orderCounts.sort((a, b) => b.numberOfOrders - a.numberOfOrders);
+            const topThreeMenus = sortedOrderCounts.slice(0, 3);
+            const topThree = await asyncMap(topThreeMenus, async ({ menuId }) => {
+                const menu = await ctx.db.get(menuId);
+                const ratings = await getManyFrom(ctx.db, 'ratings', 'by_menu', menuId, "menuId");
+
+                const ratingsWithUser = await Promise.all(
+                    ratings.map(async (rating) => {
+                        const user = await ctx.db.get(rating.userId);
+                        return {
+                            ...rating,
+                            user: user ? user : null,
+                        };
+                    })
+                );
+          
+                return {
+                    ...menu,
+                    ...(menu?.imageId === undefined ? {} : { url: await ctx.storage.getUrl(menu.imageId) }),
+                    ratings: ratingsWithUser,
+                };
+            });
+
+
+            return topThree
+        });
+
+        return topMenusByCategory;
+    }
+});

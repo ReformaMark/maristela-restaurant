@@ -8,6 +8,7 @@ import LatestProduct from './_components/LatestProduct'
 import TopRatedProducts from './_components/TopRatedProoducts'
 import ReviewsProduct from './_components/ReviewsProduct'
 import SearchAndMenu from './_components/SearchAndMenu'
+import PersonalizedRecommendation from './_components/PersonalizedRecommendation'
 
 
 function MenuPage() {
@@ -40,7 +41,7 @@ function MenuPage() {
       {/* Personalized Recommendations */}
       {}
       <section>
-
+        <PersonalizedRecommendation/>
       </section>
       <section>
         <FeaturedProducts/>

@@ -48,18 +48,20 @@ export const getRating = query({
 })
 
 export const getRatings = query({
-    args:{
+    args: {
         menuId: v.id('menus'),
     },
-    handler: async (ctx, args)=>{
+    handler: async (ctx, args) => {
         const ratings = await ctx.db.query('ratings')
-            .filter((q)=> q.eq(q.field('menuId'), args.menuId))
+            .filter((q) => q.eq(q.field('menuId'), args.menuId))
             .order('desc')
             .collect();
 
+        if (ratings.length === 0) return null; // Return null if there are no ratings
+
         const menu = await ctx.db.get(args.menuId);
-        const menuImageId = menu?.imageId
-        if(!menuImageId) return 
+        const menuImageId = menu?.imageId;
+        if (!menuImageId) return null; // Return null if there is no menu image
 
         const imageUrl = menuImageId ? await ctx.storage.getUrl(menuImageId) : null;
 

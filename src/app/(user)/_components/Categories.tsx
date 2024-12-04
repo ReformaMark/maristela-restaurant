@@ -52,6 +52,9 @@ function Categories() {
     const numberOfVeggies = ()=>{
         return menus?.filter((menu)=> menu.category === 'Veggies').length
     }
+    const numberOfDesserts = ()=>{
+        return menus?.filter((menu)=> menu.category === 'Desserts').length
+    }
   return (
         <Carousel
           opts={{
@@ -80,7 +83,7 @@ function Categories() {
                 <Card>
                     <CardContent className="flex aspect-square bg-gray-100 items-center justify-center p-6">
                         <Link href={`/Chicken`}   className=" hover:text-primary flex flex-col items-center justify-center text-text text-lg font-medium transition-colors duration-400 ease-in-out">
-                        <Image src={Chicken} alt='Pork' width={200} height={200} className='s size-56 object-cover   hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
+                        <Image src={Chicken} alt='Chicken' width={200} height={200} className='s size-56 object-cover   hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
                             <div className="flex justify-center gap-x-1 items-center mt-[-30px] bg-white text-black w-full text-lg font-cairo font-bold py-1 uppercase">
                                 <h1>Chicken</h1>
                                 <h1>({numberOfChicken()})</h1>
@@ -95,10 +98,10 @@ function Categories() {
                 <Card>
                     <CardContent className="flex aspect-square bg-gray-100 items-center justify-center p-6">
                         <Link href={`/Desserts`} className=" hover:text-primary flex flex-col items-center justify-center text-text text-lg font-medium transition-colors duration-400 ease-in-out">
-                            <Image src={Desserts} alt='Pork' width={200} height={200} className='s size-56 object-cover   hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
+                            <Image src={Desserts} alt='desserts' width={200} height={200} className='s size-56 object-cover   hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
                             <div className="flex justify-center gap-x-1 items-center mt-[-30px] bg-white text-black w-full text-lg font-cairo font-bold py-1 uppercase">
                                     <h1>Desserts</h1>
-                                    <h1>({numberOfVeggies()})</h1>
+                                    <h1>({numberOfDesserts()})</h1>
                                 </div>
                         </Link>
                     </CardContent>
@@ -110,7 +113,7 @@ function Categories() {
                 <Card>
                     <CardContent className="flex aspect-square bg-gray-100 items-center justify-center p-6">
                         <Link href={`/Extras`} className=" hover:text-primary flex flex-col items-center justify-center text-text text-lg font-medium transition-colors duration-400 ease-in-out">
-                            <Image src={Extra} alt='Pork' width={200} height={200} className='s size-56 object-cover   hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
+                            <Image src={Extra} alt='Extras' width={200} height={200} className='s size-56 object-cover   hover:scale-105 transition-all duration-400 shadow-sm ease-in-out'/>
                             <div className="flex justify-center gap-x-1 items-center mt-[-30px] bg-white text-black w-full text-lg font-cairo font-bold py-1 uppercase">
                                 <h1>Extras</h1>
                                 <h1>({numberOfExtras()})</h1>

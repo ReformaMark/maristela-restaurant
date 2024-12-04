@@ -18,7 +18,7 @@ function CategoryPage({
     const allmenus = useQuery(api.menus.allMenus)
     const menus = allmenus?.filter(menu => menu.isArchived === false)
     const formattedCategoryName = params.categoryName.replace(/%20/g, ' ') .replace(/%26/g, '&'); 
-    console.log(formattedCategoryName)
+
   return (
     <div className='relative px-3 md:pt-16 sm:px-10 md:px-15 lg:px-24'>
       <SearchAndMenu/>

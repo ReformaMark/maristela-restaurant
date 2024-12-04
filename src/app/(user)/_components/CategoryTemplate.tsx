@@ -18,7 +18,7 @@ function CategoryTemplate({
 
   //if there is no item in the specific category.
   if(filteredMenus?.length === 0){
-    return
+    return <div className="w-full flex justify-center items-center min-h-[50vh] text-center text-lg text-gray-500">No available menu in the category: {categoryName}</div>;
   }
 
   return (
