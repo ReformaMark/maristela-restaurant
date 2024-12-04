@@ -7,6 +7,7 @@ import Logo from '@/../public/img/maristela.jpg'
 import Image from 'next/image'
 
 export default function PersonalizedRecommendation() {
+
     const personalizedRecommendation = useQuery(api.menus.personalizedRecommendation)
   return (
     <div>

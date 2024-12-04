@@ -275,52 +275,33 @@ export const archiveMenu = mutation({
 export const personalizedRecommendation = query({
     handler: async (ctx) => {
         const userId = await getAuthUserId(ctx);
-        if (userId === null) {
-            throw new Error("User not authenticated");
-        }
-
+        if (userId == null) return null;
+        
         const latestTransaction = await ctx.db.query('transactions').order('desc').first();
-        if (!latestTransaction) {
-            throw new Error("No transactions found");
-        }
 
-        const orders = latestTransaction.orders;
-        if (!orders || orders.length === 0) {
-            throw new Error("No orders found in the latest transaction");
-        }
+        if (!latestTransaction?.orders) return null;
+        const categories: string[] = [];
 
-        const categories = new Set<string>();
-        await asyncMap(orders, async (orderId) => {
+        // Only take the last 50 orders
+        const recentOrders = latestTransaction.orders.slice(0, 50);
+
+        await asyncMap(recentOrders, async (orderId) => {
             const order = await ctx.db.get(orderId);
-            if (!order) {
-                throw new Error(`Order with ID ${orderId} not found`);
-            }
-
-            const orderMenuId = order.menuId;
-            if (!orderMenuId) {
-                throw new Error(`Menu ID not found for order ${orderId}`);
-            }
-
+            const orderMenuId = order?.menuId;
+            if (!orderMenuId) return null;
             const menu = await ctx.db.get(orderMenuId);
-            if (!menu) {
-                throw new Error(`Menu with ID ${orderMenuId} not found`);
+            const category = menu?.category;
+            if (category && !categories.includes(category)) {
+                categories.push(category);
             }
-
-            const category = menu.category;
-            if (category) {
-                categories.add(category);
-            }
+            return { category, orderId }; // Extract category and orderId
         });
-
-        const topMenusByCategory = await asyncMap(Array.from(categories), async (category) => {
+        const topMenusByCategory = await asyncMap(categories, async (category) => {
             const menus = await ctx.db.query('menus').filter(q => q.eq(q.field('category'), category)).collect();
-            if (!menus || menus.length === 0) {
-                throw new Error(`No menus found for category ${category}`);
-            }
 
             const orderCounts = await asyncMap(menus, async (menu) => {
                 const menuId = menu._id;
-                const orders = await ctx.db.query('orders').filter(q => q.eq(q.field('menuId'), menuId)).collect();
+                const orders = await ctx.db.query('orders').filter(q => q.eq(q.field('menuId'), menuId)).order('desc').take(50);
                 return {
                     menuId,
                     numberOfOrders: orders.length,
@@ -331,24 +312,21 @@ export const personalizedRecommendation = query({
             const topThreeMenus = sortedOrderCounts.slice(0, 3);
             const topThree = await asyncMap(topThreeMenus, async ({ menuId }) => {
                 const menu = await ctx.db.get(menuId);
-                if (!menu) {
-                    throw new Error(`Menu with ID ${menuId} not found`);
-                }
-
                 const ratings = await getManyFrom(ctx.db, 'ratings', 'by_menu', menuId, "menuId");
+
                 const ratingsWithUser = await Promise.all(
                     ratings.map(async (rating) => {
                         const user = await ctx.db.get(rating.userId);
                         return {
                             ...rating,
-                            user: user || null,
+                            user: user ? user : null,
                         };
                     })
                 );
-
+          
                 return {
                     ...menu,
-                    ...(menu.imageId ? { url: await ctx.storage.getUrl(menu.imageId) } : {}),
+                    ...(menu?.imageId === undefined ? {} : { url: await ctx.storage.getUrl(menu.imageId) }),
                     ratings: ratingsWithUser,
                 };
             });
