@@ -289,7 +289,7 @@ export const personalizedRecommendation = query({
             throw new Error("No orders found in the latest transaction");
         }
         console.log(latestTransaction)
-        const categories: string[] = [];
+        let categories: string[] = [];
         await asyncMap(latestTransaction.orders, async (orderId) => {
             const order = await ctx.db.get(orderId);
             if (!order) {
@@ -313,20 +313,20 @@ export const personalizedRecommendation = query({
             return { category, orderId }; // Extract category and orderId
         });
 
-        // const topMenusByCategory = await asyncMap(categories, async (category) => {
-        //     const menus = await ctx.db.query('menus').filter(q => q.eq(q.field('category'), category)).collect();
-        //     if (!menus || menus.length === 0) {
-        //         throw new Error(`No menus found for category ${category}`);
-        //     }
-        //     console.log(menus)
-        //     const orderCounts = await asyncMap(menus, async (menu) => {
-        //         const menuId = menu._id;
-        //         const orders = await ctx.db.query('orders').filter(q => q.eq(q.field('menuId'), menuId)).collect();
-        //         return {
-        //             menuId,
-        //             numberOfOrders: orders.length,
-        //         };
-        //     });
+        const topMenusByCategory = await asyncMap(categories, async (category) => {
+            const menus = await ctx.db.query('menus').filter(q => q.eq(q.field('category'), category)).collect();
+            if (!menus || menus.length === 0) {
+                throw new Error(`No menus found for category ${category}`);
+            }
+            console.log(menus)
+            const orderCounts = await asyncMap(menus, async (menu) => {
+                const menuId = menu._id;
+                const orders = await ctx.db.query('orders').filter(q => q.eq(q.field('menuId'), menuId)).collect();
+                return {
+                    menuId,
+                    numberOfOrders: orders.length,
+                };
+            });
 
         //     const sortedOrderCounts = orderCounts.sort((a, b) => b.numberOfOrders - a.numberOfOrders);
         //     const topThreeMenus = sortedOrderCounts.slice(0, 3);
@@ -355,7 +355,7 @@ export const personalizedRecommendation = query({
         //     // });
 
         //     // return topThree;
-        // });
+        });
 
         return ;
     }
