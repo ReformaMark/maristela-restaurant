@@ -322,15 +322,15 @@ export const personalizedRecommendation = query({
             const orderCounts = await asyncMap(menus, async (menu) => {
                 const menuId = menu._id;
 
-                const orders = await ctx.db.query('orders')
-                    // .filter(q => q.eq(q.field('menuId'), menuId))
-                    .collect();
+                // const orders = await ctx.db.query('orders')
+                //     // .filter(q => q.eq(q.field('menuId'), menuId))
+                //     .collect();
             
-                if(!orders) return null
+                // if(!orders) return null
 
                 return {
                     menuId: menuId,
-                    orders: orders
+                    // orders: orders
                 };
             });
 
