@@ -316,7 +316,7 @@ export const personalizedRecommendation = query({
 
         console.log("categories: ",categories)
 
-        const topMenusByCategory = await Promise.all(categories.map(async (category) => {
+        // const topMenusByCategory = await Promise.all(categories.map(async (category) => {
         //     const menus = await ctx.db.query('menus').filter(q => q.eq(q.field('category'), category)).collect();
         //     if (!menus || menus.length === 0) {
         //         throw new Error(`No menus found for category ${category}`);
@@ -360,8 +360,8 @@ export const personalizedRecommendation = query({
         //     });
 
         // //     // return topThree;
-        }))
+        // }))
 
-        return {topMenusByCategory } ;
+        return ;
     }
 });
