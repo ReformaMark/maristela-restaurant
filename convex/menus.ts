@@ -316,50 +316,52 @@ export const personalizedRecommendation = query({
 
         console.log("categories: ",categories)
 
-        // const topMenusByCategory = await asyncMap(categories, async (category) => {
-        //     const menus = await ctx.db.query('menus').filter(q => q.eq(q.field('category'), category)).collect();
-        //     if (!menus || menus.length === 0) {
-        //         throw new Error(`No menus found for category ${category}`);
-        //     }
-        //     console.log(menus)
-        //     const orderCounts = await asyncMap(menus, async (menu) => {
-        //         const menuId = menu._id;
-        //         const orders = await ctx.db.query('orders').filter(q => q.eq(q.field('menuId'), menuId)).collect();
-        //         return {
-        //             menuId,
-        //             numberOfOrders: orders.length,
-        //         };
-        //     });
+        const topMenusByCategory = await asyncMap(categories, async (category) => {
+            const menus = await ctx.db.query('menus').filter(q => q.eq(q.field('category'), category)).collect();
+            if (!menus || menus.length === 0) {
+                throw new Error(`No menus found for category ${category}`);
+            }
+            // console.log(menus)
+            const orderCounts = await asyncMap(menus, async (menu) => {
+                const menuId = menu._id;
+                const orders = await ctx.db.query('orders').filter(q => q.eq(q.field('menuId'), menuId)).collect();
+                return {
+                    menuId,
+                    numberOfOrders: orders.length,
+                };
+            });
 
-        //     const sortedOrderCounts = orderCounts.sort((a, b) => b.numberOfOrders - a.numberOfOrders);
-        //     const topThreeMenus = sortedOrderCounts.slice(0, 3);
-        //     // const topThree = await asyncMap(topThreeMenus, async ({ menuId }) => {
-        //     //     const menu = await ctx.db.get(menuId);
-        //     //     if (!menu) {
-        //     //         throw new Error(`Menu with ID ${menuId} not found`);
-        //     //     }
+            return {menus, orderCounts}
 
-        //     //     const ratings = await getManyFrom(ctx.db, 'ratings', 'by_menu', menuId, "menuId");
-        //     //     const ratingsWithUser = await Promise.all(
-        //     //         ratings.map(async (rating) => {
-        //     //             const user = await ctx.db.get(rating.userId);
-        //     //             return {
-        //     //                 ...rating,
-        //     //                 user: user ? user : null,
-        //     // //             };
-        //     // //         })
-        //     // //     );
+            // const sortedOrderCounts = orderCounts.sort((a, b) => b.numberOfOrders - a.numberOfOrders);
+            // const topThreeMenus = sortedOrderCounts.slice(0, 3);
+            // const topThree = await asyncMap(topThreeMenus, async ({ menuId }) => {
+            //     const menu = await ctx.db.get(menuId);
+            //     if (!menu) {
+            //         throw new Error(`Menu with ID ${menuId} not found`);
+            //     }
 
-        //     // //     return {
-        //     // //         ...menu,
-        //     // //         ...(menu.imageId === undefined ? {} : { url: await ctx.storage.getUrl(menu.imageId) }),
-        //     // //         ratings: ratingsWithUser,
-        //     // //     };
-        //     // });
+            //     const ratings = await getManyFrom(ctx.db, 'ratings', 'by_menu', menuId, "menuId");
+            //     const ratingsWithUser = await Promise.all(
+            //         ratings.map(async (rating) => {
+            //             const user = await ctx.db.get(rating.userId);
+            //             return {
+            //                 ...rating,
+            //                 user: user ? user : null,
+            // //             };
+            // //         })
+            // //     );
 
-        // //     // return topThree;
-        // });
+            // //     return {
+            // //         ...menu,
+            // //         ...(menu.imageId === undefined ? {} : { url: await ctx.storage.getUrl(menu.imageId) }),
+            // //         ratings: ratingsWithUser,
+            // //     };
+            // });
 
-        return {userid: userId, latestTransaction: latestTransaction, categories:categories, s: s  } ;
+        //     // return topThree;
+        });
+
+        return {topMenusByCategory } ;
     }
 });
