@@ -9,7 +9,7 @@ import Image from 'next/image'
 export default function PersonalizedRecommendation() {
     const personalizedRecommendation = useQuery(api.menus.personalizedRecommendation)
 
-    if (!personalizedRecommendation || personalizedRecommendation.length < 1) return <></>
+    // if (!personalizedRecommendation || personalizedRecommendation.length < 1) return <></>
     
   return (
     <div>
@@ -17,7 +17,7 @@ export default function PersonalizedRecommendation() {
         <p className="text-gray-600 mt-2">
             Explore selections inspired by your recent choices, featuring the best flavors and refreshing experiences our guests enjoy!
         </p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mt-5">
+        {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mt-5">
         {personalizedRecommendation && personalizedRecommendation?.length > 0 ? personalizedRecommendation.map((rec) => (
             <div className='contents' key={rec?.[0]?._id} >
                 {rec?.map((item)=>(
@@ -38,7 +38,7 @@ export default function PersonalizedRecommendation() {
         )): (
             <></>
         )}
-        </div>
+        </div> */}
     </div>
   )
 }
