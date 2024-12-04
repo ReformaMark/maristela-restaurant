@@ -335,21 +335,12 @@ export const personalizedRecommendation = query({
                     throw new Error(`Menu with ID ${menuId} not found`);
                 }
 
-                const ratings = await getManyFrom(ctx.db, 'ratings', 'by_menu', menuId, "menuId");
-                const ratingsWithUser = await Promise.all(
-                    ratings.map(async (rating) => {
-                        const user = await ctx.db.get(rating.userId);
-                        return {
-                            ...rating,
-                            user: user ? user : null,
-                        };
-                    })
-                );
+       
 
                 return {
                     ...menu,
                     ...(menu.imageId === undefined ? {} : { url: await ctx.storage.getUrl(menu.imageId) }),
-                    ratings: ratingsWithUser,
+                   
                 };
             });
 
