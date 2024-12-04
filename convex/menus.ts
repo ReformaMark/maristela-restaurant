@@ -278,20 +278,21 @@ export const personalizedRecommendation = query({
         if (userId === null) {
             throw new Error("User not authenticated");
         }
-        console.log(userId)
 
         const latestTransaction = await ctx.db.query('transactions').order('desc').first();
         if (!latestTransaction) {
             throw new Error("No transactions found");
         }
-       
+
         if (!latestTransaction.orders || latestTransaction.orders.length === 0) {
             throw new Error("No orders found in the latest transaction");
         }
-        console.log(latestTransaction)
+        const orderIdArr: string[] = [];
+        const categoriesWithId = await asyncMap(latestTransaction.orders, async (orderId) => {
 
-        let categories: string[] = [];
-        const s = await asyncMap(latestTransaction.orders, async (orderId) => {
+            if (orderIdArr.includes(orderId)) return null;
+            orderIdArr.push(orderId);
+
             const order = await ctx.db.get(orderId);
             if (!order) {
                 throw new Error(`Order with ID ${orderId} not found`);
@@ -301,67 +302,61 @@ export const personalizedRecommendation = query({
             if (!orderMenuId) {
                 throw new Error(`Menu ID not found for order ${orderId}`);
             }
-            console.log(orderMenuId)
+
             const menu = await ctx.db.get(orderMenuId);
             if (!menu) {
                 throw new Error(`Menu with ID ${orderMenuId} not found`);
             }
-            console.log(menu)
+
             const category = menu.category;
-            if (category && !categories.includes(category)) {
-                categories.push(category);
-            }
-            return { orderMenuId, orderId, menu }; // Extract category and orderId
+       
+            return { category, orderId }; // Extract category and orderId
         });
 
-        console.log("categories: ",categories)
+        const topMenusByCategory = await asyncMap(categoriesWithId, async (category) => {
+            const menus = await ctx.db.query('menus').filter(q => q.eq(q.field('category'), category?.category)).collect();
+            if (!menus || menus.length === 0) {
+                throw new Error(`No menus found for category ${category}`);
+            }
 
-        // const topMenusByCategory = await Promise.all(categories.map(async (category) => {
-        //     const menus = await ctx.db.query('menus').filter(q => q.eq(q.field('category'), category)).collect();
-        //     if (!menus || menus.length === 0) {
-        //         throw new Error(`No menus found for category ${category}`);
-        //     }
-        //     // console.log(menus)
-        //     const orderCounts = await asyncMap(menus, async (menu) => {
-        //         const menuId = menu._id;
-        //         const orders = await ctx.db.query('orders').filter(q => q.eq(q.field('menuId'), menuId)).collect();
-        //         return {
-        //             menuId,
-        //             numberOfOrders: orders.length,
-        //         };
-        //     });
+            const orderCounts = await asyncMap(menus, async (menu) => {
+                const menuId = menu._id;
+                const orders = await ctx.db.query('orders').filter(q => q.eq(q.field('menuId'), menuId)).collect();
+                return {
+                    menuId,
+                    numberOfOrders: orders.length,
+                };
+            });
 
-        //     return {menus, orderCounts}
+            const sortedOrderCounts = orderCounts.sort((a, b) => b.numberOfOrders - a.numberOfOrders);
+            const topThreeMenus = sortedOrderCounts.slice(0, 3);
+            const topThree = await asyncMap(topThreeMenus, async ({ menuId }) => {
+                const menu = await ctx.db.get(menuId);
+                if (!menu) {
+                    throw new Error(`Menu with ID ${menuId} not found`);
+                }
 
-        //     const sortedOrderCounts = orderCounts.sort((a, b) => b.numberOfOrders - a.numberOfOrders);
-        //     const topThreeMenus = sortedOrderCounts.slice(0, 3);
-        //     const topThree = await asyncMap(topThreeMenus, async ({ menuId }) => {
-        //         const menu = await ctx.db.get(menuId);
-        //         if (!menu) {
-        //             throw new Error(`Menu with ID ${menuId} not found`);
-        //         }
+                const ratings = await getManyFrom(ctx.db, 'ratings', 'by_menu', menuId, "menuId");
+                const ratingsWithUser = await Promise.all(
+                    ratings.map(async (rating) => {
+                        const user = await ctx.db.get(rating.userId);
+                        return {
+                            ...rating,
+                            user: user ? user : null,
+                        };
+                    })
+                );
 
-        //         const ratings = await getManyFrom(ctx.db, 'ratings', 'by_menu', menuId, "menuId");
-        //         const ratingsWithUser = await Promise.all(
-        //             ratings.map(async (rating) => {
-        //                 const user = await ctx.db.get(rating.userId);
-        //                 return {
-        //                     ...rating,
-        //                     user: user ? user : null,
-        //     //             };
-        //     //         })
-        //     //     );
+                return {
+                    ...menu,
+                    ...(menu.imageId === undefined ? {} : { url: await ctx.storage.getUrl(menu.imageId) }),
+                    ratings: ratingsWithUser,
+                };
+            });
 
-        //     //     return {
-        //     //         ...menu,
-        //     //         ...(menu.imageId === undefined ? {} : { url: await ctx.storage.getUrl(menu.imageId) }),
-        //     //         ratings: ratingsWithUser,
-        //     //     };
-        //     });
+            return topThree;
+        });
 
-        // //     // return topThree;
-        // }))
-
-        return ;
+        return topMenusByCategory;
     }
 });
