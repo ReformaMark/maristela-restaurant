@@ -275,26 +275,48 @@ export const archiveMenu = mutation({
 export const personalizedRecommendation = query({
     handler: async (ctx) => {
         const userId = await getAuthUserId(ctx);
-        if (userId === null) return null;
-        console.log(userId)
+        if (userId === null) {
+            throw new Error("User not authenticated");
+        }
+
         const latestTransaction = await ctx.db.query('transactions').order('desc').first();
+        if (!latestTransaction) {
+            throw new Error("No transactions found");
+        }
 
-        if (!latestTransaction?.orders) return null;
+        if (!latestTransaction.orders || latestTransaction.orders.length === 0) {
+            throw new Error("No orders found in the latest transaction");
+        }
+
         const categories: string[] = [];
-
         await asyncMap(latestTransaction.orders, async (orderId) => {
             const order = await ctx.db.get(orderId);
-            const orderMenuId = order?.menuId;
-            if (!orderMenuId) return null;
+            if (!order) {
+                throw new Error(`Order with ID ${orderId} not found`);
+            }
+
+            const orderMenuId = order.menuId;
+            if (!orderMenuId) {
+                throw new Error(`Menu ID not found for order ${orderId}`);
+            }
+
             const menu = await ctx.db.get(orderMenuId);
-            const category = menu?.category;
+            if (!menu) {
+                throw new Error(`Menu with ID ${orderMenuId} not found`);
+            }
+
+            const category = menu.category;
             if (category && !categories.includes(category)) {
                 categories.push(category);
             }
             return { category, orderId }; // Extract category and orderId
         });
+
         const topMenusByCategory = await asyncMap(categories, async (category) => {
             const menus = await ctx.db.query('menus').filter(q => q.eq(q.field('category'), category)).collect();
+            if (!menus || menus.length === 0) {
+                throw new Error(`No menus found for category ${category}`);
+            }
 
             const orderCounts = await asyncMap(menus, async (menu) => {
                 const menuId = menu._id;
@@ -309,8 +331,11 @@ export const personalizedRecommendation = query({
             const topThreeMenus = sortedOrderCounts.slice(0, 3);
             const topThree = await asyncMap(topThreeMenus, async ({ menuId }) => {
                 const menu = await ctx.db.get(menuId);
-                const ratings = await getManyFrom(ctx.db, 'ratings', 'by_menu', menuId, "menuId");
+                if (!menu) {
+                    throw new Error(`Menu with ID ${menuId} not found`);
+                }
 
+                const ratings = await getManyFrom(ctx.db, 'ratings', 'by_menu', menuId, "menuId");
                 const ratingsWithUser = await Promise.all(
                     ratings.map(async (rating) => {
                         const user = await ctx.db.get(rating.userId);
@@ -320,16 +345,15 @@ export const personalizedRecommendation = query({
                         };
                     })
                 );
-          
+
                 return {
                     ...menu,
-                    ...(menu?.imageId === undefined ? {} : { url: await ctx.storage.getUrl(menu.imageId) }),
+                    ...(menu.imageId === undefined ? {} : { url: await ctx.storage.getUrl(menu.imageId) }),
                     ratings: ratingsWithUser,
                 };
             });
 
-
-            return topThree
+            return topThree;
         });
 
         return topMenusByCategory;

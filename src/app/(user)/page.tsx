@@ -39,7 +39,6 @@ function MenuPage() {
         <Categories/>
       </section>
       {/* Personalized Recommendations */}
-      {}
       <section>
         <PersonalizedRecommendation/>
       </section>
