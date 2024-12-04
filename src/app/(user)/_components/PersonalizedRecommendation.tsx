@@ -12,7 +12,7 @@ export default function PersonalizedRecommendation() {
   return (
     <div>
         <h1 className="font-cairo font-extrabold text-2xl text-gray-800">Popular Picks for You</h1>
-        <p className="text-gray-600 mt-2">
+        <p className="text-[0.5rem] md:text-xs text-gray-600 mt-2">
             Explore selections inspired by your recent choices, featuring the best flavors and refreshing experiences our guests enjoy!
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mt-5">
