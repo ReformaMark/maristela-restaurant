@@ -11,6 +11,8 @@ export default function PersonalizedRecommendation() {
 
     // if (!personalizedRecommendation || personalizedRecommendation.length < 1) return <></>
     
+
+    
     console.log(personalizedRecommendation)
   return (
     <div>
