@@ -324,8 +324,8 @@ export const personalizedRecommendation = query({
                 const orders = await ctx.db.query('orders')
                     .filter(q => q.eq(q.field('menuId'), menuId))
                     .collect();
-
-                if(!orders) return null
+                console.log(orders)
+                // if(!orders) return null
 
                 // const numberOfOrders = orders.length === 0 ? 0 : orders.length
 
