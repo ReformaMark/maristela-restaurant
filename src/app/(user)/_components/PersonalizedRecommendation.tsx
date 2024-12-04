@@ -2,9 +2,9 @@
 import { useQuery } from 'convex/react'
 import React from 'react'
 import { api } from '../../../../convex/_generated/api'
-import ProductCard from '@/components/ProductCard'
-import Logo from '@/../public/img/maristela.jpg'
-import Image from 'next/image'
+// import ProductCard from '@/components/ProductCard'
+// import Logo from '@/../public/img/maristela.jpg'
+// import Image from 'next/image'
 
 export default function PersonalizedRecommendation() {
     const personalizedRecommendation = useQuery(api.menus.personalizedRecommendation)
