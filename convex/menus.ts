@@ -313,7 +313,7 @@ export const personalizedRecommendation = query({
             return { category, orderId }; // Extract category and orderId
         });
 
-        console.log(categories)
+        console.log("categories: ",categories)
 
         // const topMenusByCategory = await asyncMap(categories, async (category) => {
         //     const menus = await ctx.db.query('menus').filter(q => q.eq(q.field('category'), category)).collect();
@@ -359,6 +359,6 @@ export const personalizedRecommendation = query({
         // //     // return topThree;
         // });
 
-        // return ;
+        return userId ;
     }
 });
