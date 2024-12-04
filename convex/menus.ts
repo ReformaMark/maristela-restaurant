@@ -319,14 +319,14 @@ export const personalizedRecommendation = query({
                 throw new Error(`No menus found for category ${category}`);
             }
 
-            // const orderCounts = await asyncMap(menus, async (menu) => {
-            //     const menuId = menu._id;
-            //     const orders = await ctx.db.query('orders').filter(q => q.eq(q.field('menuId'), menuId)).collect();
-            //     return {
-            //         menuId,
-            //         numberOfOrders: orders.length,
-            //     };
-            // });
+            const orderCounts = await asyncMap(menus, async (menu) => {
+                const menuId = menu._id;
+                const orders = await ctx.db.query('orders').filter(q => q.eq(q.field('menuId'), menuId)).collect();
+                return {
+                    menuId,
+                    numberOfOrders: orders.length === 0 ? 0 : orders.length,
+                };
+            });
 
             // const sortedOrderCounts = orderCounts.sort((a, b) => b.numberOfOrders - a.numberOfOrders);
             // const topThreeMenus = sortedOrderCounts.slice(0, 3);
