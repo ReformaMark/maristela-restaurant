@@ -312,7 +312,7 @@ export const personalizedRecommendation = query({
        
             return { category, orderId }; // Extract category and orderId
         });
-
+    
         const topMenusByCategory = await asyncMap(categoriesWithId, async (category) => {
             // const menus = await ctx.db.query('menus').filter(q => q.eq(q.field('category'), category?.category)).collect();
             // if (!menus || menus.length === 0) {
@@ -355,6 +355,7 @@ export const personalizedRecommendation = query({
             // });
 
             // return topThree;
+            return category?.category
         });
 
         return topMenusByCategory;
