@@ -37,7 +37,11 @@ function MenuPage() {
       <section className='w-full my-10'>
         <Categories/>
       </section>
+      {/* Personalized Recommendations */}
+      {}
+      <section>
 
+      </section>
       <section>
         <FeaturedProducts/>
       </section>

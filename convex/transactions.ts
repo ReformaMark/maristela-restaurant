@@ -137,10 +137,12 @@ export const createTransaction = mutation({
       v.literal('Completed'),
       v.literal('Cancelled'),
     ),
-    userId: v.id('users'),
+   
     shippingId: v.id('shippingAddress')
   },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if(userId === null) return
     // Generate a unique order ID
     const generateOrderId = () => {
       const chars = '123456789';
@@ -174,7 +176,7 @@ export const createTransaction = mutation({
       orders: args.orders,
       mop: args.mop,
       status: args.status,
-      userId: args.userId,
+      userId: userId,
       shippingId: args.shippingId,
       orderId: orderId
     });

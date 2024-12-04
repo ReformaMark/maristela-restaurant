@@ -1,9 +1,10 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const createShippinngAddress = mutation({
     args: {
-        userId: v.id('users'),
+       
         firstname: v.string(),
         lastName: v.string(),
         streetAddress: v.string(),
@@ -16,8 +17,10 @@ export const createShippinngAddress = mutation({
         isSaved: v.boolean(),
     },
     handler: async (ctx, args) => {
+        const userId = await getAuthUserId(ctx)
+        if (userId === null) return
         const shippingId = await ctx.db.insert("shippingAddress", {
-            userId: args.userId,
+            userId: userId,
             firstname: args.firstname,
             lastName: args.lastName,
             streetAddress: args.streetAddress,
@@ -36,12 +39,17 @@ export const createShippinngAddress = mutation({
 });
 
 export const getShippingAddresses = query({
-    args: {
-        userId: v.id('users'),
-    },
-    handler: async (ctx, args) => {
-        const shippingAddresses = await ctx.db.query("shippingAddress").filter(q => q.eq(q.field("userId"), args.userId) && q.eq(q.field("isSaved"), true)).collect()
-        return shippingAddresses
+ 
+    handler: async (ctx) => {
+        const userId = await getAuthUserId(ctx)
+        console.log(userId)
+        if (userId === null) return
+        const shippingAddresses = await ctx.db.query("shippingAddress")
+        .filter(q => q.eq(q.field("userId"), userId))
+        .filter(q => q.eq(q.field("isSaved"), true))
+        .collect()
+        
+        return shippingAddresses 
     }
 });
 

@@ -38,12 +38,11 @@ const shippingFormSchema = z.object({
 type ShippingFormValues = z.infer<typeof shippingFormSchema>
 
 function CheckoutPage() {
-    const user = useQuery(api.users.current)
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [showAddressForm, setShowAddressForm] = useState<boolean>(false)
     const [selectedAddressId, setSelectedAddressId] = useState<Id<"shippingAddress"> | null>(null)
     const cartItems = useQuery(api.cartItems.getCartItems)
-    const savedAddresses = useQuery(api.shippingAddress.getShippingAddresses, user?._id ? { userId: user._id } : "skip")
+    const savedAddresses = useQuery(api.shippingAddress.getShippingAddresses)
     const createOrder = useMutation(api.orders.createOrders)
     const createTransaction = useMutation(api.transactions.createTransaction)
     const createShippingAddress = useMutation(api.shippingAddress.createShippinngAddress)
@@ -63,13 +62,8 @@ function CheckoutPage() {
             province: "Batangas",
             address: "",
             phoneNumber: "",
-        }
+        } 
     })
-
-    if (!user) {
-        router.replace('/auth')
-        return
-    }
 
     function calcTotal(quantity?: number, price?: number) {
         return quantity && price ? quantity * price : 0
@@ -87,7 +81,6 @@ function CheckoutPage() {
 
         try {
             const id = await createShippingAddress({
-                userId: user._id,
                 firstname: data.firstname,
                 lastName: data.lastName,
                 streetAddress: data.streetAddress,
@@ -153,7 +146,6 @@ function CheckoutPage() {
                         quantity: item.quantity,
                         status: 'unconfirmed',
                         totalPrice: totalPrice,
-                        userId: user._id,
                     })
 
                     return ids || null
@@ -171,7 +163,6 @@ function CheckoutPage() {
                 status: 'Pending',
                 mop: 'COD',
                 shippingId: selectedAddressId,
-                userId: user._id,
             }), {
                 loading: 'Placing your order...',
                 success: "Order placed successfully!",
@@ -230,7 +221,7 @@ function CheckoutPage() {
                                                 <h1>{address.phoneNumber}</h1>
                                                 <>
                                                     {address?.apartmmentNumer && (
-                                                        <span>{address.apartmmentNumer}</span>
+                                                        <span>{address.apartmmentNumer} </span>
                                                     )}
                                                     {address.streetAddress && (
                                                         <span>{address?.streetAddress}</span>

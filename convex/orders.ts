@@ -16,12 +16,15 @@ export const createOrders = mutation({
             v.literal('unsuccessful'),
         ),
         totalPrice: v.number(),
-        userId: v.id('users'),
+       
     },
     handler: async (ctx, args) => {
+        const userId = await getAuthUserId(ctx)
+        if(userId === null) return
         // Insert the order into the "orders" collection
         const orderId = await ctx.db.insert("orders", {
             ...args,
+            userId: userId,
             menuName: args.menuName ?? "",
             orderDate: Date.now()
         });
