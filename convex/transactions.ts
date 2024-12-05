@@ -247,6 +247,57 @@ export const getAllTransactions = query({
   },
 });
 
+
+export const getAllTransactionByUser = query({
+  args: {
+    limit: v.number(),
+    cursor: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      return null;
+    }
+    const transactions = await ctx.db
+      .query("transactions")
+      .order("desc")
+      .filter(q => q.eq(q.field('userId'), userId))
+      .paginate({ numItems: args.limit, cursor: args.cursor || null });
+
+    const transactionWithDetails = await Promise.all(
+      transactions.page.map(async (transaction) => {
+        const user = await ctx.db.get(transaction.userId);
+        const shippingAddress = await ctx.db.get(transaction.shippingId);
+        const orders = await Promise.all(
+          transaction.orders.map(async (orderId) => {
+            const order = await ctx.db.get(orderId);
+            const menuItem = order?.menuId ? await ctx.db.get(order.menuId) : null;
+            const familyMeal = order?.familyMealId ? await ctx.db.get(order.familyMealId) : null;
+            return {
+              ...order,
+              menuItem,
+              familyMeal,
+            };
+          })
+        );
+
+        return {
+          ...transaction,
+          user,
+          shippingAddress,
+          orders,
+        };
+      })
+    );
+
+    return {
+      transactions: transactionWithDetails,
+      continueCursor: transactions.continueCursor,
+    };
+  },
+});
+
 export const cancelTransaction = mutation({
   args: {
     transactionId: v.id('transactions')
@@ -257,6 +308,26 @@ export const cancelTransaction = mutation({
       const transaction = await ctx.db.get(args.transactionId)
       if (transaction && transaction?.status === "Pending") {
         await ctx.db.patch(args.transactionId, { status: "Cancelled" });
+
+      } else {
+
+      }
+    } else {
+
+    }
+  }
+})
+
+export const completeTransaction = mutation({
+  args: {
+    transactionId: v.id('transactions')
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (userId !== null) {
+      const transaction = await ctx.db.get(args.transactionId)
+      if (transaction && transaction?.status === "Out for Delivery") {
+        await ctx.db.patch(args.transactionId, { status: "Completed" });
 
       } else {
 

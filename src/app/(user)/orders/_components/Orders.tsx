@@ -1,6 +1,6 @@
 'use client'
-import { useQuery } from 'convex/react'
-import React from 'react'
+import { useMutation, useQuery } from 'convex/react'
+import React, { useCallback, useState } from 'react'
 import { api } from '../../../../../convex/_generated/api'
 import { formatDate, formatPrice } from '@/lib/utils'
 import Link from 'next/link'
@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { CheckCircle, Clock, Truck, Check, XCircle } from 'lucide-react';
+import { Id } from '../../../../../convex/_generated/dataModel'
+import { Button } from '@/components/ui/button'
 
 export type StatusType = 'Pending' | 'Confirmed' | 'Out for Delivery' | 'Completed' | 'Cancelled';
 export const statusIcons: Record<StatusType, JSX.Element> = {
@@ -19,13 +21,24 @@ export const statusIcons: Record<StatusType, JSX.Element> = {
 };
 
 function Orders() {
-    const transactions = useQuery(api.transactions.getTransactions)
-    const pendingTransactions = transactions?.filter((transaction) => transaction?.status === 'Pending')
-    const confirmedTransactions = transactions?.filter((transaction) => transaction?.status === 'Confirmed')
-    const outForDeliveryTransactions = transactions?.filter((transaction) => transaction?.status === 'Out for Delivery')
-    const completedTransactions = transactions?.filter((transaction) => transaction?.status === 'Completed')
-    const cancelledTransactions = transactions?.filter((transaction) => transaction?.status === 'Cancelled')
+    const [limit, setLimit] = useState(10);
+    const [cursor, setCursor] = useState<string | null>(null);
+    const transactions = useQuery(api.transactions.getAllTransactionByUser, { limit, cursor: cursor || undefined});
+    const pendingTransactions = transactions?.transactions.filter((transaction) => transaction?.status === 'Pending')
+    const confirmedTransactions = transactions?.transactions.filter((transaction) => transaction?.status === 'Confirmed')
+    const outForDeliveryTransactions = transactions?.transactions.filter((transaction) => transaction?.status === 'Out for Delivery')
+    const completedTransactions = transactions?.transactions.filter((transaction) => transaction?.status === 'Completed')
+    const cancelledTransactions = transactions?.transactions.filter((transaction) => transaction?.status === 'Cancelled')
     const router = useRouter()
+ 
+    const loadMore = useCallback(() => {
+        if (transactions?.continueCursor) {
+        
+          setLimit((prevLimit) => prevLimit + 10);
+        }
+      }, [transactions?.continueCursor, 10]);
+
+   
     // eslint-disable-next-line
     const computeCost = (orders?: any[]) => {
         if (!orders) {
@@ -65,18 +78,23 @@ function Orders() {
             )
         }
 
-        return transactions.map((transaction) => (
-            <div key={transaction?._id} className='grid grid-cols-12 justify-evenly w-full'>
-                {transaction.status === "Pending" && <div className='col-span-2 text-[0.5rem] text-center font-semibold md:text-sm'>{transaction?.queuingNumber || ""}</div>}
-                <div className='col-span-2 text-[0.5rem] md:text-sm'>{transaction?.orderId}</div>
-                <div className='col-span-3 text-[0.5rem] md:text-sm'>{formatDate({convexDate: transaction?._creationTime ?? 0})}</div>
-                <div className='col-span-2 text-[0.5rem] md:text-sm'>{formatPrice(computeCost(transaction?.orders) + (status === 'Pending' ? 80 : 0))}</div>
-                <div className='col-span-2 text-[0.5rem] md:text-sm'>{transaction?.status}</div>
-                <div className='col-span-1 text-[0.5rem] md:text-sm'>
-                    <Link href={`/orders/${transaction?._id}`} className='text-yellow'>View</Link>
-                </div>
+        return ( 
+            <div className="space-y-10">
+                {transactions.map((transaction) => (
+                    <div key={transaction?._id} className='grid grid-cols-12 justify-evenly w-full'>
+                        {transaction.status === "Pending" && <div className='col-span-2 text-[0.5rem] text-center font-semibold md:text-sm'>{transaction?.queuingNumber || ""}</div>}
+                        <div className={`${transaction.status === "Pending" ? "col-span-2" : "col-span-4"}  text-[0.6rem] md:text-sm`}>{transaction?.orderId}</div>
+                        <div className='col-span-3 text-[0.5rem] md:text-sm'>{formatDate({convexDate: transaction?._creationTime ?? 0})}</div>
+                        <div className='col-span-2 text-[0.5rem] md:text-sm'>{formatPrice(computeCost(transaction?.orders) + (status === 'Pending' ? 80 : 0))}</div>
+                        <div className='col-span-2 text-[0.5rem] md:text-sm'>{transaction?.status}</div>
+                        <div className='col-span-1 text-[0.5rem] md:text-sm'>
+                            <Link href={`/orders/${transaction?._id}`} className='text-yellow'>View</Link>
+                        </div>
+                    </div>
+                ))}
+                <Button variant={'ghost'} className='w-full' onClick={loadMore}>See More...</Button>
             </div>
-        ))
+        )
     }
 
     return (
@@ -107,7 +125,7 @@ function Orders() {
                                     <div className='col-span-1 text-[0.6rem] md:text-sm'></div>
                                 </div>
                             </div>
-                            <div className='space-y-5'>
+                            <div className='space-y-10'>
                                 {renderTransactionList(
                                     status === 'Pending' ? pendingTransactions :
                                     status === 'Confirmed' ? confirmedTransactions :
@@ -116,7 +134,7 @@ function Orders() {
                                     cancelledTransactions,
                                     statusIcons[status as StatusType],
                                     status
-                                )}
+                                )}                        
                             </div>
                         </div>
                     </TabsContent>

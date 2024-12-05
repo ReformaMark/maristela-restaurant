@@ -31,7 +31,10 @@ function TransactionPage({
 }) {
     const transaction = useQuery(api.transactions.getTransaction, {transactionid: params.orderId})
     const cancel = useMutation(api.transactions.cancelTransaction)
+    const completeTransaction = useMutation(api.transactions.completeTransaction)
     const [isOpen, setIsOpen] = useState<boolean>(false)
+    const [openRecieved, setOpenRecieved] = useState<boolean>(false)
+    
     const currentStatus = transaction?.status
     const router = useRouter()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -53,10 +56,23 @@ function TransactionPage({
         toast.promise(cancel({transactionId: transaction._id}), {
             loading: 'Cancelling your order...',
             success: "Order cancelled successfully!",
-            error: 'Error occurred while cancellingg your order.',
+            error: 'Error occurred while cancelling your order.',
         })
        router.replace('/orders')
     }
+    const handleRecieved = () =>{
+        if(!transaction){
+            return null
+        }
+        toast.promise(completeTransaction({transactionId: transaction._id}), {
+            loading: 'Completing your order...',
+            success: "Order completed successfully!",
+            error: 'Error occurred while completing your order.',
+        })
+       router.replace('/orders')
+    }
+
+
 
   return (
     <div className='px-3 sm:px-10 md:px-15 lg:px-24 min-h-screen'>
@@ -274,6 +290,28 @@ function TransactionPage({
                                    <DialogFooter>
                                        <Button variant={'ghost'} onClick={()=> setIsOpen(false)} className='w-full md:w-1/4'>No</Button>
                                        <Button variant={'destructive'} onClick={handleCancel} className='w-full md:w-1/4'>Yes</Button>
+                                   </DialogFooter>
+                               </DialogContent>
+                           </Dialog>
+                           <h1 className='text-text text-xs text-right'>* You will not be able to cancel once the order is being confirmed.</h1>
+                       </div>
+                    ):(
+                        <></>
+                    )}
+                    {transaction && transaction.status === "Out for Delivery" ? (
+                        <div className="flex flex-col md:items-end md:justify-end mt-5">
+                           <Dialog open={openRecieved} onOpenChange={setOpenRecieved}>
+                               <DialogTrigger> <Button variant={'secondary'} onClick={()=> setOpenRecieved(true)} className=' border-2 tracking-widest text-primary font-bold border-primary p-2 bg-none'>Recieve Order</Button></DialogTrigger>
+                               <DialogContent>
+                                   <DialogHeader>
+                                   <DialogTitle>Recieved Order?</DialogTitle>
+                                   <DialogDescription>
+                                        Please confirm that you have received your order. Once confirmed, the order will be marked as complete and no further changes can be made.
+                                    </DialogDescription>
+                                   </DialogHeader>
+                                   <DialogFooter>
+                                       <Button variant={'ghost'} onClick={()=> setOpenRecieved(false)} className='w-full md:w-1/4'>No</Button>
+                                       <Button variant={'destructive'} onClick={handleRecieved} className='w-full md:w-1/4'>Yes</Button>
                                    </DialogFooter>
                                </DialogContent>
                            </Dialog>
