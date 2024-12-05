@@ -31,10 +31,10 @@ import { transactionColumns } from "./transaction-columns"
 type TransactionType = NonNullable<ReturnType<typeof useAllTransactions>['data']>[number];
 
 export const TransactionCard = () => {
-    const { data, isLoading, hasMore, loadMore, searchTransaction, resetSearch, isSearchActive, searchError } = useAllTransactions()
-    const [selectedTransaction, setSelectedTransaction] = useState<TransactionType | null>(null)
-    const [activeTab, setActiveTab] = useState("new")
-    const [searchInput, setSearchInput] = useState("")
+    const { data, isLoading, hasMore, loadMore, searchTransaction, resetSearch, isSearchActive, searchError } = useAllTransactions();
+    const [selectedTransaction, setSelectedTransaction] = useState<TransactionType | null>(null);
+    const [activeTab, setActiveTab] = useState("new");
+    const [searchInput, setSearchInput] = useState("");
 
     const filteredTransactions = useMemo(() => {
         if (activeTab === "new") {
@@ -43,6 +43,16 @@ export const TransactionCard = () => {
             return data?.filter(t => ["Completed", "Cancelled"].includes(t.status))
         }
     }, [data, activeTab])
+
+    const sortedFilteredTransactions = useMemo(() => {
+        if (!filteredTransactions) return [];
+        
+        return [...filteredTransactions].sort((a, b) => {
+            const aTime = parseFloat(String(a._creationTime));
+            const bTime = parseFloat(String(b._creationTime));
+            return aTime - bTime; // Ascending order (oldest first)
+        });
+    }, [filteredTransactions]);
 
     const { mutate, isPending } = useMutation({
         mutationFn: useConvexMutation(api.transactions.handleTransactionStatus),
@@ -64,28 +74,42 @@ export const TransactionCard = () => {
     })
 
     const handleStatusChange = async (newStatus: "Pending" | "Confirmed" | "Out for Delivery" | "Completed" | "Cancelled") => {
-        if (selectedTransaction) {
-            await mutate({
-                status: newStatus,
-                transactionId: selectedTransaction._id as Id<"transactions">
-            })
+        if (!selectedTransaction) return;
 
-            setSelectedTransaction(prev => prev ? { ...prev, status: newStatus } : null)
+        // Allow cancellation regardless of older pending transactions
+        if (newStatus !== "Cancelled") {
+            // Check for older pending transactions
+            const olderPendingTransaction = data?.find(t => 
+                t.status === "Pending" && 
+                parseFloat(String(t._creationTime)) < parseFloat(String(selectedTransaction._creationTime))
+            );
+
+            if (olderPendingTransaction) {
+                toast.error("Please process older pending transactions first.");
+                return;
+            }
         }
-    }
+
+        await mutate({
+            status: newStatus,
+            transactionId: selectedTransaction._id as Id<"transactions">
+        });
+
+        setSelectedTransaction(prev => prev ? { ...prev, status: newStatus } : null);
+    };
 
     const handleSearch = () => {
         if (searchInput) {
             try {
-                searchTransaction(searchInput as Id<"transactions">)
+                searchTransaction(searchInput);
             } catch (error) {
-                toast.error("Invalid transaction ID. Please enter a valid ID.")
-                console.error("Search error:", error)
+                toast.error("Invalid order ID. Please enter a valid ID.");
+                console.error("Search error:", error);
             }
         } else {
-            toast.error("Please enter a transaction ID to search.")
+            toast.error("Please enter an order ID to search.");
         }
-    }
+    };
 
     const handleReset = () => {
         resetSearch();
@@ -194,7 +218,7 @@ export const TransactionCard = () => {
                                     <DataTable
                                         // @ts-expect-error minor type mismatch
                                         columns={transactionColumns}
-                                        data={filteredTransactions as TransactionType[]}
+                                        data={sortedFilteredTransactions as TransactionType[]}
                                         onRowClick={(row) => setSelectedTransaction(row)}
                                         filter="status"
                                     />
@@ -224,7 +248,7 @@ export const TransactionCard = () => {
                     <CardHeader className="flex flex-col items-start bg-muted/50 truncate">
                         <CardTitle className='flex justify-between items-center truncate'>
                             <div className="flex-1 min-w-0">
-                                <span className="truncate">Order # {selectedTransaction?._id}</span>
+                                <span className="truncate">{selectedTransaction?.orderId}</span>
                             </div>
                         </CardTitle>
                         {selectedTransaction?._creationTime !== undefined ? (

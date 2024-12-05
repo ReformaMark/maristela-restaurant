@@ -98,7 +98,11 @@ const schema = defineSchema({
         userId: v.id('users'),
         shippingId: v.id('shippingAddress'),
         queuingNumber: v.optional(v.number()),
-    }).index('by_shippingId', ['shippingId']).index('by_userId', ['userId']),
+    }).index('by_shippingId', ['shippingId']).index('by_userId', ['userId'])
+        .searchIndex("search_orderId", {
+            searchField: "orderId",
+            filterFields: ["orderId"],
+        }),
 
     ratings: defineTable({
         stars: v.optional(v.number()),
@@ -107,7 +111,8 @@ const schema = defineSchema({
         menuId: v.id('menus'),
         transactionid: v.id('transactions'),
         isAnonymous: v.optional(v.boolean()),
-    }).index('by_menu', ['menuId']),
+    }).index('by_menu', ['menuId'])
+    ,
 
     cartItems: defineTable({
         menuId: v.optional(v.id('menus')),

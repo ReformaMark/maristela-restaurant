@@ -137,12 +137,12 @@ export const createTransaction = mutation({
       v.literal('Completed'),
       v.literal('Cancelled'),
     ),
-   
+
     shippingId: v.id('shippingAddress')
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx)
-    if(userId === null) return
+    if (userId === null) return
     // Generate a unique order ID
     const generateOrderId = () => {
       const chars = '123456789';
@@ -164,14 +164,14 @@ export const createTransaction = mutation({
     // Check if orderId already exists
     let orderId = generateOrderId();
     let isUnique = false;
-    
+
     while (!isUnique) {
       orderId = generateOrderId();
       const existing = await ctx.db
         .query("transactions")
         .filter(q => q.eq(q.field("orderId"), orderId))
         .first();
-      
+
       if (!existing) {
         isUnique = true;
       }
@@ -486,11 +486,11 @@ export const handleTransactionStatus = mutation({
     if (currentTransaction.status === "Pending" && (args.status === "Completed" || args.status === "Out for Delivery")) {
       throw new ConvexError("Transaction is only at pending, confirm it first");
     }
-    
+
     // If the new status is "Confirmed", we need to check stock and update totalUnitsSold
     if (args.status === "Confirmed") {
       let insufficientStockItems = [];
-      
+
       for (const orderId of currentTransaction.orders) {
         const order = await ctx.db.get(orderId);
         if (!order) continue;
@@ -556,7 +556,7 @@ export const handleTransactionStatus = mutation({
       message: `Your order with an id of ${currentTransaction.orderId} has been ${args.status}`,
       isRead: false,
       orderId: args.transactionId,
-   
+
     })
 
     if (args.status === "Completed") {
@@ -604,6 +604,55 @@ export const getTransactionById = query({
     }
 
     const transaction = await ctx.db.get(args.transactionId);
+
+    if (!transaction) {
+      return null;
+    }
+
+    // Fetch related data
+    const user = await ctx.db.get(transaction.userId);
+    const shippingAddress = await ctx.db.get(transaction.shippingId);
+    const orders = await Promise.all(
+      transaction.orders.map(async (orderId) => {
+        const order = await ctx.db.get(orderId);
+        const menuItem = order?.menuId ? await ctx.db.get(order.menuId) : null;
+        const familyMeal = order?.familyMealId ? await ctx.db.get(order.familyMealId) : null;
+        return {
+          ...order,
+          menuItem,
+          familyMeal,
+        };
+      })
+    );
+
+    return {
+      ...transaction,
+      user,
+      shippingAddress,
+      orders,
+    };
+  },
+});
+
+export const getTransactionByOrderId = query({
+  args: { orderId: v.string() },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      return null;
+    }
+
+    const currentUser = await ctx.db.get(userId);
+
+    if (currentUser?.role !== "admin") {
+      return null;
+    }
+
+    const transaction = await ctx.db
+      .query("transactions")
+      .filter(q => q.eq(q.field("orderId"), args.orderId))
+      .first();
 
     if (!transaction) {
       return null;

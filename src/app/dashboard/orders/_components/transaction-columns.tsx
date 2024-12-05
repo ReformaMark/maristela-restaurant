@@ -10,29 +10,33 @@ import { TransactionWithDetails } from "../../../../../data/transactions-data"
 
 export const transactionColumns: ColumnDef<TransactionWithDetails>[] = [
     {
-        accessorKey: "_id",
-        header: "Order ID",
+        accessorKey: "orderId",
+        header: () => {
+            return <div>Transaction ID</div>
+        },
+        cell: ({ row }) => {
+            return <div>{row.original.orderId}</div>
+        },
     },
     {
         accessorKey: "_creationTime",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Date
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            )
-        },
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")} // Changed from 'desc' to 'asc'
+            >
+                Date
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
         cell: ({ row }) => {
-            const orderDate = row.original.orders[0].orderDate;
-            if (orderDate) {
-                const formattedDate = format(new Date(orderDate), 'MM/dd/yyyy');
-                return formattedDate;
-            }
-            return 'N/A';
+            const timestamp = row.original._creationTime;
+            return format(new Date(timestamp), 'MM/dd/yyyy');
+        },
+        sortingFn: (rowA, rowB) => {
+            const aTime = parseFloat(String(rowA.original._creationTime));
+            const bTime = parseFloat(String(rowB.original._creationTime));
+            return bTime - aTime; // Reverse the comparison for ascending order
         },
     },
     {
