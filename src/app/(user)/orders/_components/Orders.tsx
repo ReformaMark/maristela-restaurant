@@ -22,7 +22,7 @@ export const statusIcons: Record<StatusType, JSX.Element> = {
 
 function Orders() {
     const [limit, setLimit] = useState(10);
-    const [cursor, setCursor] = useState<string | null>(null);
+    const [cursor] = useState<string | null>(null);
     const transactions = useQuery(api.transactions.getAllTransactionByUser, { limit, cursor: cursor || undefined});
     const pendingTransactions = transactions?.transactions.filter((transaction) => transaction?.status === 'Pending')
     const confirmedTransactions = transactions?.transactions.filter((transaction) => transaction?.status === 'Confirmed')
