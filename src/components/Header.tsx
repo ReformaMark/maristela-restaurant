@@ -166,9 +166,7 @@ function Header() {
                       <MdEmail className='size-5'/>
                       <h1 className='text-xs'>sombrereriadesandoval@gmail.com</h1>
                     </div>
-                    <div className="">
-                      <h1>Free Shipping for all Order of {formatPrice(500)}</h1>
-                    </div>
+                    
                   </div>
                 </div>
               </SheetDescription>

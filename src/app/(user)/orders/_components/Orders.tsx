@@ -67,7 +67,8 @@ function Orders() {
 
         return transactions.map((transaction) => (
             <div key={transaction?._id} className='grid grid-cols-12 justify-evenly w-full'>
-                <div className='col-span-4 text-[0.5rem] md:text-sm'>{transaction?.orderId}</div>
+                {transaction.status === "Pending" && <div className='col-span-2 text-[0.5rem] text-center font-semibold md:text-sm'>{transaction?.queuingNumber || ""}</div>}
+                <div className='col-span-2 text-[0.5rem] md:text-sm'>{transaction?.orderId}</div>
                 <div className='col-span-3 text-[0.5rem] md:text-sm'>{formatDate({convexDate: transaction?._creationTime ?? 0})}</div>
                 <div className='col-span-2 text-[0.5rem] md:text-sm'>{formatPrice(computeCost(transaction?.orders) + (status === 'Pending' ? 80 : 0))}</div>
                 <div className='col-span-2 text-[0.5rem] md:text-sm'>{transaction?.status}</div>
@@ -98,7 +99,8 @@ function Orders() {
                         <div>
                             <div className='text-text w-full my-5'>
                                 <div className='grid grid-cols-12 justify-evenly w-full'>
-                                    <div className='col-span-4 text-[0.6rem] md:text-sm'>Order ID</div>
+                                    {status === "Pending" && <div className='col-span-2 text-[0.6rem] text-center md:text-sm'>Queue No.</div>}
+                                    <div className={`${status === "Pending" ? "col-span-2" : "col-span-4"}  text-[0.6rem] md:text-sm`}>Order ID</div>
                                     <div className='col-span-3 text-[0.6rem] md:text-sm'>Date</div>
                                     <div className='col-span-2 text-[0.6rem] md:text-sm'>Cost</div>
                                     <div className='col-span-2 text-[0.6rem] md:text-sm'>Status</div>

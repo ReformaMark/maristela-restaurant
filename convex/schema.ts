@@ -97,6 +97,7 @@ const schema = defineSchema({
         orderId: v.optional(v.string()),
         userId: v.id('users'),
         shippingId: v.id('shippingAddress'),
+        queuingNumber: v.optional(v.number()),
     }).index('by_shippingId', ['shippingId']).index('by_userId', ['userId']),
 
     ratings: defineTable({

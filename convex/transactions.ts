@@ -156,6 +156,11 @@ export const createTransaction = mutation({
       return `Order#:${result}`;
     };
 
+    const getLatestTransaction = await ctx.db.query('transactions').order('desc').first()
+
+    const queuingNumber = (getLatestTransaction?.queuingNumber || 0) + 1; // Default to 1 if not found
+
+
     // Check if orderId already exists
     let orderId = generateOrderId();
     let isUnique = false;
@@ -178,7 +183,8 @@ export const createTransaction = mutation({
       status: args.status,
       userId: userId,
       shippingId: args.shippingId,
-      orderId: orderId
+      orderId: orderId,
+      queuingNumber: queuingNumber
     });
 
     return transactionId;
@@ -409,11 +415,11 @@ export const handleTransactionStatus = mutation({
     if (currentTransaction.status === "Pending" && (args.status === "Completed" || args.status === "Out for Delivery")) {
       throw new ConvexError("Transaction is only at pending, confirm it first");
     }
-
+    
     // If the new status is "Confirmed", we need to check stock and update totalUnitsSold
     if (args.status === "Confirmed") {
       let insufficientStockItems = [];
-
+      
       for (const orderId of currentTransaction.orders) {
         const order = await ctx.db.get(orderId);
         if (!order) continue;
@@ -431,7 +437,20 @@ export const handleTransactionStatus = mutation({
         // Cancel the transaction if there's not enough stock for any item
         await ctx.db.patch(args.transactionId, { status: "Cancelled" });
         // throw new ConvexError(`Insufficient stock for: ${insufficientStockItems.join(", ")}. Transaction cancelled.`);
-
+        const allTransactions = await ctx.db.query('transactions').order('desc').take(1000)
+        await Promise.all(
+          allTransactions.map(async (transaction) => {
+            if (transaction._id === args.transactionId) {
+              // Set queuing number to 0 for the current transaction
+              await ctx.db.patch(transaction._id, { queuingNumber: undefined });
+            } else if (transaction.queuingNumber !== undefined) {
+              // Reduce queuing number by 1 for all other transactions
+              await ctx.db.patch(transaction._id, {
+                queuingNumber: (transaction.queuingNumber as number) - 1,
+              });
+            }
+          })
+        );
         return {
           status: "Cancelled",
           message: `Insufficient stock for: ${insufficientStockItems.join(", ")}. Transaction cancelled.`,
@@ -459,6 +478,8 @@ export const handleTransactionStatus = mutation({
       status: args.status,
     });
 
+
+
     await ctx.db.insert('notifications', {
       userId: currentTransaction.userId,
       message: `Your order with an id of ${currentTransaction.orderId} has been ${args.status}`,
@@ -474,6 +495,20 @@ export const handleTransactionStatus = mutation({
         });
       }
     }
+    const allTransactions = await ctx.db.query('transactions').order('desc').take(1000)
+    await Promise.all(
+      allTransactions.map(async (transaction) => {
+        if (transaction._id === args.transactionId) {
+          // Set queuing number to 0 for the current transaction
+          await ctx.db.patch(transaction._id, { queuingNumber: undefined });
+        } else if (transaction.queuingNumber !== undefined) {
+          // Reduce queuing number by 1 for all other transactions
+          await ctx.db.patch(transaction._id, {
+            queuingNumber: (transaction.queuingNumber as number) - 1,
+          });
+        }
+      })
+    );
 
     return {
       transaction: updatedTransactionId,
